@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shri Brand · Product Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #fcf9f6;
+            font-family: 'Inter', sans-serif;
+            color: #2e2b27;
+            line-height: 1.5;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #4a3a2a;
+            border-bottom: 2px solid #eadbc5;
+            padding-bottom: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 i {
+            color: #b38b5f;
+            font-size: 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.8fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1000px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ─── Bulk Mode Banner ────────────────────────────────── */
+        .bulk-mode-banner {
+            background: linear-gradient(135deg, #4a8f6e 0%, #3a7858 100%);
+            border-radius: 20px;
+            padding: 1.2rem 1.8rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            box-shadow: 0 8px 20px rgba(58, 120, 88, 0.3);
+            display: none;
+        }
+
+        .bulk-mode-banner.active {
+            display: block;
+        }
+
+        .bulk-mode-banner h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bulk-mode-banner h3 i {
+            font-size: 1.5rem;
+        }
+
+        .bulk-progress {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            height: 8px;
+            margin: 0.8rem 0;
+            overflow: hidden;
+        }
+
+        .bulk-progress-bar {
+            background: white;
+            height: 100%;
+            border-radius: 50px;
+            transition: width 0.3s;
+        }
+
+        .bulk-info {
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .bulk-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 1rem;
+        }
+
+        .bulk-btn {
+            background: white;
+            color: #3a7858;
+            border: none;
+            border-radius: 30px;
+            padding: 0.6rem 1.4rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bulk-btn:hover {
+            background: #f0f0f0;
+            transform: scale(0.98);
+        }
+
+        .bulk-btn.danger {
+            background: #e04f3a;
+            color: white;
+        }
+
+        .bulk-btn.danger:hover {
+            background: #c84b3a;
+        }
+
+        /* ─── Form Card ────────────────────────────────────────── */
+        .form-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.8rem 1.8rem 2rem;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.03), 0 2px 8px rgba(85, 55, 30, 0.05);
+            border: 1px solid #f1e4d8;
+        }
+
+        .form-card h2 {
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #5e4b3a;
+        }
+
+        .form-row {
+            margin-bottom: 1.2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .form-row label {
+            width: 140px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #4d3e32;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-row label i {
+            width: 18px;
+            color: #a67c4f;
+        }
+
+        .form-field {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid #e6dbcf;
+            border-radius: 18px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            background: #fffcf9;
+            transition: 0.2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #b38b5f;
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(179, 139, 95, 0.08);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* ─── Image Slots ──────────────────────────────────────── */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            margin-top: 12px;
+        }
+
+        .image-slot {
+            background: #fcf6f0;
+            border: 2px dashed #dcc9b8;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+            min-height: 130px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .image-slot:hover {
+            border-color: #b38b5f;
+            background: #f9f0e6;
+        }
+
+        .image-slot.has-image {
+            border-style: solid;
+            border-color: #d4c0a9;
+            padding: 0;
+        }
+
+        .image-slot.removed {
+            opacity: 0.35;
+            border-color: #ccc;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .image-slot .slot-upload-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 0.8rem 0.4rem;
+        }
+
+        .image-slot .slot-upload-area i {
+            font-size: 1.4rem;
+            color: #b38b5f;
+        }
+
+        .image-slot .slot-label {
+            font-weight: 600;
+            color: #7a5e4a;
+            font-size: 0.8rem;
+        }
+
+        .image-slot input[type="file"] {
+            display: none;
+        }
+
+        .image-slot .current-img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+        }
+
+        /* Hover overlay for replace */
+        .image-slot .slot-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+            border-radius: 18px;
+        }
+
+        .image-slot:hover .slot-overlay {
+            opacity: 1;
+        }
+
+        .image-slot .slot-overlay i {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+
+        .image-slot .slot-overlay span {
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* X remove button — gallery only */
+        .slot-remove-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #c84b3a;
+            color: white;
+            border: 2px solid white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: 0.15s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+        }
+
+        .slot-remove-btn:hover {
+            background: #a8392a;
+            transform: scale(1.1);
+        }
+
+        /* Undo remove button */
+        .slot-undo-btn {
+            background: #4a8f6e;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: 0.15s;
+        }
+
+        .slot-undo-btn:hover {
+            background: #3a7858;
+        }
+
+        /* New file preview */
+        .image-slot .new-preview {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            display: none;
+        }
+
+        .image-slot .new-preview.show {
+            display: block;
+        }
+
+        .image-slot .slot-footer {
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 6px 4px;
+            color: #6a5d53;
+            width: 100%;
+            text-align: center;
+            background: #faf4ee;
+        }
+
+        .mandatory-badge {
+            background: #e04f3a;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 7px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .optional-badge {
+            background: #a7a08a;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 7px;
+            border-radius: 50px;
+        }
+
+        .replace-badge {
+            background: #4a8f6e;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 7px;
+            border-radius: 50px;
+            font-weight: 700;
+        }
+
+        .removed-badge {
+            background: #c84b3a;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 7px;
+            border-radius: 50px;
+            font-weight: 700;
+        }
+
+        /* ─── Buttons ──────────────────────────────────────────── */
+        .btn {
+            background: #8f6b4f;
+            border: none;
+            border-radius: 36px;
+            padding: 0.9rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #745a46;
+            transform: scale(0.99);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #fff2e7;
+            color: #5e4b3a;
+            border: 1px solid #e2cfc0;
+            margin-top: 0;
+            width: auto;
+        }
+
+        .btn-secondary:hover {
+            background: #fae8dc;
+        }
+
+        .btn-bulk {
+            background: #4a8f6e;
+            margin-top: 1rem;
+        }
+
+        .btn-bulk:hover {
+            background: #3a7858;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 1.8rem;
+            flex-wrap: wrap;
+        }
+
+        /* ─── Product Cards ────────────────────────────────────── */
+        .product-display {
+            background: transparent;
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-header h2 {
+            font-size: 1.6rem;
+            color: #4a3a2a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stats {
+            background: #eaddd2;
+            border-radius: 40px;
+            padding: 0.4rem 1.4rem;
+            font-weight: 600;
+            color: #3f332a;
+            font-size: 0.9rem;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.6rem;
+            max-height: 800px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 26px;
+            padding: 1.5rem 1.3rem;
+            border: 1px solid #f0e2d6;
+            box-shadow: 0 6px 14px rgba(58, 43, 31, 0.02);
+            transition: all 0.25s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            border-color: #c9ad93;
+            box-shadow: 0 16px 28px rgba(99, 69, 48, 0.06);
+        }
+
+        .card-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-weight: 600;
+            background: #eee7e0;
+            color: #3e362e;
+        }
+
+        .badge.featured {
+            background: #efd9c0;
+            color: #62462b;
+        }
+
+        .badge.stock {
+            background: #d3e0d3;
+            color: #1f4f3f;
+        }
+
+        .badge.low-stock {
+            background: #eac5b0;
+            color: #7a4a2a;
+        }
+
+        .badge.out-stock {
+            background: #d9b3a5;
+            color: #6a3326;
+        }
+
+        .product-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #3f2f24;
+            margin-bottom: 0.3rem;
+        }
+
+        .product-slug {
+            font-size: 0.75rem;
+            color: #85786b;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-area {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin: 0.6rem 0;
+        }
+
+        .current-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f3a3a;
+        }
+
+        .original-price {
+            font-size: 0.95rem;
+            color: #8f7a68;
+            text-decoration: line-through;
+        }
+
+        .discount {
+            background: #b34a3c;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .desc {
+            font-size: 0.9rem;
+            color: #5f5349;
+            margin: 0.5rem 0;
+            line-height: 1.45;
+            border-left: 3px solid #efdac8;
+            padding-left: 12px;
+        }
+
+        .meta-icons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #6a5d53;
+        }
+
+        .meta-icons i {
+            margin-right: 6px;
+            color: #b38b5f;
+        }
+
+        .image-thumb-group {
+            display: flex;
+            margin-top: 1rem;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .image-placeholder {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #f3ede8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #b38b5f;
+            font-size: 1.5rem;
+            border: 1px solid #ddcdc0;
+        }
+
+        .main-image-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #f3ede8;
+            object-fit: cover;
+            border: 1px solid #ddcdc0;
+        }
+
+        .extra-images span {
+            background: #efe1d6;
+            border-radius: 10px;
+            padding: 4px 8px;
+            font-size: 0.7rem;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.2rem;
+            border-top: 1px solid #eddacf;
+            padding-top: 1rem;
+        }
+
+        .edit-btn,
+        .delete-btn {
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px 14px;
+            border-radius: 30px;
+            transition: 0.2s;
+        }
+
+        .edit-btn {
+            color: #5c6b4b;
+            background: #ecf3e7;
+        }
+
+        .delete-btn {
+            color: #9f4a3a;
+            background: #ffe9e5;
+        }
+
+        .edit-btn:hover,
+        .delete-btn:hover {
+            opacity: 0.8;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            background: #fbf6f2;
+            border-radius: 28px;
+            padding: 3rem 2rem;
+            text-align: center;
+            color: #a38d7c;
+            font-size: 1.1rem;
+        }
+
+        /* ─── Notifications ────────────────────────────────────── */
+        .notification {
+            color: white;
+            border-radius: 100px;
+            padding: 0.6rem 1.6rem;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 1rem;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+            transition: opacity 0.3s;
+        }
+
+        .notification.success {
+            background: #3c6e4c;
+        }
+
+        .notification.error {
+            background: #b34a3a;
+        }
+
+        .notification.info {
+            background: #4a6e8f;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ─── Modal ────────────────────────────────────────────── */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.2s;
+        }
+
+        .modal-backdrop.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal h3 {
+            font-size: 1.3rem;
+            color: #3f2f24;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal p {
+            color: #6a5d53;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-actions button {
+            padding: 0.7rem 1.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+        }
+
+        .modal-cancel {
+            background: #f0e5da;
+            color: #5e4b3a;
+        }
+
+        .modal-confirm {
+            background: #c84b3a;
+            color: white;
+        }
+
+        .modal-cancel:hover {
+            background: #e5d7ca;
+        }
+
+        .modal-confirm:hover {
+            background: #a8392a;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1><i class="fas fa-cannabis"></i> Shri Brand · Product Admin</h1>
+        <div id="notification" class="notification" style="display: none;"></div>
+
+        <!-- Bulk Mode Banner -->
+        <div id="bulkBanner" class="bulk-mode-banner">
+            <h3><i class="fas fa-layer-group"></i> Bulk Insert Mode Active</h3>
+            <div class="bulk-progress">
+                <div id="bulkProgressBar" class="bulk-progress-bar" style="width: 0%;"></div>
+            </div>
+            <div class="bulk-info">
+                <span id="bulkStatus">Product 0 of 8</span>
+                <span id="bulkProductName">Ready to start</span>
+            </div>
+            <div class="bulk-controls">
+                <button class="bulk-btn" id="bulkSkipBtn"><i class="fas fa-forward"></i> Skip This</button>
+                <button class="bulk-btn danger" id="bulkCancelBtn"><i class="fas fa-times"></i> Cancel Bulk Mode</button>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- ═══ LEFT: FORM ═══ -->
+            <div class="form-card">
+                <h2><i class="fas fa-feather-alt"></i> <span id="formTitle">Add New Product</span></h2>
+                <form id="productForm" enctype="multipart/form-data" novalidate>
+                    <input type="hidden" id="productId" value="">
+
+                    <div class="form-row">
+                        <label><i class="fas fa-tag"></i> Name *</label>
+                        <div class="form-field"><input type="text" id="name" name="name" placeholder="e.g. Rose Divine"
+                                required></div>
+                    </div>
+                    <div class="form-row">
+                        <label><i class="fas fa-link"></i> Slug</label>
+                        <div class="form-field"><input type="text" id="slug" name="slug" placeholder="auto-generated">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label><i class="fas fa-barcode"></i> SKU</label>
+                        <div class="form-field"><input type="text" id="sku" name="sku" placeholder="auto-generated">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label><i class="fas fa-list"></i> Type / Cat.</label>
+                        <div class="form-field" style="display:flex;gap:12px;">
+                            <select id="productType" name="productType" style="flex:1;">
+                                <option value="single">single</option>
+                                <option value="combo">combo</option>
+                                <option value="gift">gift</option>
+                            </select>
+                            <select id="fragranceCategory" name="fragranceCategory" style="flex:1;">
+                                <option value="floral">floral</option>
+                                <option value="woody">woody</option>
+                                <option value="resin">resin</option>
+                                <option value="heritage">heritage</option>
+                                <option value="mixed">mixed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label><i class="fas fa-align-left"></i> Short desc *</label>
+                        <div class="form-field"><textarea id="shortDescription" name="shortDescription" maxlength="200"
+                                placeholder="Premium rose fragrance..." required></textarea></div>
+                    </div>
+                    <div class="form-row">
+                        <label><i class="fas fa-file-alt"></i> Full desc *</label>
+                        <div class="form-field"><textarea id="fullDescription" name="fullDescription" maxlength="2000"
+                                placeholder="Handcrafted using natural rose extracts..." required></textarea></div>
+                    </div>
+                    <div class="form-row">
+                        <label><i class="fas fa-coins"></i> Price / Orig</label>
+                        <div class="form-field" style="display:flex;gap:12px;">
+                            <input type="number" id="price" name="price" placeholder="Price" step="0.01" min="0"
+                                style="flex:1;" required>
+                            <input type="number" id="originalPrice" name="originalPrice" placeholder="Original"
+                                step="0.01" min="0" style="flex:1;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label><i class="fas fa-boxes"></i> Stock / Sold</label>
+                        <div class="form-field" style="display:flex;gap:12px;">
+                            <input type="number" id="stock" name="stock" placeholder="Stock" min="0" style="flex:1;">
+                            <input type="number" id="totalSold" name="totalSold" placeholder="Sold" min="0"
+                                style="flex:1;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label><i class="fas fa-weight-hanging"></i> Weight / Burn</label>
+                        <div class="form-field" style="display:flex;gap:12px;">
+                            <input type="text" id="weight" name="weight" placeholder="50g, 100ml..." style="flex:1;">
+                            <input type="text" id="burnTime" name="burnTime" placeholder="45 minutes" style="flex:1;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label><i class="fas fa-check-circle"></i> Stick count</label>
+                        <div class="form-field"><input type="number" id="stickCount" name="stickCount" placeholder="40"
+                                min="0"></div>
+                    </div>
+                    <div class="form-row">
+                        <label><i class="fas fa-check-double"></i> Used for</label>
+                        <div class="form-field"><input type="text" id="usedFor" name="usedFor"
+                                placeholder="pooja, meditation, relaxation"></div>
+                    </div>
+
+                    <!-- ═════ Image Section ═════ -->
+                    <div style="margin:1.8rem 0 1rem;border-top:1px dashed #dccbbd;padding-top:1.2rem;">
+                        <label style="font-weight:700;color:#4f3d31;">
+                            <i class="fas fa-camera-retro"></i> Product Images (1 main + up to 4 gallery)
+                        </label>
+                    </div>
+                    <div id="imageSlotsContainer" class="image-grid"></div>
+
+                    <div style="display:flex;gap:28px;margin:1.8rem 0 0.5rem;">
+                        <label style="display:flex;align-items:center;gap:6px;">
+                            <input type="checkbox" id="isFeatured" name="isFeatured" value="true"> <span>Featured</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:6px;">
+                            <input type="checkbox" id="isActive" name="isActive" value="true" checked>
+                            <span>Active</span>
+                        </label>
+                    </div>
+
+                    <div class="action-row">
+                        <button type="submit" class="btn" id="submitBtn"><i class="fas fa-save"></i> Save
+                            Product</button>
+                        <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;"><i
+                                class="fas fa-times"></i> Cancel</button>
+                    </div>
+
+                    <!-- Bulk Insert Button -->
+                    <button type="button" class="btn btn-bulk" id="startBulkBtn">
+                        <i class="fas fa-layer-group"></i> Start Bulk Insert (8 Fragrances)
+                    </button>
+                </form>
+            </div>
+
+            <!-- ═══ RIGHT: PRODUCT LIST ═══ -->
+            <div class="product-display">
+                <div class="product-header">
+                    <h2><i class="fas fa-asterisk"></i> Current Collection</h2>
+                    <span class="stats" id="productCount">0 items</span>
+                </div>
+                <div id="productGrid" class="card-grid">
+                    <div class="empty-state">
+                        <i class="fas fa-spa"
+                            style="font-size:2.4rem;opacity:0.5;margin-bottom:1rem;display:block;"></i>
+                        Loading products...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="modal-backdrop">
+        <div class="modal">
+            <h3><i class="fas fa-exclamation-triangle" style="color:#c84b3a;"></i> Delete Product</h3>
+            <p id="deleteModalText">Are you sure?</p>
+            <div class="modal-actions">
+                <button class="modal-cancel" id="deleteCancelBtn">Cancel</button>
+                <button class="modal-confirm" id="deleteConfirmBtn"><i class="fas fa-trash-alt"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const API_BASE = 'http://127.0.0.1:5000/api/v1/products';
+
+            // ═══════════════════════════════════════════════════════
+            // BULK PRODUCT DATA - 8 Fragrances
+            // ═══════════════════════════════════════════════════════
+            const BULK_PRODUCTS = [
+                {
+                    name: "Rose Incense",
+                    productType: "single",
+                    fragranceCategory: "floral",
+                    shortDescription: "Soft, devotional floral fragrance reminiscent of rose garlands offered to goddesses in South Indian temples",
+                    fullDescription: "Soft, devotional floral fragrance reminiscent of rose garlands offered to goddesses in South Indian temples. Perfect for daily puja, meditation, and creating a soothing home ambience. Also ideal for Durga Puja, Lakshmi Puja, and feminine spiritual spaces.",
+                    price: 20,
+                    originalPrice: 40,
+                    stock: 100,
+                    weight: "10g",
+                    burnTime: "45 minutes",
+                    stickCount: 20,
+                    usedFor: "pooja, meditation, relaxation"
+                },
+                {
+                    name: "Lavender Incense",
+                    productType: "single",
+                    fragranceCategory: "floral",
+                    shortDescription: "Calming and soothing aromatic notes bringing tranquility and relaxation to meditation practice",
+                    fullDescription: "Calming and soothing aromatic notes bringing tranquility and relaxation to meditation practice. Excellent for yoga spaces, personal prayer rooms, and bedtime spiritual rituals. Blended from traditional South Indian herbal essences.",
+                    price: 20,
+                    originalPrice: 40,
+                    stock: 100,
+                    weight: "10g",
+                    burnTime: "45 minutes",
+                    stickCount: 20,
+                    usedFor: "pooja, meditation, relaxation"
+                },
+                {
+                    name: "Champa Incense",
+                    productType: "single",
+                    fragranceCategory: "floral",
+                    shortDescription: "Traditional temple floral scent, iconic in South Indian shrine traditions",
+                    fullDescription: "Traditional temple floral scent, iconic in South Indian shrine traditions. Reminiscent of the ambience inside ancient Tamil temples and pilgrimage centers. Deeply spiritual, connecting to generations of devotional practice. Perfect for family puja and festive occasions.",
+                    price: 20,
+                    originalPrice: 40,
+                    stock: 100,
+                    weight: "10g",
+                    burnTime: "45 minutes",
+                    stickCount: 20,
+                    usedFor: "pooja, meditation, relaxation"
+                },
+                {
+                    name: "Sandal Incense",
+                    productType: "single",
+                    fragranceCategory: "woody",
+                    shortDescription: "Classic woody, sacred aroma highly revered in Hindu rituals and Vedic practices",
+                    fullDescription: "Classic woody, sacred aroma highly revered in Hindu rituals and Vedic practices. Specifically suited for homams, special poojas, and ceremonial occasions. Believed to enhance spiritual focus and inner clarity. Premium choice for serious meditation and mantra recitation.",
+                    price: 20,
+                    originalPrice: 40,
+                    stock: 100,
+                    weight: "10g",
+                    burnTime: "45 minutes",
+                    stickCount: 20,
+                    usedFor: "pooja, meditation, relaxation"
+                },
+                {
+                    name: "Javathu Incense",
+                    productType: "single",
+                    fragranceCategory: "heritage",
+                    shortDescription: "Traditional South Indian devotional fragrance with rich, distinctive character",
+                    fullDescription: "Traditional South Indian devotional fragrance with rich, distinctive character. Represents the aromatic heritage of Tamil Nadu and Dravidian temple traditions. Carries deep spiritual significance in South Indian customs. Perfect for connecting with ancestral and cultural spiritual roots.",
+                    price: 20,
+                    originalPrice: 40,
+                    stock: 100,
+                    weight: "10g",
+                    burnTime: "45 minutes",
+                    stickCount: 20,
+                    usedFor: "pooja, meditation, relaxation"
+                },
+                {
+                    name: "Sambrani Incense",
+                    productType: "single",
+                    fragranceCategory: "resin",
+                    shortDescription: "Temple-style resinous fragrance widely used in South Indian shrines with purifying properties",
+                    fullDescription: "Temple-style resinous fragrance widely used in South Indian shrines. Believed to have purifying and cleansing properties. Creates sacred ambience during rituals, ceremonies, and special occasions. Used in temple archana and spiritual purification practices.",
+                    price: 20,
+                    originalPrice: 40,
+                    stock: 100,
+                    weight: "10g",
+                    burnTime: "45 minutes",
+                    stickCount: 20,
+                    usedFor: "pooja, meditation, relaxation"
+                },
+                {
+                    name: "Malligai Incense",
+                    productType: "single",
+                    fragranceCategory: "floral",
+                    shortDescription: "Fragrance inspired by jasmine garlands and flowers offered to deities in Tamil temples",
+                    fullDescription: "Fragrance inspired by jasmine garlands and flowers offered to deities in Tamil temples. Fresh, floral, and deeply connected to South Indian temple rituals. Perfect for creating festive, celebratory spiritual ambience. Popular during festivals, weddings, and family gatherings.",
+                    price: 20,
+                    originalPrice: 40,
+                    stock: 100,
+                    weight: "10g",
+                    burnTime: "45 minutes",
+                    stickCount: 20,
+                    usedFor: "pooja, meditation, relaxation"
+                },
+                {
+                    name: "Thalampoo Incense",
+                    productType: "single",
+                    fragranceCategory: "floral",
+                    shortDescription: "Fragrance inspired by screw pine flowers traditionally used in South Indian worship",
+                    fullDescription: "Fragrance inspired by screw pine flowers traditionally used in South Indian worship. Delicate, unique aroma representing the botanical diversity of temple offerings. Carries spiritual connection to regional flora and Tamil temple practices. Ideal for those seeking traditional, culturally-rooted fragrance experience.",
+                    price: 20,
+                    originalPrice: 40,
+                    stock: 100,
+                    weight: "10g",
+                    burnTime: "45 minutes",
+                    stickCount: 20,
+                    usedFor: "pooja, meditation, relaxation"
+                }
+            ];
+
+            let products = [];
+            let isEditing = false;
+            let pendingDeleteId = null;
+            let currentImages = { main: null, gallery: [null, null, null, null] };
+            let removedSlots = new Set();
+
+            // Bulk mode state
+            let bulkModeActive = false;
+            let bulkCurrentIndex = 0;
+
+            const $ = (id) => document.getElementById(id);
+
+            const form = $('productForm');
+            const productIdField = $('productId');
+            const formTitle = $('formTitle');
+            const submitBtn = $('submitBtn');
+            const cancelEditBtn = $('cancelEditBtn');
+            const productGrid = $('productGrid');
+            const productCount = $('productCount');
+            const notification = $('notification');
+            const slotsContainer = $('imageSlotsContainer');
+            const deleteModal = $('deleteModal');
+
+            // Bulk mode elements
+            const bulkBanner = $('bulkBanner');
+            const bulkProgressBar = $('bulkProgressBar');
+            const bulkStatus = $('bulkStatus');
+            const bulkProductName = $('bulkProductName');
+            const startBulkBtn = $('startBulkBtn');
+            const bulkSkipBtn = $('bulkSkipBtn');
+            const bulkCancelBtn = $('bulkCancelBtn');
+
+            // ─── Slot Config ────────────────────────────────────────
+            const SLOT_CONFIG = [
+                { key: 'main', label: 'Main Image', fieldName: 'mainImage', canRemove: false },
+                { key: 'gallery0', label: 'Gallery 1', fieldName: 'galleryImage0', canRemove: true },
+                { key: 'gallery1', label: 'Gallery 2', fieldName: 'galleryImage1', canRemove: true },
+                { key: 'gallery2', label: 'Gallery 3', fieldName: 'galleryImage2', canRemove: true },
+                { key: 'gallery3', label: 'Gallery 4', fieldName: 'galleryImage3', canRemove: true },
+            ];
+
+            // ═══════════════════════════════════════════════════════
+            // BULK MODE FUNCTIONS
+            // ═══════════════════════════════════════════════════════
+            function startBulkMode() {
+                bulkModeActive = true;
+                bulkCurrentIndex = 0;
+                bulkBanner.classList.add('active');
+                startBulkBtn.style.display = 'none';
+                loadNextBulkProduct();
+                showNotification('Bulk insert mode started! Upload images and submit for each product.', 'info', 5000);
+            }
+
+            function loadNextBulkProduct() {
+                if (bulkCurrentIndex >= BULK_PRODUCTS.length) {
+                    completeBulkMode();
+                    return;
+                }
+
+                const product = BULK_PRODUCTS[bulkCurrentIndex];
+                
+                // Reset form for new product
+                resetForm();
+                
+                // Fill form with bulk product data
+                $('name').value = product.name;
+                $('productType').value = product.productType;
+                $('fragranceCategory').value = product.fragranceCategory;
+                $('shortDescription').value = product.shortDescription;
+                $('fullDescription').value = product.fullDescription;
+                $('price').value = product.price;
+                $('originalPrice').value = product.originalPrice;
+                $('stock').value = product.stock;
+                $('weight').value = product.weight;
+                $('burnTime').value = product.burnTime;
+                $('stickCount').value = product.stickCount;
+                $('usedFor').value = product.usedFor;
+                $('isActive').checked = true;
+                $('isFeatured').checked = false;
+
+                // Update bulk progress
+                const progress = ((bulkCurrentIndex + 1) / BULK_PRODUCTS.length) * 100;
+                bulkProgressBar.style.width = progress + '%';
+                bulkStatus.textContent = `Product ${bulkCurrentIndex + 1} of ${BULK_PRODUCTS.length}`;
+                bulkProductName.textContent = product.name;
+
+                // Update form title
+                formTitle.textContent = `Add Product ${bulkCurrentIndex + 1}/${BULK_PRODUCTS.length}: ${product.name}`;
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                showNotification(`Ready for ${product.name} - Please upload the main image and submit`, 'info', 4000);
+            }
+
+            function skipCurrentBulkProduct() {
+                if (confirm(`Skip ${BULK_PRODUCTS[bulkCurrentIndex].name}? You can add it manually later.`)) {
+                    bulkCurrentIndex++;
+                    loadNextBulkProduct();
+                }
+            }
+
+            function cancelBulkMode() {
+                if (confirm('Cancel bulk insert mode? Progress will be lost.')) {
+                    bulkModeActive = false;
+                    bulkCurrentIndex = 0;
+                    bulkBanner.classList.remove('active');
+                    startBulkBtn.style.display = 'block';
+                    resetForm();
+                    showNotification('Bulk mode cancelled', 'info');
+                }
+            }
+
+            function completeBulkMode() {
+                bulkModeActive = false;
+                bulkBanner.classList.remove('active');
+                startBulkBtn.style.display = 'block';
+                resetForm();
+                showNotification('🎉 Bulk insert completed! All products have been processed.', 'success', 6000);
+                fetchProducts();
+            }
+
+            // ─── Render Image Slots ─────────────────────────────────
+            function renderImageSlots() {
+                slotsContainer.innerHTML = SLOT_CONFIG.map((slot, idx) => {
+                    const currentUrl = getCurrentImageUrl(slot.key);
+                    const hasImage = !!currentUrl;
+                    const isRemoved = removedSlots.has(idx);
+                    const isGallery = slot.canRemove;
+
+                    let badgeClass, badgeText;
+                    if (isRemoved) {
+                        badgeClass = 'removed-badge';
+                        badgeText = 'will be removed';
+                    } else if (isEditing && hasImage) {
+                        badgeClass = 'replace-badge';
+                        badgeText = 'click to replace';
+                    } else if (isEditing) {
+                        badgeClass = 'optional-badge';
+                        badgeText = 'click to add';
+                    } else if (idx === 0) {
+                        badgeClass = 'mandatory-badge';
+                        badgeText = 'required';
+                    } else {
+                        badgeClass = 'optional-badge';
+                        badgeText = 'optional';
+                    }
+
+                    const fieldName = isEditing ? slot.fieldName : (idx === 0 ? 'mainImage' : 'images');
+
+                    let innerHtml = '';
+
+                    if (isRemoved) {
+                        innerHtml = `
+                        <div class="slot-upload-area">
+                            <i class="fas fa-trash-alt" style="color:#c84b3a;"></i>
+                            <span class="slot-label" style="color:#c84b3a;">Removed</span>
+                            <button type="button" class="slot-undo-btn" data-undo="${idx}">
+                                <i class="fas fa-undo"></i> Undo
+                            </button>
+                        </div>`;
+                    } else if (hasImage) {
+                        innerHtml = `
+                        <img class="current-img" src="${currentUrl}" alt="${slot.label}"
+                             onerror="this.style.display='none'">
+                        <div class="slot-overlay">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Replace</span>
+                        </div>
+                        ${isEditing && isGallery ? `<button type="button" class="slot-remove-btn" data-remove="${idx}" title="Remove this image"><i class="fas fa-times"></i></button>` : ''}`;
+                    } else {
+                        innerHtml = `
+                        <div class="slot-upload-area">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span class="slot-label">${slot.label}</span>
+                        </div>`;
+                    }
+
+                    return `<div class="image-slot ${hasImage && !isRemoved ? 'has-image' : ''} ${isRemoved ? 'removed' : ''}" data-slot-idx="${idx}">
+                    ${innerHtml}
+                    <img class="new-preview" id="preview_${idx}" alt="new">
+                    <input type="file" id="fileInput_${idx}" name="${fieldName}"
+                           accept="image/jpeg,image/png,image/webp" data-slot-idx="${idx}">
+                    <div class="slot-footer">
+                        ${slot.label} <span class="${badgeClass}">${badgeText}</span>
+                    </div>
+                </div>`;
+                }).join('');
+
+                slotsContainer.querySelectorAll('.image-slot').forEach(slotEl => {
+                    const idx = parseInt(slotEl.dataset.slotIdx);
+                    if (removedSlots.has(idx)) return;
+
+                    const fileInput = $(`fileInput_${idx}`);
+
+                    slotEl.addEventListener('click', (e) => {
+                        if (e.target.closest('.slot-remove-btn') || e.target.closest('.slot-undo-btn')) return;
+                        if (e.target === fileInput) return;
+                        fileInput.click();
+                    });
+
+                    fileInput.addEventListener('change', () => {
+                        const file = fileInput.files[0];
+                        const preview = $(`preview_${idx}`);
+                        const currentImg = slotEl.querySelector('.current-img');
+                        const uploadArea = slotEl.querySelector('.slot-upload-area');
+                        const overlay = slotEl.querySelector('.slot-overlay');
+                        const removeBtn = slotEl.querySelector('.slot-remove-btn');
+
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                preview.src = e.target.result;
+                                preview.classList.add('show');
+                                if (currentImg) currentImg.style.display = 'none';
+                                if (overlay) overlay.style.display = 'none';
+                                if (uploadArea) uploadArea.style.display = 'none';
+                                if (removeBtn) removeBtn.style.display = 'none';
+                                slotEl.classList.add('has-image');
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                });
+
+                slotsContainer.querySelectorAll('.slot-remove-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const idx = parseInt(btn.dataset.remove);
+                        removedSlots.add(idx);
+                        renderImageSlots();
+                    });
+                });
+
+                slotsContainer.querySelectorAll('.slot-undo-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const idx = parseInt(btn.dataset.undo);
+                        removedSlots.delete(idx);
+                        renderImageSlots();
+                    });
+                });
+            }
+
+            function getCurrentImageUrl(key) {
+                if (key === 'main') return currentImages.main;
+                const idx = parseInt(key.replace('gallery', ''));
+                return currentImages.gallery[idx] || null;
+            }
+
+            // ─── Notification ───────────────────────────────────────
+            function showNotification(text, type = 'success', duration = 4000) {
+                notification.textContent = text;
+                notification.className = `notification ${type}`;
+                notification.style.display = 'inline-block';
+                clearTimeout(notification._timer);
+                notification._timer = setTimeout(() => { notification.style.display = 'none'; }, duration);
+            }
+
+            function setSubmitLoading(loading) {
+                if (loading) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `<span class="spinner"></span> ${isEditing ? 'Updating...' : 'Saving...'}`;
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = isEditing
+                        ? '<i class="fas fa-pen-fancy"></i> Update Product'
+                        : '<i class="fas fa-save"></i> Save Product';
+                }
+            }
+
+            // ─── Reset Form ─────────────────────────────────────────
+            function resetForm() {
+                form.reset();
+                productIdField.value = '';
+                isEditing = false;
+                if (!bulkModeActive) {
+                    formTitle.textContent = 'Add New Product';
+                }
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Product';
+                submitBtn.disabled = false;
+                cancelEditBtn.style.display = 'none';
+                $('isActive').checked = true;
+                $('isFeatured').checked = false;
+                currentImages = { main: null, gallery: [null, null, null, null] };
+                removedSlots.clear();
+                renderImageSlots();
+            }
+
+            // ─── Fetch & Render Products ────────────────────────────
+            async function fetchProducts() {
+                try {
+                    const res = await fetch(API_BASE);
+                    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).message || `HTTP ${res.status}`);
+                    const json = await res.json();
+                    products = json.data || [];
+                    renderProductGrid();
+                    productCount.textContent = `${products.length} item${products.length !== 1 ? 's' : ''}`;
+                } catch (err) {
+                    productGrid.innerHTML = `<div class="empty-state">
+                    <i class="fas fa-exclamation-triangle" style="font-size:2rem;margin-bottom:1rem;display:block;color:#c84b3a;"></i>
+                    Failed to load.<br><small style="color:#a38d7c;">${err.message}</small>
+                </div>`;
+                }
+            }
+
+            function renderProductGrid() {
+                if (!products.length) {
+                    productGrid.innerHTML = `<div class="empty-state">
+                    <i class="fas fa-leaf" style="font-size:2rem;margin-bottom:1rem;display:block;"></i>
+                    No products yet. Create one ✨
+                </div>`;
+                    return;
+                }
+
+                productGrid.innerHTML = products.map(prod => {
+                    const id = prod._id || prod.id;
+                    const stockVal = prod.stock || 0;
+                    const isLow = stockVal <= (prod.lowStockThreshold || 10) && stockVal > 0;
+                    const isOut = stockVal === 0;
+                    const discount = prod.originalPrice && prod.originalPrice > prod.price
+                        ? Math.round(((prod.originalPrice - prod.price) / prod.originalPrice) * 100) : 0;
+                    const galleryCount = (prod.images && prod.images.length) || 0;
+                    const imageHtml = prod.mainImage
+                        ? `<img class="main-image-thumb" src="${prod.mainImage}" alt="${prod.name}"
+                           onerror="this.outerHTML='<div class=\\'image-placeholder\\'><i class=\\'fas fa-image\\'></i></div>';">`
+                        : `<div class="image-placeholder"><i class="fas fa-image"></i></div>`;
+
+                    return `<div class="product-card">
+                    <div class="card-badges">
+                        <span class="badge">${prod.fragranceCategory || 'floral'}</span>
+                        ${prod.productType !== 'single' ? `<span class="badge">${prod.productType}</span>` : ''}
+                        ${prod.isFeatured ? '<span class="badge featured"><i class="fas fa-star"></i> featured</span>' : ''}
+                        <span class="badge ${isOut ? 'out-stock' : isLow ? 'low-stock' : 'stock'}">${isOut ? 'out of stock' : isLow ? stockVal + ' (low)' : stockVal + ' in stock'}</span>
+                    </div>
+                    <div class="product-title">${prod.name || 'Unnamed'}</div>
+                    <div class="product-slug"><i class="fas fa-link"></i> ${prod.slug || 'no-slug'}</div>
+                    <div class="price-area">
+                        <span class="current-price">₹${prod.price || 0}</span>
+                        ${prod.originalPrice ? `<span class="original-price">₹${prod.originalPrice}</span>` : ''}
+                        ${discount > 0 ? `<span class="discount">-${discount}%</span>` : ''}
+                    </div>
+                    <div class="desc">${prod.shortDescription || 'No description'}</div>
+                    <div class="meta-icons">
+                        <span><i class="fas fa-weight-hanging"></i> ${prod.weight || '—'}</span>
+                        <span><i class="fas fa-clock"></i> ${prod.burnTime || '—'}</span>
+                        ${prod.stickCount ? `<span><i class="fas fa-arrows-alt-h"></i> ${prod.stickCount} sticks</span>` : ''}
+                        ${prod.totalSold ? `<span><i class="fas fa-chart-line"></i> ${prod.totalSold} sold</span>` : ''}
+                    </div>
+                    <div class="image-thumb-group">
+                        ${imageHtml}
+                        ${galleryCount > 0 ? `<div class="extra-images"><span><i class="fas fa-images"></i> +${galleryCount} gallery</span></div>` : ''}
+                    </div>
+                    <div style="font-size:0.8rem;margin-top:0.3rem;color:#8f7665;"><i class="fas fa-tag"></i> ${prod.sku || 'NO-SKU'}</div>
+                    <div class="card-footer">
+                        <button class="edit-btn" data-action="edit" data-id="${id}"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="delete-btn" data-action="delete" data-id="${id}" data-name="${prod.name || 'this product'}"><i class="fas fa-trash-alt"></i> Delete</button>
+                    </div>
+                </div>`;
+                }).join('');
+            }
+
+            // ─── Edit Product ───────────────────────────────────────
+            async function editProduct(id) {
+                // Cancel bulk mode if active
+                if (bulkModeActive) {
+                    if (!confirm('Exit bulk mode to edit this product?')) return;
+                    cancelBulkMode();
+                }
+
+                try {
+                    const res = await fetch(`${API_BASE}/${id}`);
+                    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).message || `HTTP ${res.status}`);
+                    const prod = (await res.json()).data;
+                    if (!prod) throw new Error('Product not found');
+
+                    productIdField.value = prod._id || prod.id;
+                    $('name').value = prod.name || '';
+                    $('slug').value = prod.slug || '';
+                    $('sku').value = prod.sku || '';
+                    $('productType').value = prod.productType || 'single';
+                    $('fragranceCategory').value = prod.fragranceCategory || 'floral';
+                    $('shortDescription').value = prod.shortDescription || '';
+                    $('fullDescription').value = prod.fullDescription || '';
+                    $('price').value = prod.price || '';
+                    $('originalPrice').value = prod.originalPrice || '';
+                    $('stock').value = prod.stock ?? '';
+                    $('totalSold').value = prod.totalSold ?? '';
+                    $('weight').value = prod.weight || '';
+                    $('burnTime').value = prod.burnTime || '';
+                    $('stickCount').value = prod.stickCount || '';
+                    $('usedFor').value = Array.isArray(prod.usedFor) ? prod.usedFor.join(', ') : (prod.usedFor || '');
+                    $('isFeatured').checked = !!prod.isFeatured;
+                    $('isActive').checked = prod.isActive !== false;
+
+                    currentImages.main = prod.mainImage || null;
+                    currentImages.gallery = [
+                        (prod.images && prod.images[0]) || null,
+                        (prod.images && prod.images[1]) || null,
+                        (prod.images && prod.images[2]) || null,
+                        (prod.images && prod.images[3]) || null,
+                    ];
+
+                    removedSlots.clear();
+                    isEditing = true;
+                    formTitle.textContent = 'Edit Product';
+                    submitBtn.innerHTML = '<i class="fas fa-pen-fancy"></i> Update Product';
+                    cancelEditBtn.style.display = 'inline-block';
+
+                    renderImageSlots();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    showNotification('Click images to replace. Use ✕ to remove gallery images.', 'info');
+                } catch (err) {
+                    showNotification(`Could not load product: ${err.message}`, 'error');
+                }
+            }
+
+            // ─── Delete Product ─────────────────────────────────────
+            function confirmDelete(id, name) {
+                pendingDeleteId = id;
+                $('deleteModalText').textContent = `Are you sure you want to delete "${name}"? Images will also be removed from Cloudinary.`;
+                deleteModal.classList.add('visible');
+            }
+
+            async function executeDelete() {
+                if (!pendingDeleteId) return;
+                const id = pendingDeleteId;
+                deleteModal.classList.remove('visible');
+                try {
+                    const res = await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
+                    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).message || `HTTP ${res.status}`);
+                    showNotification('Product deleted', 'success');
+                    if (productIdField.value === id) resetForm();
+                    await fetchProducts();
+                } catch (err) {
+                    showNotification(`Delete failed: ${err.message}`, 'error');
+                } finally {
+                    pendingDeleteId = null;
+                }
+            }
+
+            $('deleteCancelBtn').addEventListener('click', () => { deleteModal.classList.remove('visible'); pendingDeleteId = null; });
+            $('deleteConfirmBtn').addEventListener('click', executeDelete);
+            deleteModal.addEventListener('click', (e) => { if (e.target === deleteModal) { deleteModal.classList.remove('visible'); pendingDeleteId = null; } });
+
+            // ─── Grid Delegation ────────────────────────────────────
+            productGrid.addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-action]');
+                if (!btn) return;
+                if (btn.dataset.action === 'edit') editProduct(btn.dataset.id);
+                else if (btn.dataset.action === 'delete') confirmDelete(btn.dataset.id, btn.dataset.name);
+            });
+
+            // ─── Form Submit ────────────────────────────────────────
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = productIdField.value;
+
+                const mainFileInput = $('fileInput_0');
+                if (!id && (!mainFileInput || !mainFileInput.files[0])) {
+                    showNotification('Main image is required when creating a new product.', 'error');
+                    return;
+                }
+
+                setSubmitLoading(true);
+
+                const formData = new FormData();
+
+                const textFields = [
+                    'name', 'slug', 'sku', 'productType', 'fragranceCategory',
+                    'shortDescription', 'fullDescription', 'price', 'originalPrice',
+                    'stock', 'totalSold', 'weight', 'burnTime', 'stickCount', 'usedFor',
+                ];
+                textFields.forEach(field => {
+                    const val = $(field).value.trim();
+                    if (val) formData.append(field, val);
+                });
+
+                formData.append('isFeatured', $('isFeatured').checked ? 'true' : 'false');
+                formData.append('isActive', $('isActive').checked ? 'true' : 'false');
+
+                SLOT_CONFIG.forEach((slot, idx) => {
+                    if (removedSlots.has(idx)) return;
+                    const fileInput = $(`fileInput_${idx}`);
+                    if (fileInput && fileInput.files[0]) {
+                        formData.append(fileInput.name, fileInput.files[0]);
+                    }
+                });
+
+                if (isEditing && removedSlots.size > 0) {
+                    const galleryRemoveIndices = [];
+                    removedSlots.forEach(slotIdx => {
+                        if (slotIdx >= 1 && slotIdx <= 4) {
+                            galleryRemoveIndices.push(slotIdx - 1);
+                        }
+                    });
+                    if (galleryRemoveIndices.length > 0) {
+                        formData.append('removeGalleryImages', galleryRemoveIndices.join(','));
+                    }
+                }
+
+                const method = id ? 'PUT' : 'POST';
+                const url = id ? `${API_BASE}/${id}` : API_BASE;
+
+                try {
+                    const res = await fetch(url, { method, body: formData });
+                    const json = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(json.message || `Server error (${res.status})`);
+
+                    showNotification(
+                        id ? '✅ Product updated!' : '✅ Product created!',
+                        'success'
+                    );
+                    
+                    // If in bulk mode, move to next product
+                    if (bulkModeActive && !id) {
+                        bulkCurrentIndex++;
+                        loadNextBulkProduct();
+                    } else {
+                        resetForm();
+                    }
+                    
+                    await fetchProducts();
+                } catch (err) {
+                    showNotification(`Save failed: ${err.message}`, 'error', 6000);
+                } finally {
+                    setSubmitLoading(false);
+                }
+            });
+
+            cancelEditBtn.addEventListener('click', resetForm);
+
+            // ═══════════════════════════════════════════════════════
+            // BULK MODE EVENT LISTENERS
+            // ═══════════════════════════════════════════════════════
+            startBulkBtn.addEventListener('click', startBulkMode);
+            bulkSkipBtn.addEventListener('click', skipCurrentBulkProduct);
+            bulkCancelBtn.addEventListener('click', cancelBulkMode);
+
+            // ─── Init ───────────────────────────────────────────────
+            renderImageSlots();
+            fetchProducts();
+        })();
+    </script>
+</body>
+
+</html>

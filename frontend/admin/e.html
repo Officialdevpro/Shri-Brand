@@ -1,0 +1,1350 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeoAnalytics | Real-Time Dashboard</title>
+
+    <!-- Fonts & Icons -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      :root {
+        /* Dark Theme (Default) */
+        --bg-primary: #0a0e17;
+        --bg-secondary: #121828;
+        --bg-card: rgba(18, 24, 40, 0.8);
+        --bg-glass: rgba(255, 255, 255, 0.05);
+        --border: rgba(56, 70, 120, 0.4);
+        --border-light: rgba(99, 102, 241, 0.3);
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --accent-primary: #6366f1;
+        --accent-secondary: #22d3ee;
+        --accent-success: #10b981;
+        --accent-warning: #f59e0b;
+        --accent-danger: #ef4444;
+        --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.2);
+        --radius-lg: 24px;
+        --radius-md: 16px;
+        --radius-sm: 10px;
+      }
+
+      /* Light Theme Variables */
+      [data-theme="light"] {
+        --bg-primary: #f8fafc;
+        --bg-secondary: #e2e8f0;
+        --bg-card: rgba(255, 255, 255, 0.9);
+        --bg-glass: rgba(0, 0, 0, 0.05);
+        --border: rgba(203, 213, 225, 0.8);
+        --border-light: rgba(99, 102, 241, 0.4);
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+      }
+
+      body {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* Theme Toggle */
+      .theme-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--shadow-glow);
+        backdrop-filter: blur(10px);
+      }
+
+      .theme-toggle i {
+        font-size: 20px;
+        color: var(--accent-primary);
+      }
+
+      .theme-toggle:hover {
+        transform: rotate(30deg);
+        transition: transform 0.3s ease;
+      }
+
+      /* Main Container */
+      .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 24px;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Header */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .header-left h1 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 36px;
+        font-weight: 700;
+        background: linear-gradient(
+          90deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .header-left p {
+        color: var(--text-secondary);
+        font-size: 16px;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .real-time-badge {
+        background: linear-gradient(90deg, var(--accent-success), #22c55e);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .date-time {
+        text-align: right;
+      }
+
+      .date {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .time {
+        font-size: 32px;
+        font-weight: 700;
+        background: linear-gradient(
+          90deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      /* Stats Grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+      }
+
+      .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 28px;
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--border-light);
+        box-shadow: var(--shadow-glow);
+      }
+
+      .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+      }
+
+      .stat-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        background: linear-gradient(
+          135deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+        color: white;
+        box-shadow: var(--shadow-glow);
+      }
+
+      .stat-content {
+        margin-bottom: 20px;
+      }
+
+      .stat-value {
+        font-size: 42px;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+
+      .stat-change {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .stat-change.positive {
+        color: var(--accent-success);
+      }
+
+      .stat-change.negative {
+        color: var(--accent-danger);
+      }
+
+      .stat-trend {
+        height: 4px;
+        background: rgba(128, 128, 128, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-top: 12px;
+      }
+
+      .trend-fill {
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+        border-radius: 2px;
+        transition: width 1.5s ease;
+      }
+
+      /* Main Dashboard Grid */
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+      }
+
+      @media (max-width: 1200px) {
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Charts */
+      .chart-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 28px;
+        backdrop-filter: blur(10px);
+        height: 100%;
+        transition: all 0.3s ease;
+      }
+
+      .chart-card:hover {
+        border-color: var(--border-light);
+        box-shadow: var(--shadow-glow);
+      }
+
+      .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .chart-header h2 {
+        font-size: 20px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .chart-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .time-filter {
+        display: flex;
+        gap: 8px;
+        background: var(--bg-glass);
+        padding: 6px;
+        border-radius: var(--radius-md);
+      }
+
+      .time-btn {
+        padding: 8px 16px;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        border-radius: var(--radius-sm);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .time-btn:hover {
+        color: var(--text-primary);
+        background: var(--bg-glass);
+      }
+
+      .time-btn.active {
+        background: linear-gradient(
+          135deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+        color: white;
+        box-shadow: var(--shadow-glow);
+      }
+
+      select.time-btn {
+        padding: 8px 16px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        color: var(--text-primary);
+      }
+
+      .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+      }
+
+      /* Second Row Grid */
+      .second-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-bottom: 24px;
+      }
+
+      @media (max-width: 768px) {
+        .second-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Mini Stats */
+      .mini-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      .mini-stat {
+        background: var(--bg-glass);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .mini-stat:hover {
+        background: var(--bg-card);
+        transform: translateY(-4px);
+        border-color: var(--border-light);
+      }
+
+      .mini-stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .mini-stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Top Products */
+      .top-products {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 28px;
+        backdrop-filter: blur(10px);
+      }
+
+      .product-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .product-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px;
+        background: var(--bg-glass);
+        border-radius: var(--radius-md);
+        transition: all 0.3s ease;
+      }
+
+      .product-item:hover {
+        background: var(--bg-card);
+        transform: translateX(4px);
+      }
+
+      .product-rank {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        background: linear-gradient(
+          135deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+        color: white;
+      }
+
+      .product-info {
+        flex: 1;
+      }
+
+      .product-name {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .product-stats {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .product-sales {
+        font-size: 14px;
+        color: var(--text-secondary);
+      }
+
+      .product-growth {
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background: rgba(16, 185, 129, 0.2);
+        color: var(--accent-success);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 1024px) {
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .mini-stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 16px;
+        }
+
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 20px;
+        }
+
+        .header-right {
+          width: 100%;
+          justify-content: space-between;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .mini-stats {
+          grid-template-columns: 1fr;
+        }
+
+        .chart-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .chart-actions {
+          width: 100%;
+        }
+
+        .time-filter {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .stat-value {
+          font-size: 32px;
+        }
+
+        .time {
+          font-size: 24px;
+        }
+
+        .header-left h1 {
+          font-size: 28px;
+        }
+      }
+
+      /* Activity Feed */
+      .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        max-height: 320px;
+        overflow-y: auto;
+        padding-right: 10px;
+      }
+
+      .activity-list::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .activity-list::-webkit-scrollbar-track {
+        background: var(--bg-glass);
+        border-radius: 3px;
+      }
+
+      .activity-list::-webkit-scrollbar-thumb {
+        background: var(--accent-primary);
+        border-radius: 3px;
+      }
+
+      .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px;
+        background: var(--bg-glass);
+        border-radius: var(--radius-md);
+        border-left: 4px solid var(--accent-primary);
+        transition: all 0.3s ease;
+        animation: slideIn 0.5s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .activity-item:hover {
+        background: var(--bg-card);
+        transform: translateX(4px);
+      }
+
+      .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        background: linear-gradient(
+          135deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+        color: white;
+      }
+
+      .activity-content {
+        flex: 1;
+      }
+
+      .activity-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .activity-time {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="themeToggle">
+      <i class="fas fa-moon"></i>
+    </div>
+
+    <div class="dashboard-container">
+      <!-- Header -->
+      <header class="dashboard-header">
+        <div class="header-left">
+          <h1><i class="fas fa-chart-network"></i> NeoAnalytics Dashboard</h1>
+          <p>
+            Real-time business intelligence & analytics
+            <span class="real-time-badge">
+              <i class="fas fa-bolt"></i> LIVE
+            </span>
+          </p>
+        </div>
+        <div class="header-right">
+          <div class="date-time">
+            <div class="date" id="currentDate">Monday, February 26, 2024</div>
+            <div class="time" id="currentTime">14:30:45</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-title">Total Revenue</div>
+            <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="totalRevenue">₹2,45,80,500</div>
+            <div class="stat-change positive">
+              <i class="fas fa-arrow-up"></i>
+              <span>12.5% from last month</span>
+            </div>
+          </div>
+          <div class="stat-trend">
+            <div class="trend-fill" style="width: 75%"></div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-title">Active Customers</div>
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="activeCustomers">12,458</div>
+            <div class="stat-change positive">
+              <i class="fas fa-arrow-up"></i>
+              <span>8.2% growth</span>
+            </div>
+          </div>
+          <div class="stat-trend">
+            <div class="trend-fill" style="width: 62%"></div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-title">Monthly Orders</div>
+            <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="monthlyOrders">8,924</div>
+            <div class="stat-change positive">
+              <i class="fas fa-arrow-up"></i>
+              <span>15.3% increase</span>
+            </div>
+          </div>
+          <div class="stat-trend">
+            <div class="trend-fill" style="width: 85%"></div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-title">Avg. Order Value</div>
+            <div class="stat-icon"><i class="fas fa-chart-pie"></i></div>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="avgOrderValue">₹2,755</div>
+            <div class="stat-change negative">
+              <i class="fas fa-arrow-down"></i>
+              <span>3.2% decrease</span>
+            </div>
+          </div>
+          <div class="stat-trend">
+            <div class="trend-fill" style="width: 45%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Dashboard Grid -->
+      <div class="dashboard-grid">
+        <!-- Revenue Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h2><i class="fas fa-chart-line"></i> Revenue Analytics</h2>
+            <div class="chart-actions">
+              <div class="time-filter">
+                <button class="time-btn active" onclick="setTimeRange('7d')">
+                  7D
+                </button>
+                <button class="time-btn" onclick="setTimeRange('30d')">
+                  30D
+                </button>
+                <button class="time-btn" onclick="setTimeRange('90d')">
+                  90D
+                </button>
+                <button class="time-btn" onclick="setTimeRange('1y')">
+                  1Y
+                </button>
+              </div>
+              <button class="time-btn" onclick="exportChart('revenueChart')">
+                <i class="fas fa-download"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h2><i class="fas fa-credit-card"></i> Payment Distribution</h2>
+            <div class="chart-actions">
+              <select
+                class="time-btn"
+                id="paymentFilter"
+                onchange="updatePaymentChart()"
+              >
+                <option value="month">This Month</option>
+                <option value="quarter">This Quarter</option>
+                <option value="year">This Year</option>
+              </select>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="paymentChart"></canvas>
+          </div>
+          <div class="mini-stats" style="margin-top: 20px">
+            <div class="mini-stat">
+              <div class="mini-stat-value" id="upiPercent">48%</div>
+              <div class="mini-stat-label">UPI</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-value" id="cardPercent">32%</div>
+              <div class="mini-stat-label">Cards</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-value" id="cashPercent">20%</div>
+              <div class="mini-stat-label">Cash</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Second Row -->
+      <div class="second-row">
+        <!-- Daily Sales -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h2><i class="fas fa-calendar-day"></i> Daily Sales Performance</h2>
+            <div class="chart-actions">
+              <button class="time-btn" onclick="updateDailySales()">
+                <i class="fas fa-sync"></i> Refresh
+              </button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="dailySalesChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Top Products -->
+        <div class="top-products">
+          <div class="chart-header">
+            <h2><i class="fas fa-crown"></i> Top Selling Products</h2>
+            <div class="chart-actions">
+              <select class="time-btn" onchange="updateTopProducts()">
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="quarter">This Quarter</option>
+              </select>
+            </div>
+          </div>
+          <div class="product-list" id="topProductsList">
+            <!-- Products will be dynamically loaded -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Theme Management
+      function initTheme() {
+        const themeToggle = document.getElementById("themeToggle");
+        const themeIcon = themeToggle.querySelector("i");
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        const savedTheme = localStorage.getItem("theme");
+
+        // Set initial theme
+        if (savedTheme) {
+          document.documentElement.setAttribute("data-theme", savedTheme);
+        } else {
+          document.documentElement.setAttribute(
+            "data-theme",
+            prefersDark ? "dark" : "light",
+          );
+        }
+
+        // Update icon based on theme
+        updateThemeIcon();
+
+        // Toggle theme on click
+        themeToggle.addEventListener("click", () => {
+          const currentTheme = document.documentElement.getAttribute(
+            "data-theme",
+          );
+          const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+          document.documentElement.setAttribute("data-theme", newTheme);
+          localStorage.setItem("theme", newTheme);
+          updateThemeIcon();
+          updateChartThemes(newTheme);
+        });
+      }
+
+      function updateThemeIcon() {
+        const themeIcon = document.querySelector("#themeToggle i");
+        const currentTheme = document.documentElement.getAttribute(
+          "data-theme",
+        );
+
+        if (currentTheme === "dark") {
+          themeIcon.className = "fas fa-sun";
+        } else {
+          themeIcon.className = "fas fa-moon";
+        }
+      }
+
+      function updateChartThemes(theme) {
+        const gridColor = theme === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)";
+        const textColor = theme === "dark" ? "#94a3b8" : "#64748b";
+
+        // Update all charts with new theme
+        if (revenueChart) {
+          revenueChart.options.scales.x.grid.color = gridColor;
+          revenueChart.options.scales.y.grid.color = gridColor;
+          revenueChart.options.scales.x.ticks.color = textColor;
+          revenueChart.options.scales.y.ticks.color = textColor;
+          revenueChart.update();
+        }
+
+        if (paymentChart) {
+          paymentChart.options.plugins.legend.labels.color = textColor;
+          paymentChart.update();
+        }
+
+        if (dailySalesChart) {
+          dailySalesChart.options.scales.x.grid.color = gridColor;
+          dailySalesChart.options.scales.y.grid.color = gridColor;
+          dailySalesChart.options.scales.x.ticks.color = textColor;
+          dailySalesChart.options.scales.y.ticks.color = textColor;
+          dailySalesChart.options.plugins.legend.labels.color = textColor;
+          dailySalesChart.update();
+        }
+      }
+
+      // Real-Time Clock
+      function updateDateTime() {
+        const now = new Date();
+
+        // Format date
+        const options = {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        };
+        document.getElementById("currentDate").textContent =
+          now.toLocaleDateString("en-US", options);
+
+        // Format time
+        const time = now.toLocaleTimeString("en-US", { hour12: false });
+        document.getElementById("currentTime").textContent = time;
+
+        // Update every second
+        setTimeout(updateDateTime, 1000);
+      }
+
+      // Initialize Charts
+      let revenueChart, paymentChart, dailySalesChart;
+
+      function initCharts() {
+        const gridColor = document.documentElement.getAttribute(
+          "data-theme",
+        ) === "dark"
+          ? "rgba(255, 255, 255, 0.1)"
+          : "rgba(0, 0, 0, 0.1)";
+        const textColor = document.documentElement.getAttribute(
+          "data-theme",
+        ) === "dark"
+          ? "#94a3b8"
+          : "#64748b";
+
+        // Revenue Chart
+        const revenueCtx = document
+          .getElementById("revenueChart")
+          .getContext("2d");
+        revenueChart = new Chart(revenueCtx, {
+          type: "line",
+          data: {
+            labels: generateMonthLabels(),
+            datasets: [
+              {
+                label: "Revenue",
+                data: generateRevenueData(),
+                borderColor: "#6366f1",
+                backgroundColor: "rgba(99, 102, 241, 0.1)",
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: "#22d3ee",
+                pointBorderColor: document.documentElement.getAttribute(
+                  "data-theme",
+                ) === "dark" ? "#ffffff" : "#0a0e17",
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                mode: "index",
+                intersect: false,
+                backgroundColor: "rgba(18, 24, 40, 0.9)",
+                titleColor: "#f1f5f9",
+                bodyColor: "#cbd5e1",
+                borderColor: "#6366f1",
+                borderWidth: 1,
+                padding: 12,
+                callbacks: {
+                  label: function (context) {
+                    return `₹${context.parsed.y.toLocaleString("en-IN")}`;
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                grid: { color: gridColor },
+                ticks: { color: textColor },
+              },
+              y: {
+                grid: { color: gridColor },
+                ticks: {
+                  color: textColor,
+                  callback: function (value) {
+                    return "₹" + (value / 100000).toFixed(1) + "L";
+                  },
+                },
+              },
+            },
+            interaction: {
+              intersect: false,
+              mode: "nearest",
+            },
+          },
+        });
+
+        // Payment Chart
+        const paymentCtx = document
+          .getElementById("paymentChart")
+          .getContext("2d");
+        paymentChart = new Chart(paymentCtx, {
+          type: "doughnut",
+          data: {
+            labels: ["UPI", "Credit/Debit Cards", "Cash", "Net Banking", "Wallet"],
+            datasets: [
+              {
+                data: [48, 32, 12, 5, 3],
+                backgroundColor: [
+                  "#6366f1",
+                  "#22d3ee",
+                  "#10b981",
+                  "#f59e0b",
+                  "#8b5cf6",
+                ],
+                borderWidth: 0,
+                hoverOffset: 20,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "70%",
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  color: textColor,
+                  padding: 20,
+                  font: { size: 12 },
+                },
+              },
+              tooltip: {
+                backgroundColor: "rgba(18, 24, 40, 0.9)",
+                titleColor: "#f1f5f9",
+                bodyColor: "#cbd5e1",
+                borderColor: "#6366f1",
+                borderWidth: 1,
+                padding: 12,
+                callbacks: {
+                  label: function (context) {
+                    return `${context.label}: ${context.parsed}%`;
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        // Daily Sales Chart
+        const salesCtx = document
+          .getElementById("dailySalesChart")
+          .getContext("2d");
+        dailySalesChart = new Chart(salesCtx, {
+          type: "bar",
+          data: {
+            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            datasets: [
+              {
+                label: "This Week",
+                data: [45, 52, 38, 65, 72, 88, 42],
+                backgroundColor: "rgba(99, 102, 241, 0.8)",
+                borderRadius: 8,
+                borderSkipped: false,
+              },
+              {
+                label: "Last Week",
+                data: [38, 48, 32, 58, 65, 75, 35],
+                backgroundColor: "rgba(34, 211, 238, 0.8)",
+                borderRadius: 8,
+                borderSkipped: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "top",
+                labels: {
+                  color: textColor,
+                  padding: 20,
+                  font: { size: 12 },
+                },
+              },
+              tooltip: {
+                backgroundColor: "rgba(18, 24, 40, 0.9)",
+                titleColor: "#f1f5f9",
+                bodyColor: "#cbd5e1",
+                borderColor: "#6366f1",
+                borderWidth: 1,
+                padding: 12,
+              },
+            },
+            scales: {
+              x: {
+                grid: { color: gridColor },
+                ticks: { color: textColor },
+              },
+              y: {
+                grid: { color: gridColor },
+                ticks: { color: textColor },
+              },
+            },
+          },
+        });
+      }
+
+      // Generate Data
+      function generateMonthLabels() {
+        const months = [];
+        const now = new Date();
+        for (let i = 5; i >= 0; i--) {
+          const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          months.push(date.toLocaleDateString("en-US", { month: "short" }));
+        }
+        return months;
+      }
+
+      function generateRevenueData() {
+        return Array.from(
+          { length: 6 },
+          () => Math.floor(Math.random() * 1500000) + 1000000,
+        );
+      }
+
+      // Time Range Filter
+      function setTimeRange(range) {
+        // Update active button
+        document
+          .querySelectorAll(".time-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        event.target.classList.add("active");
+
+        // Simulate data update
+        const newData = generateRevenueData();
+        revenueChart.data.datasets[0].data = newData;
+
+        // Update labels based on range
+        let labels = [];
+        const now = new Date();
+
+        if (range === "7d") {
+          for (let i = 6; i >= 0; i--) {
+            const date = new Date(now);
+            date.setDate(date.getDate() - i);
+            labels.push(date.toLocaleDateString("en-US", { weekday: "short" }));
+          }
+        } else if (range === "30d") {
+          for (let i = 4; i >= 0; i--) {
+            const date = new Date(now);
+            date.setDate(date.getDate() - i * 7);
+            labels.push(`Week ${5 - i}`);
+          }
+        } else if (range === "90d") {
+          for (let i = 5; i >= 0; i--) {
+            const date = new Date(now);
+            date.setMonth(date.getMonth() - i);
+            labels.push(date.toLocaleDateString("en-US", { month: "short" }));
+          }
+        } else {
+          labels = generateMonthLabels();
+        }
+
+        revenueChart.data.labels = labels;
+        revenueChart.update();
+      }
+
+      // Update Payment Chart
+      function updatePaymentChart() {
+        const filter = document.getElementById("paymentFilter").value;
+        const percentages = {
+          month: [48, 32, 12, 5, 3],
+          quarter: [45, 35, 13, 4, 3],
+          year: [42, 38, 12, 5, 3],
+        };
+
+        paymentChart.data.datasets[0].data = percentages[filter];
+        paymentChart.update();
+
+        // Update mini stats
+        document.getElementById("upiPercent").textContent =
+          `${percentages[filter][0]}%`;
+        document.getElementById("cardPercent").textContent =
+          `${percentages[filter][1]}%`;
+        document.getElementById("cashPercent").textContent =
+          `${percentages[filter][2]}%`;
+      }
+
+      // Update Daily Sales Chart
+      function updateDailySales() {
+        const newDataThisWeek = Array.from(
+          { length: 7 },
+          () => Math.floor(Math.random() * 50) + 30,
+        );
+        const newDataLastWeek = Array.from(
+          { length: 7 },
+          () => Math.floor(Math.random() * 45) + 25,
+        );
+
+        dailySalesChart.data.datasets[0].data = newDataThisWeek;
+        dailySalesChart.data.datasets[1].data = newDataLastWeek;
+        dailySalesChart.update();
+      }
+
+      // Top Products
+      function updateTopProducts() {
+        const products = [
+          { name: "Premium Wireless Headphones", sales: 2450, growth: 12 },
+          { name: "Mechanical Gaming Keyboard", sales: 1890, growth: 8 },
+          { name: "4K Webcam with Mic", sales: 1560, growth: 15 },
+          { name: "Ergonomic Office Chair", sales: 1320, growth: 5 },
+          { name: "Smart Watch Pro", sales: 1120, growth: 22 },
+        ];
+
+        const list = document.getElementById("topProductsList");
+        list.innerHTML = "";
+
+        products.forEach((product, index) => {
+          const item = document.createElement("div");
+          item.className = "product-item";
+          item.innerHTML = `
+            <div class="product-rank">${index + 1}</div>
+            <div class="product-info">
+              <div class="product-name">${product.name}</div>
+              <div class="product-stats">
+                <span class="product-sales">${product.sales.toLocaleString()} units</span>
+                <span class="product-growth">+${product.growth}%</span>
+              </div>
+            </div>
+          `;
+          list.appendChild(item);
+        });
+      }
+
+      // Export Chart
+      function exportChart(chartId) {
+        const canvas = document.getElementById(chartId);
+        const link = document.createElement("a");
+        link.download = `${chartId}-${new Date().toISOString().split("T")[0]}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }
+
+      // Initialize Everything
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize theme
+        initTheme();
+
+        // Initialize date/time
+        updateDateTime();
+
+        // Initialize charts
+        initCharts();
+
+        // Initialize top products
+        updateTopProducts();
+
+        // Update stats randomly every 30 seconds
+        setInterval(() => {
+          // Update revenue
+          const revenue = document.getElementById("totalRevenue");
+          const currentRev = parseInt(revenue.textContent.replace(/[^0-9]/g, ""));
+          const newRev = currentRev + Math.floor(Math.random() * 100000);
+          revenue.textContent = `₹${newRev.toLocaleString("en-IN")}`;
+
+          // Update active customers
+          const customers = document.getElementById("activeCustomers");
+          const currentCust = parseInt(customers.textContent.replace(/[^0-9]/g, ""));
+          const newCust = currentCust + Math.floor(Math.random() * 50);
+          customers.textContent = newCust.toLocaleString("en-IN");
+        }, 30000);
+      });
+
+      // Handle window resize
+      window.addEventListener("resize", function () {
+        if (revenueChart) revenueChart.resize();
+        if (paymentChart) paymentChart.resize();
+        if (dailySalesChart) dailySalesChart.resize();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Checkout - Shri Brand</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="./assets/images/logo/Logo.png" />
+
+    <!-- Fonts & Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <!-- Project styles -->
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/checkout.css" />
+</head>
+
+<body>
+    <div class="checkout-page">
+        <!-- Checkout Header -->
+        <header class="checkout-header">
+            <a href="./index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Shop</span>
+            </a>
+            <div class="logo-wrap">
+                <img class="logo" src="./assets/images/logo/Logo.png" alt="Shri Brand" />
+            </div>
+        </header>
+
+        <div class="checkout-container">
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <span class="step-label">Shipping</span>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <span class="step-label">Payment</span>
+                </div>
+            </div>
+
+            <div class="checkout-content">
+                <!-- Left Side: Forms -->
+                <div class="checkout-forms">
+                    <!-- Shipping Form -->
+                    <form id="shipping-form" class="checkout-form active">
+                        <h2 class="form-title">
+                            <i class="fas fa-shipping-fast"></i>
+                            Shipping Information
+                        </h2>
+
+                        <div class="form-group">
+                            <label for="fullName">Full Name <span class="required">*</span></label>
+                            <input type="text" id="fullName" name="fullName" placeholder="Enter your full name"
+                                required />
+                            <div class="error-message" id="fullNameError">Please enter your full name</div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">Email <span class="required">*</span></label>
+                                <input type="email" id="email" name="email" placeholder="Enter your email" required />
+                                <div class="error-message" id="emailError">Please enter a valid email</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number <span class="required">*</span></label>
+                                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number"
+                                    required />
+                                <div class="error-message" id="phoneError">Please enter a valid phone number</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pincode">PIN Code <span class="required">*</span></label>
+                            <input type="text" id="pincode" name="pincode" placeholder="Enter PIN code" maxlength="6"
+                                required />
+                            <div class="error-message" id="pincodeError">Please enter a valid 6-digit PIN code</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">Street Address <span class="required">*</span></label>
+                            <textarea id="address" name="address" rows="2" placeholder="Enter your street address"
+                                required></textarea>
+                            <div class="error-message" id="addressError">Please enter your address</div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">City <span class="required">*</span></label>
+                                <input type="text" id="city" name="city" placeholder="Enter your city" required />
+                                <div class="error-message" id="cityError">Please enter your city</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State <span class="required">*</span></label>
+                                <input type="text" id="state" name="state" placeholder="Enter your state" required />
+                                <div class="error-message" id="stateError">Please enter your state</div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-continue" id="continue-to-payment">
+                            Continue to Payment
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+
+                    <!-- Payment Form -->
+                    <form id="payment-form" class="checkout-form">
+                        <h2 class="form-title">
+                            <i class="fas fa-credit-card"></i>
+                            Payment Method
+                        </h2>
+
+                        <div class="payment-options">
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="cod" checked />
+                                <div class="option-content">
+                                    <div class="option-icon">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+                                    <div class="option-details">
+                                        <span class="option-title">Cash on Delivery</span>
+                                        <span class="option-desc">Pay when you receive your order</span>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="upi" />
+                                <div class="option-content">
+                                    <div class="option-icon">
+                                        <i class="fas fa-qrcode"></i>
+                                    </div>
+                                    <div class="option-details">
+                                        <span class="option-title">UPI Payment</span>
+                                        <span class="option-desc">Pay using UPI apps like GPay, PhonePe</span>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="card" />
+                                <div class="option-content">
+                                    <div class="option-icon">
+                                        <i class="fas fa-credit-card"></i>
+                                    </div>
+                                    <div class="option-details">
+                                        <span class="option-title">Credit/Debit Card</span>
+                                        <span class="option-desc">Pay securely with your card</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-back" id="back-to-shipping">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Shipping
+                            </button>
+                            <button type="submit" class="btn-place-order" id="place-order-btn">
+                                <i class="fas fa-check"></i>
+                                Place Order
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Side: Order Summary -->
+                <aside class="order-summary">
+                    <h2 class="summary-title">
+                        <i class="fas fa-shopping-bag"></i>
+                        Order Summary
+                    </h2>
+
+                    <div class="cart-items" id="checkout-cart-items">
+                        <!-- Cart items loaded dynamically -->
+                    </div>
+
+                    <div class="summary-details">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="checkout-subtotal">₹0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span id="checkout-shipping">Free</span>
+                        </div>
+                        <div class="summary-row discount" id="discount-row" style="display: none;">
+                            <span>Discount</span>
+                            <span id="checkout-discount">-₹0</span>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span id="checkout-total">₹0</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div class="modal-overlay" id="success-modal">
+            <div class="modal-content">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>Order Placed Successfully!</h2>
+                <p>Thank you for your order. We'll send you a confirmation email shortly.</p>
+                <a href="./index.html" class="btn-continue">
+                    Continue Shopping
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Product data (same as products.js)
+        const productsData = [
+            { id: 1, name: "Jasmine", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/1.png" },
+            { id: 2, name: "Champa", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/2.png" },
+            { id: 3, name: "Lavender", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/3.png" },
+            { id: 4, name: "Screw Pine", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/4.png" },
+            { id: 5, name: "Rose", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/5.png" },
+            { id: 6, name: "Sandal", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/6.png" },
+            { id: 7, name: "Sacred Resin", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/7.png" },
+            { id: 8, name: "Javathu", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/8.png" }
+        ];
+        const comboPackData = [
+            { id: 101, name: "8 Fragrances Pack", price: 799, originalPrice: 1199, image: "./assets/images/images/8fragrances.png" },
+            { id: 102, name: "Temple Essentials", price: 399, originalPrice: 599, image: "./assets/images/Fragrances/c1.png" },
+            { id: 103, name: "Floral Collection", price: 349, originalPrice: 499, image: "./assets/images/Fragrances/c1.png" }
+        ];
+        const giftPackData = [
+            { id: 201, name: "Premium Gift Set", price: 499, originalPrice: 699, image: "./assets/images/images/8fragrances.png" },
+            { id: 202, name: "Festive Gift Box", price: 399, originalPrice: 549, image: "./assets/images/Fragrances/c1.png" }
+        ];
+
+        function getAllProducts() {
+            return [...productsData, ...comboPackData, ...giftPackData];
+        }
+
+        function findProductById(id) {
+            return getAllProducts().find(p => p.id === parseInt(id));
+        }
+
+        // Load cart from localStorage and display
+        function loadCheckoutCart() {
+            const cartData = localStorage.getItem('shriCart');
+            const cartContainer = document.getElementById('checkout-cart-items');
+            const subtotalEl = document.getElementById('checkout-subtotal');
+            const totalEl = document.getElementById('checkout-total');
+
+            if (!cartData) {
+                cartContainer.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+                return;
+            }
+
+            const savedCart = JSON.parse(cartData);
+
+            if (savedCart.length === 0) {
+                cartContainer.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+                return;
+            }
+
+            // Rebuild cart with product details
+            const cart = savedCart.map(item => {
+                const product = findProductById(item.id);
+                if (product) {
+                    return { id: item.id, quantity: item.quantity, product: product };
+                }
+                return null;
+            }).filter(Boolean);
+
+            if (cart.length === 0) {
+                cartContainer.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+                return;
+            }
+
+            let subtotal = 0;
+            let itemsHTML = '';
+
+            cart.forEach(item => {
+                const itemTotal = item.product.price * item.quantity;
+                subtotal += itemTotal;
+
+                itemsHTML += `
+                    <div class="cart-item">
+                        <img src="${item.product.image}" alt="${item.product.name}" class="item-image" />
+                        <div class="item-details">
+                            <span class="item-name">${item.product.name}</span>
+                            <span class="item-qty">Qty: ${item.quantity}</span>
+                        </div>
+                        <span class="item-price">₹${itemTotal}</span>
+                    </div>
+                `;
+            });
+
+            cartContainer.innerHTML = itemsHTML;
+            subtotalEl.textContent = `₹${subtotal}`;
+            totalEl.textContent = `₹${subtotal}`;
+        }
+
+        // Form validation
+        function validateShippingForm() {
+            let isValid = true;
+            const fields = ['fullName', 'email', 'phone', 'pincode', 'address', 'city', 'state'];
+
+            fields.forEach(field => {
+                const input = document.getElementById(field);
+                const errorEl = document.getElementById(field + 'Error');
+                const value = input.value.trim();
+
+                if (!value) {
+                    input.classList.add('error');
+                    if (errorEl) errorEl.style.display = 'block';
+                    isValid = false;
+                } else {
+                    input.classList.remove('error');
+                    if (errorEl) errorEl.style.display = 'none';
+                }
+            });
+
+            // Email validation
+            const email = document.getElementById('email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email.value && !emailRegex.test(email.value)) {
+                email.classList.add('error');
+                document.getElementById('emailError').style.display = 'block';
+                isValid = false;
+            }
+
+            // Phone validation
+            const phone = document.getElementById('phone');
+            const phoneRegex = /^[0-9]{10}$/;
+            if (phone.value && !phoneRegex.test(phone.value.replace(/\D/g, ''))) {
+                phone.classList.add('error');
+                document.getElementById('phoneError').style.display = 'block';
+                isValid = false;
+            }
+
+            // PIN code validation
+            const pincode = document.getElementById('pincode');
+            const pincodeRegex = /^[0-9]{6}$/;
+            if (pincode.value && !pincodeRegex.test(pincode.value)) {
+                pincode.classList.add('error');
+                document.getElementById('pincodeError').style.display = 'block';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Switch between forms
+        function showPaymentForm() {
+            if (validateShippingForm()) {
+                document.getElementById('shipping-form').classList.remove('active');
+                document.getElementById('payment-form').classList.add('active');
+                document.querySelector('.step[data-step="1"]').classList.remove('active');
+                document.querySelector('.step[data-step="1"]').classList.add('completed');
+                document.querySelector('.step[data-step="2"]').classList.add('active');
+            }
+        }
+
+        function showShippingForm() {
+            document.getElementById('payment-form').classList.remove('active');
+            document.getElementById('shipping-form').classList.add('active');
+            document.querySelector('.step[data-step="2"]').classList.remove('active');
+            document.querySelector('.step[data-step="1"]').classList.remove('completed');
+            document.querySelector('.step[data-step="1"]').classList.add('active');
+        }
+
+        // Place order
+        function placeOrder(e) {
+            e.preventDefault();
+            const modal = document.getElementById('success-modal');
+            modal.classList.add('active');
+
+            // Clear cart
+            localStorage.removeItem('shriCart');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCheckoutCart();
+
+            document.getElementById('continue-to-payment').addEventListener('click', showPaymentForm);
+            document.getElementById('back-to-shipping').addEventListener('click', showShippingForm);
+            document.getElementById('payment-form').addEventListener('submit', placeOrder);
+
+            // Input focus effects
+            document.querySelectorAll('input, textarea').forEach(input => {
+                input.addEventListener('focus', function () {
+                    this.classList.remove('error');
+                    const errorEl = document.getElementById(this.id + 'Error');
+                    if (errorEl) errorEl.style.display = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

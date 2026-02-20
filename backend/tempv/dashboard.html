@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard - InstaStick Shop">
+    <title>Dashboard - InstaStick Shop</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #800000;
+            --primary-dark: #5a0000;
+            --gold: #FFD700;
+            --gold-dark: #d4a800;
+            --text: #e0e0e0;
+            --text-muted: #999;
+            --bg: #0f0f1a;
+            --surface: rgba(255, 255, 255, 0.06);
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --white: #ffffff;
+            --success: #2ed573;
+            --error: #ff4757;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            color: var(--text);
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(128, 0, 0, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 215, 0, 0.06) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: rgba(30, 30, 50, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            color: var(--white);
+            padding: 14px 22px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 300px;
+            box-shadow: var(--shadow);
+            animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast.hiding {
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.3s;
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--error);
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.info {
+            border-left: 4px solid #3742fa;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Navbar */
+        .navbar {
+            position: relative;
+            z-index: 10;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 68px;
+        }
+
+        .nav-brand {
+            font-family: 'Poppins', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .nav-brand span {
+            color: var(--gold);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--white);
+            border: 2px solid var(--gold);
+        }
+
+        .nav-user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-user-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--white);
+        }
+
+        .nav-user-email {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .btn-logout {
+            padding: 8px 20px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 71, 87, 0.1);
+            color: #ff6b7a;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 71, 87, 0.2);
+            border-color: var(--error);
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .welcome-section {
+            margin-bottom: 32px;
+        }
+
+        .welcome-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 4px;
+        }
+
+        .welcome-subtitle {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 16px;
+        }
+
+        .card-icon.primary {
+            background: rgba(128, 0, 0, 0.2);
+        }
+
+        .card-icon.gold {
+            background: rgba(255, 215, 0, 0.15);
+        }
+
+        .card-icon.green {
+            background: rgba(46, 213, 115, 0.15);
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--white);
+            margin-bottom: 6px;
+        }
+
+        .card-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .card-label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Section Card (profile + address) */
+        .section-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 32px;
+            box-shadow: var(--shadow);
+            margin-bottom: 28px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title .icon {
+            font-size: 22px;
+        }
+
+        /* Profile */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .profile-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 28px;
+            color: var(--white);
+            border: 3px solid var(--gold);
+            flex-shrink: 0;
+        }
+
+        .profile-info h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 2px;
+        }
+
+        .profile-info p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .profile-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 6px;
+        }
+
+        .badge-verified {
+            background: rgba(46, 213, 115, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .badge-admin {
+            background: rgba(255, 215, 0, 0.15);
+            color: var(--gold);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .badge-user {
+            background: rgba(128, 0, 0, 0.15);
+            color: #e08080;
+            border: 1px solid rgba(128, 0, 0, 0.3);
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .detail-item {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .detail-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--white);
+            word-break: break-all;
+        }
+
+        .actions-section {
+            margin-top: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn-action {
+            padding: 10px 24px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            color: var(--white);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-1px);
+            border-color: var(--gold);
+        }
+
+        .btn-action.danger {
+            border-color: rgba(255, 71, 87, 0.3);
+            color: #ff6b7a;
+        }
+
+        .btn-action.danger:hover {
+            background: rgba(255, 71, 87, 0.1);
+        }
+
+        /* ==================== ADDRESS SECTION ==================== */
+        .btn-add-address {
+            padding: 10px 22px;
+            border: 1px solid var(--gold);
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--gold);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-add-address:hover {
+            background: rgba(255, 215, 0, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .address-count {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-left: 6px;
+        }
+
+        .address-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .address-card {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .address-card:hover {
+            border-color: rgba(255, 215, 0, 0.25);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .address-card.default {
+            border-color: rgba(46, 213, 115, 0.35);
+        }
+
+        .address-default-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(46, 213, 115, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(46, 213, 115, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .address-line {
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .address-meta {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .address-phone {
+            color: var(--gold);
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+
+        .address-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-addr {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            border: none;
+        }
+
+        .btn-addr-edit {
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--gold);
+        }
+
+        .btn-addr-edit:hover {
+            background: rgba(255, 215, 0, 0.22);
+        }
+
+        .btn-addr-default {
+            background: rgba(46, 213, 115, 0.1);
+            color: var(--success);
+        }
+
+        .btn-addr-default:hover {
+            background: rgba(46, 213, 115, 0.2);
+        }
+
+        .btn-addr-delete {
+            background: rgba(255, 71, 87, 0.1);
+            color: #ff6b7a;
+        }
+
+        .btn-addr-delete:hover {
+            background: rgba(255, 71, 87, 0.2);
+        }
+
+        .address-empty {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+        }
+
+        .address-empty .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .address-empty .empty-text {
+            font-size: 15px;
+            margin-bottom: 4px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .address-empty .empty-sub {
+            font-size: 13px;
+        }
+
+        /* Loading State */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            gap: 16px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: rgba(20, 20, 40, 0.98);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 36px;
+            width: 100%;
+            max-width: 500px;
+            margin: 20px;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 20px;
+        }
+
+        .modal .input-group {
+            margin-bottom: 16px;
+        }
+
+        .modal label {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .modal input,
+        .modal select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius-sm);
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .modal select option {
+            background: #1a1a30;
+            color: var(--white);
+        }
+
+        .modal input:focus,
+        .modal select:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .modal-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-modal-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+        }
+
+        .btn-modal-gold {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            color: var(--primary-dark);
+        }
+
+        .btn-modal-cancel {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-muted);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-modal:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-modal:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--gold);
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            text-transform: none;
+            font-size: 14px;
+            letter-spacing: 0;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .nav-user-info {
+                display: none;
+            }
+
+            .main-content {
+                padding: 0 16px;
+            }
+
+            .welcome-title {
+                font-size: 22px;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .address-list {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal {
+                padding: 24px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Loading State -->
+    <div class="loading-state" id="loading-state">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading your dashboard...</div>
+    </div>
+
+    <!-- Main App (hidden until loaded) -->
+    <div id="app" style="display: none;">
+
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="nav-brand">🎯 Insta<span>Stick</span></div>
+            <div class="nav-actions">
+                <div class="nav-user">
+                    <div class="nav-avatar" id="nav-avatar"></div>
+                    <div class="nav-user-info">
+                        <div class="nav-user-name" id="nav-name"></div>
+                        <div class="nav-user-email" id="nav-email"></div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Welcome -->
+            <div class="welcome-section">
+                <h1 class="welcome-title" id="welcome-title">Welcome back!</h1>
+                <p class="welcome-subtitle">Here's your account overview</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon primary">🔐</div>
+                    <div class="card-title">Account Status</div>
+                    <div class="card-value" id="card-status">Active</div>
+                    <div class="card-label">Your account is ready</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon gold">✉️</div>
+                    <div class="card-title">Email Status</div>
+                    <div class="card-value" id="card-verified">Verified</div>
+                    <div class="card-label" id="card-verified-label">Email is verified</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon green">📅</div>
+                    <div class="card-title">Member Since</div>
+                    <div class="card-value" id="card-joined">—</div>
+                    <div class="card-label">Join date</div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="section-card">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profile-avatar"></div>
+                    <div class="profile-info">
+                        <h2 id="profile-name">—</h2>
+                        <p id="profile-email">—</p>
+                        <div>
+                            <span class="profile-badge badge-verified" id="badge-verified" style="display:none;">✓
+                                Verified</span>
+                            <span class="profile-badge" id="badge-role"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <div class="detail-label">User ID</div>
+                        <div class="detail-value" id="detail-id">—</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Email Address</div>
+                        <div class="detail-value" id="detail-email">—</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Role</div>
+                        <div class="detail-value" id="detail-role">—</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Phone</div>
+                        <div class="detail-value" id="detail-phone">—</div>
+                    </div>
+                </div>
+
+                <div class="actions-section">
+                    <button class="btn-action" onclick="openPasswordModal()">🔑 Change Password</button>
+                    <button class="btn-action danger" onclick="deleteAccount()">🗑️ Delete Account</button>
+                </div>
+            </div>
+
+            <!-- ==================== ADDRESS SECTION ==================== -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="icon">📍</span> My Addresses
+                        <span class="address-count" id="address-count"></span>
+                    </div>
+                    <button class="btn-add-address" onclick="openAddressModal()">
+                        ➕ Add Address
+                    </button>
+                </div>
+
+                <!-- Address List -->
+                <div id="address-container">
+                    <!-- Dynamically rendered -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ==================== CHANGE PASSWORD MODAL ==================== -->
+    <div class="modal-overlay" id="password-modal">
+        <div class="modal">
+            <div class="modal-title">🔑 Change Password</div>
+            <form id="password-form">
+                <div class="input-group">
+                    <label>Current Password</label>
+                    <input type="password" id="modal-current" placeholder="Enter current password" required>
+                </div>
+                <div class="input-group">
+                    <label>New Password</label>
+                    <input type="password" id="modal-new" placeholder="Enter new password" required>
+                </div>
+                <div class="input-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="modal-confirm" placeholder="Confirm new password" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal btn-modal-cancel"
+                        onclick="closePasswordModal()">Cancel</button>
+                    <button type="submit" class="btn-modal btn-modal-primary" id="modal-submit-btn">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== ADDRESS MODAL (Add / Edit) ==================== -->
+    <div class="modal-overlay" id="address-modal">
+        <div class="modal">
+            <div class="modal-title" id="address-modal-title">📍 Add New Address</div>
+            <form id="address-form">
+                <input type="hidden" id="addr-edit-id" value="">
+
+                <div class="input-group">
+                    <label for="addr-line1">Address Line 1 *</label>
+                    <input type="text" id="addr-line1" placeholder="House / Flat / Building No., Street" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="addr-line2">Address Line 2</label>
+                    <input type="text" id="addr-line2" placeholder="Landmark, Area (optional)">
+                </div>
+
+                <div class="modal-row">
+                    <div class="input-group">
+                        <label for="addr-city">City *</label>
+                        <input type="text" id="addr-city" placeholder="City" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="addr-state">State *</label>
+                        <input type="text" id="addr-state" placeholder="State" required>
+                    </div>
+                </div>
+
+                <div class="modal-row">
+                    <div class="input-group">
+                        <label for="addr-pincode">Pincode *</label>
+                        <input type="text" id="addr-pincode" placeholder="6-digit pincode" required maxlength="6"
+                            inputmode="numeric">
+                    </div>
+                    <div class="input-group">
+                        <label for="addr-phone">Phone *</label>
+                        <input type="text" id="addr-phone" placeholder="10-digit phone" required maxlength="10"
+                            inputmode="numeric">
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="addr-default">
+                    <label for="addr-default">Set as default address</label>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal btn-modal-cancel"
+                        onclick="closeAddressModal()">Cancel</button>
+                    <button type="submit" class="btn-modal btn-modal-gold" id="addr-submit-btn">Save Address</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_AUTH = '/api/v1/auth';
+        const API_USERS = '/api/v1/users';
+        let userAddresses = [];
+
+        // ==================== TOAST ====================
+        function showToast(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('toast-container');
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${icons[type] || ''}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.add('hiding'); setTimeout(() => toast.remove(), 300); }, duration);
+        }
+
+        function getInitials(name) {
+            if (!name) return '?';
+            return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '—';
+            return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        }
+
+        // ==================== LOAD USER ====================
+        async function loadUser() {
+            try {
+                const response = await fetch(`${API_AUTH}/check-auth`, { credentials: 'same-origin' });
+                const result = await response.json();
+                if (!result.isAuthenticated) { window.location.href = '/auth.html'; return; }
+                renderUser(result.data.user);
+            } catch (error) {
+                const refreshed = await refreshToken();
+                if (refreshed) { loadUser(); } else { window.location.href = '/auth.html'; }
+            }
+        }
+
+        function renderUser(user) {
+            const initials = getInitials(user.name);
+            document.getElementById('nav-avatar').textContent = initials;
+            document.getElementById('nav-name').textContent = user.name;
+            document.getElementById('nav-email').textContent = user.email;
+            document.getElementById('welcome-title').textContent = `Welcome, ${user.name.split(' ')[0]}! 👋`;
+            document.getElementById('profile-avatar').textContent = initials;
+            document.getElementById('profile-name').textContent = user.name;
+            document.getElementById('profile-email').textContent = user.email;
+
+            if (user.isVerified) {
+                document.getElementById('badge-verified').style.display = 'inline-flex';
+                document.getElementById('card-verified').textContent = 'Verified';
+                document.getElementById('card-verified').style.color = '#2ed573';
+                document.getElementById('card-verified-label').textContent = 'Email is verified';
+            } else {
+                document.getElementById('card-verified').textContent = 'Unverified';
+                document.getElementById('card-verified').style.color = '#ff4757';
+                document.getElementById('card-verified-label').textContent = 'Please verify your email';
+            }
+
+            const roleEl = document.getElementById('badge-role');
+            roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            roleEl.className = `profile-badge ${user.role === 'admin' ? 'badge-admin' : 'badge-user'}`;
+
+            document.getElementById('detail-id').textContent = user._id;
+            document.getElementById('detail-email').textContent = user.email;
+            document.getElementById('detail-role').textContent = user.role;
+            document.getElementById('detail-phone').textContent = user.phone || 'Not set';
+            document.getElementById('card-joined').textContent = formatDate(user.createdAt);
+
+            // Render addresses
+            userAddresses = user.addresses || [];
+            renderAddresses();
+
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+        }
+
+        // ==================== ADDRESS RENDERING ====================
+        function renderAddresses() {
+            const container = document.getElementById('address-container');
+            const countEl = document.getElementById('address-count');
+            const addBtn = document.querySelector('.btn-add-address');
+            const MAX_ADDRESSES = 2;
+
+            countEl.textContent = `(${userAddresses.length}/${MAX_ADDRESSES})`;
+
+            // Hide add button if limit reached
+            if (addBtn) {
+                addBtn.style.display = userAddresses.length >= MAX_ADDRESSES ? 'none' : 'flex';
+            }
+
+            if (userAddresses.length === 0) {
+                container.innerHTML = `
+                    <div class="address-empty">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-text">No addresses yet</div>
+                        <div class="empty-sub">Add your first delivery address to get started</div>
+                    </div>`;
+                return;
+            }
+
+            // Sort: default first
+            const sorted = [...userAddresses].sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+
+            container.innerHTML = `<div class="address-list">${sorted.map(addr => `
+                <div class="address-card ${addr.isDefault ? 'default' : ''}">
+                    ${addr.isDefault ? '<div class="address-default-tag">⭐ Default</div>' : ''}
+                    <div class="address-line">${escapeHtml(addr.addressLine1)}</div>
+                    ${addr.addressLine2 ? `<div class="address-line" style="opacity:0.7">${escapeHtml(addr.addressLine2)}</div>` : ''}
+                    <div class="address-meta">${escapeHtml(addr.city)}, ${escapeHtml(addr.state)} — ${escapeHtml(addr.pincode)}</div>
+                    <div class="address-phone">📞 ${escapeHtml(addr.phone)}</div>
+                    <div class="address-actions">
+                        <button class="btn-addr btn-addr-edit" onclick="editAddress('${addr._id}')">✏️ Edit</button>
+                        ${!addr.isDefault ? `<button class="btn-addr btn-addr-default" onclick="setDefaultAddress('${addr._id}')">⭐ Default</button>` : ''}
+                        <button class="btn-addr btn-addr-delete" onclick="deleteAddress('${addr._id}')">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('')}</div>`;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ==================== ADDRESS MODAL ====================
+        function openAddressModal(editId = null) {
+            const modal = document.getElementById('address-modal');
+            const title = document.getElementById('address-modal-title');
+            const form = document.getElementById('address-form');
+            const submitBtn = document.getElementById('addr-submit-btn');
+            form.reset();
+            document.getElementById('addr-edit-id').value = '';
+
+            if (editId) {
+                const addr = userAddresses.find(a => a._id === editId);
+                if (!addr) return;
+                title.textContent = '✏️ Edit Address';
+                submitBtn.textContent = 'Update Address';
+                document.getElementById('addr-edit-id').value = editId;
+                document.getElementById('addr-line1').value = addr.addressLine1 || '';
+                document.getElementById('addr-line2').value = addr.addressLine2 || '';
+                document.getElementById('addr-city').value = addr.city || '';
+                document.getElementById('addr-state').value = addr.state || '';
+                document.getElementById('addr-pincode').value = addr.pincode || '';
+                document.getElementById('addr-phone').value = addr.phone || '';
+                document.getElementById('addr-default').checked = addr.isDefault || false;
+            } else {
+                title.textContent = '📍 Add New Address';
+                submitBtn.textContent = 'Save Address';
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeAddressModal() {
+            document.getElementById('address-modal').classList.remove('active');
+        }
+
+        function editAddress(id) {
+            openAddressModal(id);
+        }
+
+        // ==================== ADDRESS CRUD ====================
+        document.getElementById('address-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('addr-edit-id').value;
+            const data = {
+                addressLine1: document.getElementById('addr-line1').value.trim(),
+                addressLine2: document.getElementById('addr-line2').value.trim(),
+                city: document.getElementById('addr-city').value.trim(),
+                state: document.getElementById('addr-state').value.trim(),
+                pincode: document.getElementById('addr-pincode').value.trim(),
+                phone: document.getElementById('addr-phone').value.trim(),
+                isDefault: document.getElementById('addr-default').checked
+            };
+
+            // Validate
+            if (!data.addressLine1 || !data.city || !data.state || !data.pincode || !data.phone) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            if (!/^\d{6}$/.test(data.pincode)) {
+                showToast('Pincode must be exactly 6 digits', 'error');
+                return;
+            }
+            if (!/^\d{10}$/.test(data.phone)) {
+                showToast('Phone must be exactly 10 digits', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('addr-submit-btn');
+            btn.disabled = true;
+            btn.textContent = editId ? 'Updating...' : 'Saving...';
+
+            try {
+                let url, method;
+                if (editId) {
+                    url = `${API_USERS}/addresses/${editId}`;
+                    method = 'PATCH';
+                } else {
+                    url = `${API_USERS}/addresses`;
+                    method = 'POST';
+                }
+
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    userAddresses = result.data.addresses;
+                    renderAddresses();
+                    closeAddressModal();
+                    showToast(editId ? 'Address updated!' : 'Address added!', 'success');
+                } else {
+                    showToast(result.message || 'Failed to save address', 'error');
+                }
+            } catch {
+                showToast('Network error', 'error');
+            }
+
+            btn.disabled = false;
+            btn.textContent = editId ? 'Update Address' : 'Save Address';
+        });
+
+        async function setDefaultAddress(id) {
+            try {
+                const response = await fetch(`${API_USERS}/addresses/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ isDefault: true })
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    userAddresses = result.data.addresses;
+                    renderAddresses();
+                    showToast('Default address updated!', 'success');
+                } else {
+                    showToast(result.message || 'Failed to update', 'error');
+                }
+            } catch {
+                showToast('Network error', 'error');
+            }
+        }
+
+        async function deleteAddress(id) {
+            if (!confirm('Are you sure you want to delete this address?')) return;
+            try {
+                const response = await fetch(`${API_USERS}/addresses/${id}`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin'
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    userAddresses = result.data.addresses;
+                    renderAddresses();
+                    showToast('Address deleted!', 'success');
+                } else {
+                    showToast(result.message || 'Failed to delete', 'error');
+                }
+            } catch {
+                showToast('Network error', 'error');
+            }
+        }
+
+        // ==================== REFRESH TOKEN ====================
+        async function refreshToken() {
+            try {
+                const response = await fetch(`${API_AUTH}/refresh-token`, {
+                    method: 'POST', credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                return result.status === 'success';
+            } catch { return false; }
+        }
+
+        // ==================== LOGOUT ====================
+        async function logout() {
+            try { await fetch(`${API_AUTH}/logout`, { method: 'POST', credentials: 'same-origin' }); } catch { }
+            window.location.href = '/auth.html';
+        }
+
+        // ==================== CHANGE PASSWORD ====================
+        function openPasswordModal() { document.getElementById('password-modal').classList.add('active'); }
+        function closePasswordModal() { document.getElementById('password-modal').classList.remove('active'); document.getElementById('password-form').reset(); }
+
+        document.getElementById('password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const currentPassword = document.getElementById('modal-current').value;
+            const newPassword = document.getElementById('modal-new').value;
+            const confirmPassword = document.getElementById('modal-confirm').value;
+
+            if (!currentPassword || !newPassword || !confirmPassword) { showToast('Please fill in all fields', 'error'); return; }
+            if (newPassword !== confirmPassword) { showToast('New passwords do not match', 'error'); return; }
+            if (newPassword.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+
+            const btn = document.getElementById('modal-submit-btn');
+            btn.disabled = true; btn.textContent = 'Updating...';
+
+            try {
+                const response = await fetch(`${API_AUTH}/update-password`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+                });
+                const result = await response.json();
+                if (result.status === 'success') { showToast('Password updated successfully!', 'success'); closePasswordModal(); }
+                else { showToast(result.message || 'Failed to update password', 'error'); }
+            } catch { showToast('Network error', 'error'); }
+
+            btn.disabled = false; btn.textContent = 'Update';
+        });
+
+        // ==================== DELETE ACCOUNT ====================
+        async function deleteAccount() {
+            const password = prompt('Enter your password to confirm account deletion:');
+            if (!password) return;
+            if (!confirm('Are you sure? This action cannot be undone.')) return;
+            try {
+                const response = await fetch(`${API_USERS}/delete-me`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ password })
+                });
+                if (response.status === 204 || response.ok) {
+                    showToast('Account deleted. Redirecting...', 'success');
+                    setTimeout(() => { window.location.href = '/auth.html'; }, 1500);
+                } else {
+                    const result = await response.json();
+                    showToast(result.message || 'Failed to delete account', 'error');
+                }
+            } catch { showToast('Network error', 'error'); }
+        }
+
+        // Close modals on overlay click
+        document.getElementById('password-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('password-modal')) closePasswordModal();
+        });
+        document.getElementById('address-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('address-modal')) closeAddressModal();
+        });
+
+        // Initialize
+        loadUser();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POS Dashboard Unique</title>
+
+    <style>
+      .pos-unique * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Segoe UI;
+      }
+      .pos-unique {
+        background: #1c1f1e;
+        color: #fff;
+      }
+
+      .pos-unique .pos-app {
+        display: flex;
+        gap: 20px;
+        padding: 20px;
+        min-height: 100vh;
+      }
+      .pos-unique .pos-left {
+        flex: 3;
+        background: #222826;
+        border-radius: 12px;
+        padding: 20px;
+      }
+      .pos-unique .pos-right {
+        flex: 1.5;
+        background: #222826;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* search */
+      .pos-unique .pos-search {
+        display: flex;
+        margin-bottom: 20px;
+      }
+      .pos-unique .pos-search input {
+        flex: 1;
+        padding: 15px;
+        border: none;
+        border-radius: 6px 0 0 6px;
+        background: #161a18;
+        color: #fff;
+      }
+      .pos-unique .pos-search button {
+        padding: 10px 20px;
+        background: #633bb3;
+        border: none;
+        border-radius: 0 6px 6px 0;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      /* products */
+      .pos-unique .pos-products {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 2fr));
+        gap: 15px;
+      }
+      .pos-unique .pos-product {
+        background: #161a18;
+        padding: 15px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+      }
+      .pos-unique .pos-product img {
+        width: 55px;
+        height: 55px;
+        background: #fff;
+        border-radius: 8px;
+        padding: 5px;
+        object-fit: contain;
+      }
+      .pos-unique .pos-price-stock{
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        gap: 15px;
+
+      }
+      .pos-unique .pos-product-info {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: start;
+        gap: 5px;
+        flex-direction: column;
+      }
+      .pos-unique .pos-product-info h4 {
+        margin-bottom: 5px;
+        font-size: 14px;
+      }
+      .pos-unique .pos-product-info p {
+        color: #ffc107;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      .pos-unique .pos-stock-badge {
+        font-size: 12px;
+        padding: 4px 15px;
+        border-radius: 15px;
+        display: inline-block;
+        text-transform: uppercase;
+        
+      }
+      .pos-unique .pos-stock-in {
+        background: rgba(46, 204, 146, 0.2);
+        color: #2ecc71;
+        border: 1px solid #2ecc71;
+
+      }
+      .pos-unique .pos-stock-low {
+        background: rgba(241, 196, 15, 0.2);
+        color: #f1c40f;
+        border: 1px solid #f1c40f;
+      }
+      .pos-unique .pos-stock-out {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+        border: 1px solid #e74c3c;
+      }
+      .pos-unique .pos-add {
+        margin-left: auto;
+        background: #2ecc71;
+        border: none;
+        color: #fff;
+        width: 35px;
+        height: 35px;
+        border-radius: 6px;
+        font-size: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .pos-unique .pos-add:disabled {
+        background: #555;
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+
+      /* cart */
+      .pos-unique .pos-right input {
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        border: none;
+        background: #161a18;
+        color: #fff;
+      }
+      .pos-unique .pos-cart {
+        flex: 1;
+        overflow: auto;
+        margin: 10px 0;
+      }
+      .pos-unique .pos-cart-empty {
+        text-align: center;
+        padding: 30px 20px;
+        color: #888;
+        font-style: italic;
+      }
+      .pos-unique .pos-cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        background: #161a18;
+        padding: 10px;
+        border-radius: 6px;
+      }
+      .pos-unique .pos-qty {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .pos-unique .pos-qty button {
+        background: #444;
+        color: #fff;
+        border: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .pos-unique .pos-qty .pos-minus {
+        background: #e74c3c;
+      }
+      .pos-unique .pos-qty .pos-plus {
+        background: #2ecc71;
+      }
+      .pos-unique .pos-qty span {
+        min-width: 25px;
+        text-align: center;
+        font-weight: bold;
+      }
+
+      .pos-unique .pos-summary {
+        border-top: 1px solid #444;
+        padding-top: 10px;
+      }
+      .pos-unique .pos-summary div {
+        display: flex;
+        justify-content: space-between;
+        margin: 5px 0;
+      }
+      .pos-unique .pos-summary input {
+        width: 60px;
+        text-align: center;
+        padding: 5px;
+        margin: 0;
+      }
+
+      /* payments */
+      .pos-unique .pos-payments {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .pos-unique .pos-payments button {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 6px;
+        color: #fff;
+        cursor: pointer;
+        opacity: 0.6;
+        transition: 0.2s;
+      }
+      .pos-unique .pos-cash {
+        background: #0a4fff;
+      }
+      .pos-unique .pos-upi {
+        background: #25aceb;
+      }
+      .pos-unique .pos-payments button.active {
+        opacity: 1;
+        outline: 2px solid #fff;
+      }
+
+      /* place order */
+      .pos-unique .pos-place {
+        margin-top: 10px;
+        padding: 12px;
+        background: #b38b00;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #000;
+      }
+
+      /* ===== BILL MODAL ===== */
+      .pos-unique .pos-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.3s;
+        z-index: 1000;
+      }
+      .pos-unique .pos-modal.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .pos-unique .pos-bill {
+        background: #222826;
+        width: 380px;
+        border-radius: 12px;
+        padding: 20px;
+        transform: scale(0.8) translateY(30px);
+        transition: 0.3s;
+      }
+      .pos-unique .pos-modal.show .pos-bill {
+        transform: scale(1) translateY(0);
+      }
+
+      .pos-unique .pos-bill h2 {
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      .pos-unique .pos-bill hr {
+        border: 1px solid #444;
+        margin: 10px 0;
+      }
+      .pos-unique .pos-bill .pos-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        margin: 4px 0;
+      }
+      .pos-unique .pos-bill-items {
+        max-height: 150px;
+        overflow: auto;
+        font-size: 14px;
+        margin: 10px 0;
+      }
+      .pos-unique .pos-bill-items .pos-row {
+        padding: 6px;
+        background: #161a18;
+        border-radius: 4px;
+        margin: 3px 0;
+      }
+      .pos-unique .pos-bill-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+      .pos-unique .pos-bill-actions button {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .pos-unique .pos-confirm {
+        background: #1e8f4d;
+        color: #fff;
+      }
+      .pos-unique .pos-cancel {
+        background: #444;
+        color: #fff;
+      }
+
+      /* MESSAGE MODAL */
+      .pos-unique .pos-message-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.3s;
+        z-index: 1001;
+      }
+      .pos-unique .pos-message-modal.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .pos-unique .pos-message-box {
+        background: #222826;
+        width: 320px;
+        border-radius: 10px;
+        padding: 25px;
+        text-align: center;
+        transform: scale(0.8) translateY(30px);
+        transition: 0.3s;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+      .pos-unique .pos-message-modal.show .pos-message-box {
+        transform: scale(1) translateY(0);
+      }
+      .pos-unique .pos-message-box h3 {
+        margin-bottom: 15px;
+        color: #ffc107;
+      }
+      .pos-unique .pos-message-box p {
+        margin-bottom: 20px;
+        color: #ddd;
+      }
+      .pos-unique .pos-message-box button {
+        padding: 10px 25px;
+        background: #b38b00;
+        border: none;
+        border-radius: 6px;
+        color: #000;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      @media (max-width: 900px) {
+        .pos-unique .pos-app {
+          flex-direction: column;
+        }
+      }
+      
+    </style>
+  </head>
+
+  <body class="pos-unique">
+    <div class="pos-app">
+      <!-- LEFT -->
+      <div class="pos-left">
+        <div class="pos-search">
+          <input
+            id="pos-search"
+            placeholder="Search items.."
+            onkeyup="posRenderProducts()"
+          />
+          <button>🔍</button>
+        </div>
+        <div class="pos-products" id="pos-products"></div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="pos-right">
+        <input id="pos-custName" placeholder="Customer name" />
+        <input id="pos-custMobile" placeholder="Mobile number" />
+
+        <div class="pos-cart" id="pos-cart">
+          <div class="pos-cart-empty">Your cart is empty.</div>
+        </div>
+
+        <div class="pos-summary">
+          <div><span>Subtotal:</span><span id="pos-item">₹0</span></div>
+
+          <div>
+            <span>Tax (%)</span>
+            <input id="pos-taxInput" value="1" oninput="posUpdateTotal()" />
+          </div>
+
+          <div>
+            <span>Discount (%)</span>
+            <input id="pos-discountInput" value="0" oninput="posUpdateTotal()" />
+          </div>
+
+          <div>
+            <strong>Total:</strong>
+            <strong id="pos-total">₹0</strong>
+          </div>
+        </div>
+
+        <div class="pos-payments">
+          <button class="pos-cash" onclick="posSelectPayment('Cash', this)">
+            Cash
+          </button>
+          <button class="pos-upi" onclick="posSelectPayment('UPI', this)">
+            UPI
+          </button>
+        </div>
+
+        <button class="pos-place" onclick="posOpenBill()">Place Order</button>
+      </div>
+    </div>
+
+    <!-- BILL MODAL -->
+    <div class="pos-modal" id="pos-modal">
+      <div class="pos-bill">
+        <h2>Order Bill</h2>
+        <hr />
+
+        <div class="pos-row"><span>Name</span><span id="pos-bName"></span></div>
+        <div class="pos-row"><span>Mobile</span><span id="pos-bMobile"></span></div>
+        <div class="pos-row">
+          <span>Payment</span><span id="pos-bPayment"></span>
+        </div>
+
+        <hr />
+        <div class="pos-bill-items" id="pos-bItems"></div>
+        <hr />
+
+        <div class="pos-row"><span>Tax (%)</span><span id="pos-bTax"></span></div>
+        <div class="pos-row">
+          <span>Discount (%)</span><span id="pos-bDiscount"></span>
+        </div>
+
+        <div class="pos-row" style="font-weight: bold">
+          <span>Total</span>
+          <span id="pos-bTotal"></span>
+        </div>
+
+        <!-- WHATSAPP OPTION -->
+        <div class="pos-row" style="align-items: center; gap: 6px">
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              cursor: pointer;
+            "
+          >
+            <input type="checkbox" id="pos-sendWhatsapp" checked />
+            Send bill to WhatsApp
+          </label>
+        </div>
+
+        <div class="pos-bill-actions">
+          <button class="pos-confirm" onclick="posConfirmOrder()">Confirm</button>
+          <button class="pos-cancel" onclick="posCloseBill()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGE MODAL -->
+    <div class="pos-message-modal" id="pos-messageModal">
+      <div class="pos-message-box">
+        <h3 id="pos-messageTitle">Message</h3>
+        <p id="pos-messageText">This is a message.</p>
+        <button onclick="posCloseMessage()">OK</button>
+      </div>
+    </div>
+
+    <script>
+      // Product data with stock information
+      let posProductsData = [
+        { id: 1, name: "Boat ear phone", price: 599, stock: 15, image: "https://i.imgur.com/lb6J8E0.png" },
+        { id: 2, name: "Sony headset", price: 1900, stock: 8, image: "https://i.imgur.com/Y7W3w5k.png" },
+        { id: 3, name: "HP basic mouse", price: 199, stock: 22, image: "https://i.imgur.com/9v9JQ6S.png" },
+        { id: 4, name: "Logitech keyboard", price: 1299, stock: 12, image: "https://i.imgur.com/zQZ3L9q.png" },
+        { id: 5, name: "Samsung SSD 500GB", price: 3499, stock: 7, image: "https://i.imgur.com/mR3L4tK.png" },
+        { id: 6, name: "iPhone Charger", price: 899, stock: 18, image: "https://i.imgur.com/8F7sG5D.png" },
+      ];
+
+      let posCart = [];
+      let posSelectedPayment = null;
+
+      // Calculate available stock
+      function posGetAvailableStock(productId) {
+        const product = posProductsData.find(p => p.id === productId);
+        if (!product) return 0;
+        
+        const cartItem = posCart.find(item => item.id === productId);
+        const cartQuantity = cartItem ? cartItem.qty : 0;
+        
+        return product.stock - cartQuantity;
+      }
+
+      // Get stock badge class
+      function posGetStockClass(availableStock) {
+        if (availableStock <= 0) return 'pos-stock-out';
+        if (availableStock <= 5) return 'pos-stock-low';
+        return 'pos-stock-in';
+      }
+
+      // Get stock text
+      function posGetStockText(availableStock) {
+        if (availableStock <= 0) return 'Out of Stock';
+        if (availableStock <= 5) return `Low: ${availableStock}`;
+        return `Stock: ${availableStock}`;
+      }
+
+      function posRenderProducts() {
+        const q = document.getElementById('pos-search').value.toLowerCase();
+        const productsDiv = document.getElementById('pos-products');
+        productsDiv.innerHTML = "";
+        
+        posProductsData
+          .filter((p) => p.name.toLowerCase().includes(q))
+          .forEach((p) => {
+            const availableStock = posGetAvailableStock(p.id);
+            const stockClass = posGetStockClass(availableStock);
+            const stockText = posGetStockText(availableStock);
+            
+            productsDiv.innerHTML += `
+              <div class="pos-product">
+                <img src="${p.image}">
+                <div class="pos-product-info">
+                  <h4>${p.name}</h4>
+                  <div class="pos-price-stock">
+                    <p>₹${p.price}</p>
+                  <span class="pos-stock-badge ${stockClass}">${stockText}</span>
+                  </div>
+                </div>
+                <button class="pos-add" onclick="posAddToCart(${p.id})" ${availableStock <= 0 ? 'disabled' : ''}>+</button>
+              </div>`;
+          });
+      }
+
+      function posAddToCart(id) {
+        const availableStock = posGetAvailableStock(id);
+        
+        if (availableStock <= 0) {
+          posShowMessage("Out of Stock", "This product is out of stock!");
+          return;
+        }
+        
+        let i = posCart.find((x) => x.id === id);
+        if (i) {
+          i.qty++;
+        } else {
+          const p = posProductsData.find((x) => x.id === id);
+          posCart.push({ ...p, qty: 1 });
+        }
+        
+        posRenderCart();
+        posRenderProducts(); // Update stock display
+        
+      }
+
+      function posRenderCart() {
+        const cartDiv = document.getElementById('pos-cart');
+        
+        if (!posCart.length) {
+          cartDiv.innerHTML = '<div class="pos-cart-empty">Your cart is empty.</div>';
+          posUpdateTotal();
+          return;
+        }
+        
+        cartDiv.innerHTML = "";
+        posCart.forEach((i) => {
+          cartDiv.innerHTML += `
+            <div class="pos-cart-item">
+              <span>${i.name}</span>
+              <div class="pos-qty">
+                <button class="pos-minus" onclick="posChangeQty(${i.id}, -1)">-</button>
+                <span>${i.qty}</span>
+                <button class="pos-plus" onclick="posChangeQty(${i.id}, 1)">+</button>
+              </div>
+            </div>`;
+        });
+        posUpdateTotal();
+      }
+
+      function posChangeQty(id, v) {
+        let i = posCart.find((x) => x.id === id);
+        if (!i) return;
+        
+        const newQty = i.qty + v;
+        
+        if (v < 0) {
+          i.qty = newQty;
+          if (i.qty <= 0) {
+            posCart = posCart.filter((x) => x.id !== id);
+          }
+        } else {
+          const availableStock = posGetAvailableStock(id);
+          if (availableStock <= 0) {
+            posShowMessage("Stock Limit", "No more stock available!");
+            return;
+          }
+          i.qty = newQty;
+        }
+        
+        posRenderCart();
+        posRenderProducts(); // Update stock display
+      }
+
+      function posUpdateTotal() {
+        let sub = posCart.reduce((a, i) => a + i.price * i.qty, 0);
+        let taxP = +document.getElementById('pos-taxInput').value || 0;
+        let disP = +document.getElementById('pos-discountInput').value || 0;
+        let taxed = sub + (sub * taxP) / 100;
+        let total = taxed - (taxed * disP) / 100;
+
+        document.getElementById('pos-item').innerText = "₹" + sub.toFixed(2);
+        document.getElementById('pos-total').innerText = "₹" + total.toFixed(2);
+      }
+
+      function posSelectPayment(m, b) {
+        posSelectedPayment = m;
+        document
+          .querySelectorAll(".pos-payments button")
+          .forEach((x) => x.classList.remove("active"));
+        b.classList.add("active");
+      }
+
+      function posOpenBill() {
+        if (!posCart.length) {
+          posShowMessage("Cart Empty", "Cart is empty! Add products first.");
+          return;
+        }
+        if (!posSelectedPayment) {
+          posShowMessage("Payment Required", "Select payment method!");
+          return;
+        }
+
+        document.getElementById('pos-bName').innerText = document.getElementById('pos-custName').value || "-";
+        document.getElementById('pos-bMobile').innerText = document.getElementById('pos-custMobile').value || "-";
+        document.getElementById('pos-bPayment').innerText = posSelectedPayment;
+        document.getElementById('pos-bTax').innerText = document.getElementById('pos-taxInput').value + "%";
+        document.getElementById('pos-bDiscount').innerText = document.getElementById('pos-discountInput').value + "%";
+
+        const bItems = document.getElementById('pos-bItems');
+        bItems.innerHTML = "";
+        posCart.forEach((i) => {
+          bItems.innerHTML += `
+            <div class="pos-row">
+              <span>${i.name} x${i.qty}</span>
+              <span>₹${(i.price * i.qty).toFixed(2)}</span>
+            </div>`;
+        });
+        
+        document.getElementById('pos-bTotal').innerText = document.getElementById('pos-total').innerText;
+        document.getElementById('pos-modal').classList.add("show");
+      }
+
+      function posCloseBill() {
+        document.getElementById('pos-modal').classList.remove("show");
+      }
+
+      function posConfirmOrder() {
+        // Reduce stock permanently
+        posCart.forEach(cartItem => {
+          const product = posProductsData.find(p => p.id === cartItem.id);
+          if (product) {
+            product.stock -= cartItem.qty;
+            if (product.stock < 0) product.stock = 0;
+          }
+        });
+        
+        const sendWhatsapp = document.getElementById('pos-sendWhatsapp').checked;
+        const customerName = document.getElementById('pos-custName').value || "Customer";
+        
+        posShowMessage(
+          "Order Confirmed",
+          `Order placed for ${customerName}!${sendWhatsapp ? " WhatsApp bill sent." : ""}`
+        );
+        
+        // Reset everything
+        posCart = [];
+        posSelectedPayment = null;
+        document.querySelectorAll(".pos-payments button").forEach((b) => b.classList.remove("active"));
+        document.getElementById('pos-custName').value = "";
+        document.getElementById('pos-custMobile').value = "";
+        document.getElementById('pos-taxInput').value = "1";
+        document.getElementById('pos-discountInput').value = "0";
+        
+        posCloseBill();
+        posRenderCart();
+        posRenderProducts();
+      }
+
+      // Message modal functions
+      function posShowMessage(title, text) {
+        document.getElementById('pos-messageTitle').innerText = title;
+        document.getElementById('pos-messageText').innerText = text;
+        document.getElementById('pos-messageModal').classList.add('show');
+      }
+
+      function posCloseMessage() {
+        document.getElementById('pos-messageModal').classList.remove('show');
+      }
+
+      // Initialize
+      document.addEventListener('DOMContentLoaded', () => {
+        posRenderProducts();
+        posRenderCart();
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            posCloseBill();
+            posCloseMessage();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

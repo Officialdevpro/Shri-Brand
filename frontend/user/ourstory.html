@@ -1,0 +1,1247 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shri C Valliappa's Visionary Mentorship</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&family=Poppins:wght@300;400;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #f8f9fa;
+      /* Light theme background */
+      color: #1a1a1a;
+      line-height: 1.7;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #7f0403 0%, #a00505 100%);
+      color: white;
+      padding: 40px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header h1 {
+      font-family: "Playfair Display", serif;
+      font-size: 42px;
+      margin-bottom: 15px;
+      font-weight: 700;
+      /* Remove gradient text effects */
+      background: none;
+      -webkit-background-clip: border-box;
+      background-clip: border-box;
+      -webkit-text-fill-color: initial;
+      text-shadow: none;
+    }
+
+    .header p {
+      font-size: 18px;
+      font-weight: 300;
+      opacity: 0.95;
+    }
+
+    /* Tab Navigation */
+    .tab-navigation {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      overflow-x: auto;
+      position: relative;
+      /* Changed from sticky */
+      /* top: 0; Removed */
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border-bottom: none;
+      -webkit-overflow-scrolling: touch;
+      /* Smooth scroll on iOS */
+    }
+
+    .tab-btn {
+      flex: 0 1 auto;
+      padding: 10px 25px;
+      background: #f1f3f5;
+      border: 2px solid transparent;
+      /* Prepare for hover border */
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      color: #555;
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      font-family: "Inter", sans-serif;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: #fffcf5;
+      border-color: #ffc406;
+      color: #7f0403;
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 5px 15px rgba(255, 196, 6, 0.3);
+    }
+
+    .tab-btn.active {
+      background: #ffc406;
+      color: #7f0403;
+      border-color: #ffc406;
+      box-shadow: 0 8px 20px rgba(255, 196, 6, 0.4);
+      transform: translateY(-2px) scale(1.05);
+      /* Keep scale on active */
+    }
+
+    .tab-btn.active::after {
+      display: none;
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+      padding: 50px 60px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Content Styles */
+    .section-title {
+      font-family: "Playfair Display", serif;
+      font-size: 32px;
+      color: #1a1a1a;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 3px solid #7f0403;
+    }
+
+    .content-text {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #333;
+      margin-bottom: 25px;
+      text-align: justify;
+    }
+
+    .highlight-box {
+      background: linear-gradient(135deg, #fff7e6 0%, #ffe0b2 100%);
+      padding: 30px;
+      border-left: 5px solid #ffc406;
+      margin: 30px 0;
+      border-radius: 4px;
+    }
+
+    .highlight-box h3 {
+      font-family: "Playfair Display", serif;
+      color: #7f0403;
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    .highlight-box p {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.7;
+    }
+
+    /* Image Grid */
+    /* Infinite Scroll Container */
+    /* Infinite Scroll Container */
+    .scroll-container {
+      width: 100%;
+      overflow: hidden;
+      margin: 40px 0;
+      position: relative;
+    }
+
+    .scroll-track {
+      display: flex;
+      gap: 25px;
+      padding-right: 25px;
+      /* Ensures gap consistency for seamless loop */
+      width: max-content;
+      animation: scroll 30s linear infinite;
+    }
+
+    /* Hover pause removed */
+
+    @keyframes scroll {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    .image-card {
+      flex: 0 0 500px;
+      /* Wider width */
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      /* More rounded */
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+      /* Deeper shadow */
+      transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+      margin-bottom: 25px;
+      /* Add some space for shadow */
+    }
+
+    .image-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .image-card img {
+      width: 100%;
+      height: 260px;
+      /* Decreased height */
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+      filter: brightness(0.95);
+    }
+
+    .image-card:hover img {
+      transform: scale(1.08);
+      /* Enhanced zoom */
+      filter: brightness(1.05);
+      /* Brighten on hover */
+    }
+
+    .image-card .caption {
+      position: relative;
+      background: linear-gradient(to bottom, #ffffff, #fdf8f0);
+      /* Subtle warmth */
+      color: #7f0403;
+      padding: 18px 20px;
+      font-family: "Poppins", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      /* Bolder */
+      letter-spacing: 0.3px;
+      text-align: center;
+      border-top: 4px solid #ffc406;
+      border-bottom: 1px solid #f0f0f0;
+      /* Subtle grouping */
+      z-index: 2;
+      transition: background 0.3s ease;
+    }
+
+    .image-card:hover .caption {
+      background: #fffcf5;
+      /* Slightly lighter on hover */
+      color: #a00505;
+    }
+
+    /* Two Column Layout */
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 35px;
+      margin: 30px 0;
+    }
+
+    .content-block {
+      background: #f8f9fa;
+      padding: 30px;
+      border-radius: 8px;
+      border-top: 4px solid #7f0403;
+    }
+
+    .content-block h3 {
+      font-family: "Playfair Display", serif;
+      font-size: 22px;
+      color: #7f0403;
+      margin-bottom: 15px;
+    }
+
+    .content-block p {
+      font-size: 15px;
+      color: #444;
+      margin-bottom: 15px;
+    }
+
+    .content-block ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .content-block li {
+      padding: 10px 0 10px 30px;
+      position: relative;
+      font-size: 15px;
+      color: #555;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .content-block li:last-child {
+      border-bottom: none;
+    }
+
+    .content-block li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #ffc406;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    /* Impact Cards */
+    /* Impact Cards - Now Scrolling */
+    .impact-card {
+      flex: 0 0 320px;
+      /* Slightly narrower for better fit */
+      background: linear-gradient(145deg, #ffffff, #fffcf5);
+      /* Subtle gradient */
+      padding: 40px 30px;
+      text-align: center;
+      color: #333;
+      border-radius: 20px;
+      /* Softer corners */
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05),
+        inset 0 0 0 1px rgba(255, 196, 6, 0.1);
+      /* Subtle border */
+      border-top: 5px solid transparent;
+      border-image: linear-gradient(to right, #7f0403, #ffc406) 1;
+      /* Gradient Border Hack */
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      /* Bouncy transition */
+      margin: 15px 0;
+      /* Vertical spacing */
+    }
+
+    /* Gradient overlay on hover */
+    .impact-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255, 196, 6, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .impact-card:hover::after {
+      opacity: 1;
+    }
+
+    .impact-card .icon {
+      font-size: 42px;
+      margin-bottom: 25px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 196, 6, 0.15);
+      /* Gold tint circle */
+      color: #7f0403;
+      border-radius: 50%;
+      box-shadow: 0 5px 15px rgba(255, 196, 6, 0.2);
+      transition: transform 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .impact-card:hover .icon {
+      transform: rotate(10deg) scale(1.1);
+      background: rgba(255, 196, 6, 0.25);
+    }
+
+    .impact-card h4 {
+      font-size: 20px;
+      margin-bottom: 15px;
+      font-weight: 700;
+      color: #7f0403;
+      letter-spacing: 0.5px;
+      font-family: "Playfair Display", serif;
+      /* Make headings more sophisticated */
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+
+    .impact-card p {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #555;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Featured Image */
+    .featured-image {
+      margin: 40px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    .featured-image img {
+      width: 100%;
+      height: 350px;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .featured-image:hover img {
+      transform: scale(1.02);
+      /* Minimal zoom */
+    }
+
+    /* Quote Box */
+    .quote-box {
+      background: #f8f9fa;
+      padding: 30px 40px;
+      border-left: 5px solid #7f0403;
+      margin: 30px 0;
+      font-style: italic;
+      font-size: 17px;
+      color: #555;
+      line-height: 1.8;
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding: 30px 0;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-left: 50px;
+      margin-bottom: 30px;
+      opacity: 0;
+      /* Hidden initially */
+    }
+
+    /* Animate timeline when tab is active */
+    .tab-content.active .timeline-item {
+      animation: slideDownFade 0.6s ease forwards;
+    }
+
+    .tab-content.active .timeline-item:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .tab-content.active .timeline-item:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+
+    .tab-content.active .timeline-item:nth-child(3) {
+      animation-delay: 0.5s;
+    }
+
+    .tab-content.active .timeline-item:nth-child(4) {
+      animation-delay: 0.7s;
+    }
+
+    @keyframes slideDownFade {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: 15px;
+      top: 0;
+      bottom: -30px;
+      width: 2px;
+      background: #7f0403;
+    }
+
+    .timeline-item:last-child::before {
+      display: none;
+    }
+
+    .timeline-item::after {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 5px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ffc406;
+      border: 3px solid white;
+      box-shadow: 0 0 0 2px #7f0403;
+    }
+
+    .timeline-item h4 {
+      font-size: 20px;
+      color: #7f0403;
+      margin-bottom: 10px;
+    }
+
+    .timeline-item p {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.7;
+    }
+
+    /* Footer */
+    .footer {
+      background: linear-gradient(135deg, #7f0403 0%, #5a0302 60%, #3d0201 100%);
+      color: white;
+      text-align: center;
+      padding: 50px 60px;
+      margin-top: 50px;
+      position: relative;
+      overflow: hidden;
+      border-top: 5px solid #ffc406;
+    }
+
+    .footer::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 196, 6, 0.5), transparent);
+    }
+
+    .footer p {
+      font-size: 14px;
+      opacity: 0.9;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .footer .company-name {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #ffc406;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        padding: 40px 20px;
+      }
+
+      .tab-navigation {
+        justify-content: flex-start;
+        /* Allow scrolling on mobile */
+        padding: 15px;
+      }
+
+      .tab-btn {
+        font-size: 14px;
+        padding: 10px 20px;
+        flex: 0 0 auto;
+        /* Stop shrinking */
+      }
+
+      .tab-content {
+        padding: 30px 20px;
+      }
+
+      .image-grid,
+      .two-column,
+      .impact-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header h1 {
+        font-size: 32px;
+      }
+
+      .section-title {
+        font-size: 26px;
+      }
+    }
+
+    /* Sparkle Animation */
+    .sparkle-particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: radial-gradient(circle, rgba(255, 196, 6, 0.9), rgba(255, 215, 0, 0.3));
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255, 196, 6, 0.8);
+      animation: sparkleFloat 15s infinite ease-in-out;
+      opacity: 0;
+    }
+
+    .sparkle:nth-child(1) {
+      left: 10%;
+      animation-delay: 0s;
+      animation-duration: 12s;
+    }
+
+    .sparkle:nth-child(2) {
+      left: 20%;
+      animation-delay: 2s;
+      animation-duration: 14s;
+    }
+
+    .sparkle:nth-child(3) {
+      left: 30%;
+      animation-delay: 4s;
+      animation-duration: 16s;
+    }
+
+    .sparkle:nth-child(4) {
+      left: 50%;
+      animation-delay: 1s;
+      animation-duration: 13s;
+    }
+
+    .sparkle:nth-child(5) {
+      left: 60%;
+      animation-delay: 3s;
+      animation-duration: 15s;
+    }
+
+    .sparkle:nth-child(6) {
+      left: 70%;
+      animation-delay: 5s;
+      animation-duration: 17s;
+    }
+
+    @keyframes sparkleFloat {
+      0% {
+        bottom: -10px;
+        opacity: 0;
+        transform: translateX(0) scale(0);
+      }
+
+      50% {
+        opacity: 1;
+        transform: translateX(-30px) scale(1.3);
+      }
+
+      100% {
+        bottom: 100%;
+        opacity: 0;
+        transform: translateX(10px) scale(0.8);
+      }
+    }
+
+    /* Animation CSS */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Solution Layout */
+    .solution-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .solution-layout .featured-image {
+      margin: 0;
+      height: 100%;
+    }
+
+    .solution-layout .featured-image img {
+      height: 100%;
+      min-height: 300px;
+      object-fit: cover;
+    }
+
+    @media (max-width: 768px) {
+      .solution-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="sparkle-particles">
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+      </div>
+      <h1>Shri C Valliappa's Visionary Mentorship</h1>
+      <p>Transforming Temple Waste into a Women-Led Social Enterprise</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+      <button class="tab-btn active" onclick="openTab(event, 'overview')">
+        Overview
+      </button>
+      <button class="tab-btn" onclick="openTab(event, 'problem')">
+        The Problem
+      </button>
+      <button class="tab-btn" onclick="openTab(event, 'vision')">
+        The Vision
+      </button>
+      <button class="tab-btn" onclick="openTab(event, 'solution')">
+        The Solution
+      </button>
+      <button class="tab-btn" onclick="openTab(event, 'impact')">
+        Impact
+      </button>
+    </div>
+
+    <!-- Tab Content: Overview -->
+    <div id="overview" class="tab-content active">
+      <h2 class="section-title">
+        A Story of Sustainability, Tradition & Empowerment
+      </h2>
+
+      <p class="content-text">
+        In the ancient Hindu tradition, flowers offered to Lord Almighty in
+        temples symbolize devotion, gratitude, and reverence. Yet, a paradox
+        persists in our sacred spaces: every single day, thousands of tons of
+        these flowers—symbols of spiritual offering—are discarded as waste.
+        This stark contradiction between devotion and waste caught the
+        attention of Shri C Valliappa, the Managing Trustee of three ancient
+        temples in Salem.
+      </p>
+
+      <div class="scroll-container">
+        <div class="scroll-track">
+          <!-- Original Set -->
+          <div class="image-card">
+            <img src="./waste.png" alt="Temple flowers discarded" />
+            <div class="caption">
+              Temple flowers thrown in the garbage
+            </div>
+          </div>
+          <div class="image-card">
+            <img src="./flowers.png" alt="Blessed flowers as waste" />
+            <div class="caption">
+              Temple blessed flowers destined for disposal
+            </div>
+          </div>
+          <div class="image-card">
+            <img src="./imag.png" alt="Shri C Valliappa" />
+            <div class="caption">
+              Shri C Valliappa - The Visionary Mentor
+            </div>
+          </div>
+          <div class="image-card">
+            <img src="./product.png" alt="Arudhra products" />
+            <div class="caption">
+              Arudhra Creations - Sacred Agarbathi Products
+            </div>
+          </div>
+
+          <!-- Duplicate Set for Infinite Scroll -->
+          <div class="image-card">
+            <img src="./waste.png" alt="Temple flowers discarded" />
+            <div class="caption">
+              Fig 1: Temple flowers thrown in the garbage
+            </div>
+          </div>
+          <div class="image-card">
+            <img src="./flowers.png" alt="Blessed flowers as waste" />
+            <div class="caption">
+              Fig 2: Temple blessed flowers destined for disposal
+            </div>
+          </div>
+          <div class="image-card">
+            <img src="./imag.png" alt="Shri C Valliappa" />
+            <div class="caption">
+              Fig 3: Shri C Valliappa - The Visionary Mentor
+            </div>
+          </div>
+          <div class="image-card">
+            <img src="./product.png" alt="Arudhra products" />
+            <div class="caption">
+              Fig 4: Arudhra Creations - Sacred Agarbathi Products
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quote-box">
+        "This is more than an environmental initiative—it's about aligning
+        spiritual values with entrepreneurial innovation, creating
+        opportunities where waste once existed."
+      </div>
+    </div>
+
+    <!-- Tab Content: The Problem -->
+    <div id="problem" class="tab-content">
+      <h2 class="section-title">The Paradox of Sacred Waste</h2>
+
+      <p class="content-text">
+        During his tenure as Managing Trustee at Shri Rajaganapathi Temple,
+        Sri Suganvaneswara Temple, and Sri Kashi Vishwanathar Temple in Salem,
+        Shri C Valliappa observed an alarming reality. The daily rituals of
+        temple worship generated enormous quantities of fresh flowers that,
+        despite their purity and fragrance, were destined for landfills.
+      </p>
+
+      <div class="highlight-box">
+        <h3>The Critical Challenge</h3>
+        <p>
+          These flowers, blessed by centuries of spiritual tradition, were
+          treated as waste products rather than valuable resources. The
+          cognitive dissonance between honoring the divine and discarding
+          these offerings troubled his conscience, propelling him to seek
+          solutions that could align spiritual values with environmental
+          responsibility.
+        </p>
+      </div>
+
+      <div class="two-column">
+        <div class="content-block">
+          <h3>Environmental Impact</h3>
+          <p>
+            Thousands of tons of organic waste generated daily from temples
+            across India contribute to:
+          </p>
+          <ul>
+            <li>Landfill burden and methane emissions</li>
+            <li>Loss of valuable organic resources</li>
+            <li>Environmental degradation</li>
+            <li>Missed circular economy opportunities</li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>Social-Economic Gap</h3>
+          <p>The waste represented a missed opportunity for:</p>
+          <ul>
+            <li>Sustainable value creation</li>
+            <li>Rural women's employment</li>
+            <li>Economic empowerment initiatives</li>
+            <li>Community development programs</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="featured-image">
+        <img src="image1.jpg" alt="Temple waste problem" />
+      </div>
+    </div>
+
+    <!-- Tab Content: The Vision -->
+    <div id="vision" class="tab-content">
+      <h2 class="section-title">Design Thinking Meets Mentorship</h2>
+
+      <p class="content-text">
+        Recognizing the magnitude of the challenge, Shri C Valliappa mentored
+        Dr M E Paramasivam, a faculty member at Sona College of Technology,
+        whose expertise in business analysis and market research proved
+        invaluable. Together, they embarked on an extensive exploration using
+        design thinking methodology.
+      </p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <h4>Problem Definition</h4>
+          <p>
+            Identified the paradox of sacred offerings becoming environmental
+            waste while rural women lacked economic opportunities.
+          </p>
+        </div>
+        <div class="timeline-item">
+          <h4>Market Research</h4>
+          <p>
+            Dr Paramasivam's analysis revealed that dried temple flowers could
+            serve as premium raw material for agarbathi (incense) production.
+          </p>
+        </div>
+        <div class="timeline-item">
+          <h4>Solution Prototyping</h4>
+          <p>
+            Developed circular economy model aligning with India's
+            sustainability vision and growing consumer demand for eco-friendly
+            products.
+          </p>
+        </div>
+        <div class="timeline-item">
+          <h4>Mentorship Catalyst</h4>
+          <p>
+            Shri Valliappa mentored Mrs G C Saranya, transforming her from
+            returning professional to social entrepreneur.
+          </p>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <h3>The Transformative Mentorship</h3>
+        <p>
+          The turning point came when Shri C Valliappa discussed this market
+          opportunity with Mrs G C Saranya, an MCA graduate and software
+          professional who had stepped away to embrace motherhood. Rather than
+          encouraging conventional employment, he mentored her toward
+          entrepreneurship—specifically, social entrepreneurship that combined
+          personal agency with community impact.
+        </p>
+      </div>
+
+      <div class="quote-box">
+        "True mentorship is not about directing people back to familiar
+        paths—it's about illuminating new possibilities that align personal
+        potential with societal need."
+      </div>
+    </div>
+
+    <!-- Tab Content: The Solution -->
+    <div id="solution" class="tab-content">
+      <h2 class="section-title">
+        Arudhra Creations: From Concept to Reality
+      </h2>
+
+      <div class="solution-layout">
+        <div class="solution-text">
+          <p class="content-text">
+            In August 2025, Arudhra Creations Pvt Limited was formally established
+            as a women-led rural startup dedicated to manufacturing agarbathi from
+            temple-blessed flowers. The name "Arudhra," synonymous with compassion
+            and sacred devotion, encapsulates the enterprise's dual mission:
+            honoring spiritual tradition while creating tangible economic value.
+          </p>
+        </div>
+        <div class="featured-image">
+          <img src="./award.png" alt="Women entrepreneurs at Arudhra Creations" />
+        </div>
+      </div>
+
+      <div class="two-column">
+        <div class="content-block">
+          <h3>Product Innovation</h3>
+          <ul>
+            <li>Sacred raw material from post-worship flower collection</li>
+            <li>Artisanal processing using traditional drying methods</li>
+            <li>Zero-waste manufacturing with composted byproducts</li>
+            <li>Premium positioning with cultural authenticity</li>
+            <li>Natural fragrance and therapeutic properties</li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>Institutional Recognition</h3>
+          <ul>
+            <li>Faculty startup under NEP 2020 framework</li>
+            <li>Sona Incubation Foundation support</li>
+            <li>Aligned with Startup India Initiative</li>
+            <li>Women-led enterprise certification</li>
+            <li>Sustainable Development Goals compliance</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <h3>Circular Economy in Action</h3>
+        <p>
+          The agarbathi produced by Arudhra Creations embodies sustainable
+          entrepreneurship principles. Every aspect of the production
+          process—from sacred flower collection to artisanal processing to
+          zero-waste byproduct management—demonstrates practical
+          implementation of circular economy ideals. Market validation through
+          EXPO events and preliminary sales have demonstrated strong consumer
+          acceptance among temple devotees, spirituality enthusiasts, and
+          eco-conscious consumers.
+        </p>
+      </div>
+    </div>
+
+    <!-- Tab Content: Impact -->
+    <div id="impact" class="tab-content">
+      <h2 class="section-title">
+        National Vision Alignment & Scalable Impact
+      </h2>
+
+      <p class="content-text">
+        The Prime Minister's vision of "Startup India" articulates a
+        comprehensive entrepreneurial ecosystem where innovation drives
+        inclusive economic growth and sustainable development. Arudhra
+        Creations embodies this vision across multiple dimensions, creating a
+        blueprint for transformation that extends far beyond Salem.
+      </p>
+
+      <div class="scroll-container">
+        <div class="scroll-track">
+          <!-- Original Set -->
+          <div class="impact-card">
+            <div class="icon">♻️</div>
+            <h4>Circular Economy</h4>
+            <p>
+              Converting waste into value, supporting India's commitment to
+              sustainable development and smart waste management
+            </p>
+          </div>
+          <div class="impact-card">
+            <div class="icon">👩‍💼</div>
+            <h4>Women Empowerment</h4>
+            <p>
+              Creating dignified employment for rural women, advancing gender
+              equality and economic independence
+            </p>
+          </div>
+          <div class="impact-card">
+            <div class="icon">🌾</div>
+            <h4>Rural Development</h4>
+            <p>
+              Addressing geographic inequality and supporting rural prosperity
+              through inclusive growth
+            </p>
+          </div>
+          <div class="impact-card">
+            <div class="icon">🎓</div>
+            <h4>Academic Innovation</h4>
+            <p>
+              NEP 2020 alignment promoting innovation, problem-solving, and
+              entrepreneurial education
+            </p>
+          </div>
+          <div class="impact-card">
+            <div class="icon">🇮🇳</div>
+            <h4>Startup India</h4>
+            <p>
+              Demonstrating that profitability and social impact are mutually
+              reinforcing when structured with purpose
+            </p>
+          </div>
+          <div class="impact-card">
+            <div class="icon">📈</div>
+            <h4>Scalable Model</h4>
+            <p>
+              Replicable blueprint for thousands of temples across India,
+              multiplying positive impact nationwide
+            </p>
+          </div>
+
+          <!-- Duplicate Set for Infinite Scroll -->
+          <div class="impact-card">
+            <div class="icon">♻️</div>
+            <h4>Circular Economy</h4>
+            <p>
+              Converting waste into value, supporting India's commitment to
+              sustainable development and smart waste management
+            </p>
+          </div>
+          <div class="impact-card">
+            <div class="icon">👩‍💼</div>
+            <h4>Women Empowerment</h4>
+            <p>
+              Creating dignified employment for rural women, advancing gender
+              equality and economic independence
+            </p>
+          </div>
+          <div class="impact-card">
+            <div class="icon">🌾</div>
+            <h4>Rural Development</h4>
+            <p>
+              Addressing geographic inequality and supporting rural prosperity
+              through inclusive growth
+            </p>
+          </div>
+          <div class="impact-card">
+            <div class="icon">🎓</div>
+            <h4>Academic Innovation</h4>
+            <p>
+              NEP 2020 alignment promoting innovation, problem-solving, and
+              entrepreneurial education
+            </p>
+          </div>
+          <div class="impact-card">
+            <div class="icon">🇮🇳</div>
+            <h4>Startup India</h4>
+            <p>
+              Demonstrating that profitability and social impact are mutually
+              reinforcing when structured with purpose
+            </p>
+          </div>
+          <div class="impact-card">
+            <div class="icon">📈</div>
+            <h4>Scalable Model</h4>
+            <p>
+              Replicable blueprint for thousands of temples across India,
+              multiplying positive impact nationwide
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <h3>The Ripple Effect</h3>
+        <p>
+          Perhaps most significantly, Arudhra Creations presents a replicable
+          model that extends far beyond Salem. India contains thousands of
+          temples, each generating daily flower waste. Each represents an
+          opportunity for similar social enterprises. The modular nature of
+          the business model—temple flower collection, artisanal processing,
+          product manufacturing, rural women employment—can be adapted to
+          diverse geographies, products, and communities.
+        </p>
+      </div>
+
+      <div class="quote-box">
+        "In Salem's temples, where flowers continue their daily journey from
+        offering to earth, a new narrative is unfolding—one where ancient
+        spiritual practice intersects with modern entrepreneurship, where
+        waste becomes resource, where returning mothers become enterprise
+        leaders, and where a mentor's vision catalyzes systemic change."
+      </div>
+
+      <div class="two-column">
+        <div class="content-block">
+          <h3>Key Success Factors</h3>
+          <ul>
+            <li>Visionary mentorship approach</li>
+            <li>Design thinking methodology</li>
+            <li>Academic-industry collaboration</li>
+            <li>Women-centric empowerment model</li>
+            <li>Cultural sensitivity and respect</li>
+          </ul>
+        </div>
+
+        <div class="content-block">
+          <h3>Future Potential</h3>
+          <ul>
+            <li>National temple network integration</li>
+            <li>Product line diversification</li>
+            <li>Export market expansion</li>
+            <li>Franchise model development</li>
+            <li>Technology integration for scale</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Intersection Observer for fade-up animations
+    document.addEventListener("DOMContentLoaded", function () {
+      const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+      };
+
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      const elements = document.querySelectorAll('.image-card, .impact-card, .content-block, .highlight-box, .featured-image, .section-title');
+      elements.forEach(el => {
+        el.classList.add('fade-up');
+        observer.observe(el);
+      });
+    });
+
+    function openTab(evt, tabName) {
+      // Hide all tab contents
+      var tabContents = document.getElementsByClassName("tab-content");
+      for (var i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove("active");
+      }
+
+      // Remove active class from all tab buttons
+      var tabBtns = document.getElementsByClassName("tab-btn");
+      for (var i = 0; i < tabBtns.length; i++) {
+        tabBtns[i].classList.remove("active");
+      }
+
+      // Show the selected tab and mark button as active
+      document.getElementById(tabName).classList.add("active");
+      evt.currentTarget.classList.add("active");
+
+      // Scroll to top of tab content removed as per user request
+    }
+
+    // Handle image load errors with gradient placeholder
+    document.addEventListener("DOMContentLoaded", function () {
+      const images = document.querySelectorAll("img");
+      images.forEach((img) => {
+        img.addEventListener("error", function () {
+          this.style.background =
+            "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)";
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>

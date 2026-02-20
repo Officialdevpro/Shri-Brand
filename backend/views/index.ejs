@@ -1,0 +1,1642 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shri Brand</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/assets/images/logo/Logo.png" />
+
+  <!-- Fonts & Icons -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Project styles -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/mediaquery.css" />
+  <link rel="stylesheet" href="/css/products.css" />
+  <link rel="stylesheet" href="/css/ourstory.css" />
+
+  <!-- Small page-scoped styles (merged/trimmed) -->
+  <style>
+    /* layout helpers used on this page (kept minimal) */
+    #home {
+      display: flex;
+      justify-content: center;
+      align-items: start;
+      width: 100%;
+      height: 100vh;
+      position: relative;
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      padding-top: 15vh;
+      /* Push down from top */
+      text-align: center;
+    }
+
+    /* hero buttons */
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      z-index: 5;
+    }
+
+    .timeline-item h4 {
+      text-align: left;
+      width: 100%;
+
+    }
+
+    .btn2 {
+      display: inline-block;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      border: none;
+      font-family: "Poppins", sans-serif;
+      font-size: 1rem;
+      z-index: 3;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .btn-primary {
+      background-color: #7f0403;
+      color: var(--white);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: #7f0403;
+      border: 2px solid #8b4513;
+    }
+
+    #viewerImg {
+      position: relative;
+      z-index: 2;
+      transition:
+        transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.6s ease;
+      will-change: transform, opacity;
+    }
+
+    /* small utility used for thumbnails */
+    .small {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Auth Guard: Redirect to auth.html if not logged in -->
+  <script>
+    /* (function () {
+       const token = localStorage.getItem('token');
+       if (!token) {
+         window.location.href = 'auth.html';
+       }
+     })();*/
+  </script>
+  <header class="site-header" role="banner">
+    <nav class="container" aria-label="Main navigation">
+      <div class="nav-row">
+        <div class="logo-wrap">
+          <img id="site-logo" class="logo" src="/assets/images/logo/Logo.png" alt="Shri Brand" />
+          <!-- <h2 style="color: #7f0403; margin-left: .5rem;">Shri Brand</h2> -->
+        </div>
+
+        <div id="desktop-nav" class="desktop-nav" role="menubar" aria-label="Primary">
+          <a class="nav-link" href="#home" role="menuitem">Home<span class="underline" aria-hidden="true"></span></a>
+          <a class="nav-link" href="#products" role="menuitem">Products<span class="underline"
+              aria-hidden="true"></span></a>
+          <a class="nav-link" href="#about" role="menuitem">About Us<span class="underline"
+              aria-hidden="true"></span></a>
+          <a class="nav-link" href="#ourstory" role="menuitem">Our Story<span class="underline"
+              aria-hidden="true"></span></a>
+          <a class="nav-link" href="#contact" role="menuitem">Contact Us<span class="underline"
+              aria-hidden="true"></span></a>
+        </div>
+
+        <!-- Right side icons group (Profile, Cart, Hamburger) -->
+        <div class="nav-right-group">
+          <div class="user-info">
+            <a class="user-btn profile-btn" href="/profile" role="menuitem" title="Profile">
+              <i class="fas fa-user"></i>
+              <span>Profile</span>
+            </a>
+            <a class="user-btn cart-btn" role="menuitem" onclick="toggleCard()">
+              <i class="fas fa-shopping-cart"></i>
+              <span class="cart-count" id="nav-cart-count">0</span>
+            </a>
+          </div>
+
+          <div class="mobile-button-wrap">
+            <button id="menu-toggle" class="mobile-menu-toggle" aria-label="Toggle navigation">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Overlay -->
+      <div class="mobile-overlay" id="mobile-overlay"></div>
+
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar" id="sidebar">
+        <!-- Top Decoration -->
+        <div class="sidebar-top-decoration">
+          <img src="/assets/images/images/floral.png" alt="Floral Decoration">
+        </div>
+
+        <div class="profile-summary">
+          <div class="sidebar-logo-container">
+            <img src="/assets/images/logo/Logo.png" alt="Shri Brand" class="sidebar-logo">
+          </div>
+          <h3 class="profile-name-sidebar">Shri Brand</h3>
+        </div>
+
+        <div class="nav-menu">
+          <a class="nav-item" href="#home" onclick="closeSidebar()">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+          </a>
+          <a class="nav-item" href="#products" onclick="closeSidebar()">
+            <i class="fas fa-box-open"></i>
+            <span>Products</span>
+          </a>
+          <a class="nav-item" href="#about" onclick="closeSidebar()">
+            <i class="fas fa-info-circle"></i>
+            <span>About Us</span>
+          </a>
+          <a class="nav-item" href="#ourstory" onclick="closeSidebar()">
+            <i class="fas fa-book-open"></i>
+            <span>Our Story</span>
+          </a>
+          <a class="nav-item" href="#contact" onclick="closeSidebar()">
+            <i class="fas fa-envelope"></i>
+            <span>Contact Us</span>
+          </a>
+          <a class="nav-item" href="/profile">
+            <i class="fas fa-user"></i>
+            <span>My Profile</span>
+          </a>
+        </div>
+
+        <!-- Bottom Decoration -->
+        <div class="sidebar-bottom-decoration">
+          <img src="/assets/images/images/3.png" alt="Bottom Decoration">
+        </div>
+      </aside>
+    </nav>
+  </header>
+  </nav>
+  </header>
+  <style>
+    main {
+      position: relative;
+      min-height: 200vh;
+      /* just to show scrolling */
+    }
+
+    #card {
+      width: 35%;
+      height: calc(100vh - 60px);
+      /* ✅ IMPORTANT */
+      background-color: #ffffff;
+      position: fixed;
+      top: 60px;
+      right: 0;
+      z-index: 20;
+
+      display: flex;
+      flex-direction: column;
+
+      overflow-y: auto;
+      /* ✅ use auto, not scroll */
+      transform: translateX(100%);
+      transition: transform 0.5s ease-in-out;
+    }
+
+    /* Mobile: Cart takes 100% width */
+    @media (max-width: 767px) {
+      #card {
+        width: 100%;
+        top: 50px;
+        height: calc(100vh - 50px);
+      }
+    }
+
+    /* When active */
+    #card.active {
+      transform: translateX(0);
+    }
+
+    /* Prevent page scroll when card is open */
+    body.no-scroll {
+      overflow: hidden;
+    }
+
+    /* Cart Backdrop Overlay */
+    .cart-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+      z-index: 15;
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+    }
+
+    .cart-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .product-details {
+      text-align: center;
+
+      font-size: 16px;
+      width: 100% !important;
+    }
+
+    .product-details .selecteditems {
+      display: flex;
+      justify-content: start;
+      align-items: center;
+      text-align: left;
+      padding: 10px 10px;
+      border-bottom: 1px solid #818181;
+      width: 100%;
+    }
+
+    .product-details .selecteditems .card-img img {
+      width: 120px;
+      height: 120px;
+      -o-object-fit: cover;
+      object-fit: cover;
+      -o-object-position: center;
+      object-position: center;
+      border-radius: 10%;
+    }
+
+    .product-details .selecteditems .product-d {
+      margin-left: 10px;
+    }
+
+    .product-details .selecteditems .product-d p,
+    .product-details .selecteditems .product-d span {
+      font-size: 12px !important;
+      color: #666666;
+    }
+
+    .product-details .selecteditems .product-d .btns {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+    }
+
+    .product-details .selecteditems .product-d .btns {
+      border: none;
+      border-radius: 3px;
+    }
+
+    .btns {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    /* Quantity box */
+    .qty-control {
+      display: flex;
+      align-items: center;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    /* + and - buttons */
+    .qty-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: #f5f5f5;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .qty-btn:hover {
+      background: #ddd;
+    }
+
+    /* Quantity number */
+    .qty-value {
+      width: 40px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      background: #fff;
+    }
+
+    /* Remove button */
+    .remove {
+      background: #ffb703;
+      border: none;
+      padding: 9px 30px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+  </style>
+
+  <main>
+    <!-- Cart Backdrop - blurs content when cart is open -->
+    <div class="cart-backdrop" id="cart-backdrop" onclick="toggleCard()"></div>
+
+    <div id="card">
+      <!-- Cart Header -->
+      <div class="cart-header">
+        <h3>Your Cart</h3>
+        <span id="cart-item-count">0 items</span>
+      </div>
+
+      <!-- Cart Items Container - Dynamically populated -->
+      <div id="cart-items-container">
+        <!-- Cart items will be loaded dynamically via JavaScript -->
+        <div class="empty-cart-message" id="empty-cart-msg">
+          <i class="fas fa-shopping-cart" style="font-size: 48px; color: #ccc; margin-bottom: 10px"></i>
+          <p>Your cart is empty</p>
+          <small>Add products to see them here</small>
+        </div>
+      </div>
+
+      <!-- Cart Summary -->
+      <div class="cart-summary" id="cart-summary">
+        <div class="summary-row total">
+          <span>Total:</span>
+          <span id="cart-total">₹0</span>
+        </div>
+        <button class="checkout-btn" id="checkout-btn">
+          Proceed to Checkout
+        </button>
+      </div>
+    </div>
+    <section id="home">
+      <!-- Golden sparkle particles -->
+      <div class="sparkle-particles">
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+      </div>
+
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <span class="hero-title-line">Divine</span>
+          <span class="hero-title-line highlight">Fragrances</span>
+        </h1>
+        <p class="hero-subtitle">Sacred Aromas from Temple Flowers</p>
+      </div>
+    </section>
+
+    <section class="split-section" id="products">
+      <div class="split-inner">
+        <div class="split-left">
+          <div class="content">
+            <h2 class="attractive">
+              Shri Agarbathi Premium Quality Sacred Origins
+            </h2>
+            <p class="lead">
+              Crafted to capture the sacred ambience, spiritual depth, and
+              timeless fragrance traditions of South Indian temples—bringing
+              their serene essence into every moment.
+            </p>
+
+            <div class="counters">
+              <div class="counter" role="status" aria-live="polite">
+                <div class="num" data-target="8">0</div>
+                <div class="label">Fragrances</div>
+              </div>
+              <div class="counter" role="status" aria-live="polite">
+                <div class="num" data-target="120">0</div>
+                <div class="label">Temp Data</div>
+              </div>
+              <div class="counter" role="status" aria-live="polite">
+                <div class="num" data-target="15">0</div>
+                <div class="label">Temp Data</div>
+              </div>
+            </div>
+
+            <div class="hero-btns">
+              <a href="#products" class="btn2 btn-primary">Explore Our Fragrances</a>
+              <a href="#contact" class="btn2 btn-secondary">Enquire for Orders</a>
+            </div>
+          </div>
+
+          <span class="shape shape-1"></span>
+          <span class="shape shape-2"></span>
+        </div>
+
+        <div class="split-right" aria-hidden="true">
+          <div class="image-wrap">
+            <img src="/assets/images/images/8fragrances.png" alt="Decorative hero" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skeleton Loading Styles -->
+    <style>
+      /* Skeleton shimmer animation */
+      @keyframes skeleton-shimmer {
+        0% {
+          background-position: -200% 0;
+        }
+
+        100% {
+          background-position: 200% 0;
+        }
+      }
+
+      .skeleton-card {
+        width: 250px;
+        background: #fff;
+       
+        overflow: hidden;
+         padding: 5px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      }
+
+      .skeleton-img {
+       
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      }
+
+      .skeleton-body {
+        padding: 16px 10px 0px 10px;
+      }
+
+      .skeleton-line {
+        height: 14px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      }
+
+      .skeleton-line.title {
+        width: 60%;
+        height: 18px;
+      }
+
+      .skeleton-line.desc {
+        width: 80%;
+      }
+
+      .skeleton-line.price {
+        width: 40%;
+        height: 16px;
+      }
+
+      .skeleton-line.btn {
+        width: 100%;
+        height: 40px;
+        border-radius: 50px;
+        margin-top: 12px;
+      }
+
+      /* Hide skeletons when products a
+      re loaded */
+      .products-loaded .skeleton-card {
+        display: none;
+      }
+    </style>
+
+    <section class="pro-cont">
+      <!-- ========== Products (single) ========== -->
+      <div class="veg-container showcard">
+        <h3>Single Pack</h3>
+        <ul class="products-ul">
+          <% if (products && products.length> 0) { %>
+            <% products.forEach(function(product) { %>
+              <li>
+                <div class="card" data-product-id="<%= product._id %>" data-slug="<%= product.slug %>"
+                  style="cursor:pointer">
+                  <% if (product.stock <=0) { %>
+                    <span class="stock-label">Out of Stock</span>
+                    <% } %>
+                      <div class="card-img">
+                        <img loading="lazy" src="<%= product.mainImage %>" alt="<%= product.name %>" class="img" />
+                      </div>
+                      <div class="product-description">
+                        <p class="product-title">
+                          <%= product.name %>
+                        </p>
+                        <small class="sample">
+                          <%= product.shortDescription.slice(0, 55) %>..
+                        </small><br />
+                        <p class="rupees"><span class="rupees"></span>₹<%= product.price %>
+                        </p>
+                        <% if (product.originalPrice) { %>
+                          <span class="light">M.R.P:<strike class="light">₹<%= product.originalPrice %></strike>(<%=
+                              product.discountPercentage %>% Off)</span>
+                          <% } %>
+                      </div>
+                      <button class="addtoplate" data-item-name="<%= product.productType %>"
+                        data-id="<%= product._id %>">
+                        Add to Cart
+                      </button>
+                </div>
+              </li>
+              <% }); %>
+                <% } else { %>
+                  <!-- Skeleton placeholders -->
+                  <% for (var i=0; i < 6; i++) { %>
+                    <li>
+                      <div class="skeleton-card">
+                        <div class="skeleton-img"></div>
+                        <div class="skeleton-body">
+                          <div class="skeleton-line title"></div>
+                          <div class="skeleton-line desc"></div>
+                          <div class="skeleton-line price"></div>
+                          <div class="skeleton-line btn"></div>
+                        </div>
+                      </div>
+                    </li>
+                    <% } %>
+                      <% } %>
+        </ul>
+      </div>
+
+      <!-- ========== Combo Packs ========== -->
+      <div class="non-veg-container showcard">
+        <h3>Combo Pack</h3>
+        <ul class="products-ul">
+          <% if (comboPacks && comboPacks.length> 0) { %>
+            <% comboPacks.forEach(function(product) { %>
+              <li>
+                <div class="card" data-product-id="<%= product._id %>" data-slug="<%= product.slug %>"
+                  style="cursor:pointer">
+                  <% if (product.stock <=0) { %>
+                    <span class="stock-label">Out of Stock</span>
+                    <% } %>
+                      <div class="card-img">
+                        <img loading="lazy" src="<%= product.mainImage %>" alt="<%= product.name %>" class="img" />
+                      </div>
+                      <div class="product-description">
+                        <p class="product-title">
+                          <%= product.name %>
+                        </p>
+                        <small class="sample">
+                          <%= product.shortDescription %>
+                        </small><br />
+                        <p class="rupees"><span class="rupees"></span>₹<%= product.price %>
+                        </p>
+                        <% if (product.originalPrice) { %>
+                          <span class="light">M.R.P:<strike class="light">₹<%= product.originalPrice %></strike>(<%=
+                              product.discountPercentage %>% Off)</span>
+                          <% } %>
+                      </div>
+                      <button class="addtoplate" data-item-name="<%= product.productType %>"
+                        data-id="<%= product._id %>">
+                        Add to Cart
+                      </button>
+                </div>
+              </li>
+              <% }); %>
+                <% } else { %>
+                  <% for (var i=0; i < 6; i++) { %>
+                    <li>
+                      <div class="skeleton-card">
+                        <div class="skeleton-img"></div>
+                        <div class="skeleton-body">
+                          <div class="skeleton-line title"></div>
+                          <div class="skeleton-line desc"></div>
+                          <div class="skeleton-line price"></div>
+                          <div class="skeleton-line btn"></div>
+                        </div>
+                      </div>
+                    </li>
+                    <% } %>
+                      <% } %>
+        </ul>
+      </div>
+
+      <!-- ========== Gift Packs ========== -->
+      <div class="recommended-section showcard">
+        <h3>Gift Pack</h3>
+        <div class="cards-container">
+          <% if (giftPacks && giftPacks.length> 0) { %>
+            <% giftPacks.forEach(function(product) { %>
+              <div class="gift-card" data-product-id="<%= product._id %>" data-slug="<%= product.slug %>"
+                style="cursor:pointer">
+                <div class="gift-card-img">
+                  <img loading="lazy" src="<%= product.mainImage %>" alt="<%= product.name %>" class="img" />
+                </div>
+                <div class="gift-card-info">
+                  <h4>
+                    <%= product.name %>
+                  </h4>
+                  <p class="gift-desc">
+                    <%= product.shortDescription %>
+                  </p>
+                  <div class="gift-price">
+                    <span class="gift-current">₹<%= product.price %></span>
+                    <% if (product.originalPrice) { %>
+                      <span class="gift-original">₹<%= product.originalPrice %></span>
+                      <span class="gift-discount">
+                        <%= product.discountPercentage %>% Off
+                      </span>
+                      <% } %>
+                  </div>
+                  <button class="addtoplate" data-item-name="<%= product.productType %>" data-id="<%= product._id %>">
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+              <% }); %>
+                <% } else { %>
+                  <% for (var i=0; i < 6; i++) { %>
+                    <div class="skeleton-card">
+                      <div class="skeleton-img"></div>
+                      <div class="skeleton-body">
+                        <div class="skeleton-line title"></div>
+                        <div class="skeleton-line desc"></div>
+                        <div class="skeleton-line price"></div>
+                        <div class="skeleton-line btn"></div>
+                      </div>
+                    </div>
+                    <% } %>
+                      <% } %>
+        </div>
+      </div>
+    </section>
+
+
+
+    <section class="about-section" id="about">
+      <div class="about-container">
+        <div class="main-content">
+          <div class="company-header">
+            <div class="logo-container">
+              <div class="logo-gradient">
+                <img src="/assets/images/logo/ARUDHRA_CREATIONS_LOGO_page-0001.jpg" alt="Arudhra Creations"
+                  class="company-logo" />
+              </div>
+            </div>
+
+            <div class="company-info">
+              <div class="badge-row">
+                <span class="est-badge">Est. 2025</span>
+                <span class="type-badge"><i class="fas fa-certificate" aria-hidden="true"></i>
+                  Private Limited</span>
+              </div>
+              <h1 class="company-name">Arudhra Creations Private Limited</h1>
+              <p class="company-tagline">Women-led · Temple-inspired</p>
+            </div>
+          </div>
+
+          <div class="mission-statement">
+            <div class="mission-icon">
+              <i class="fas fa-praying-hands" aria-hidden="true"></i>
+            </div>
+            <p class="mission-text">
+              Every day, South Indian temples receive beautiful flowers
+              offered with reverence and devotion... Arudhra Creations Private
+              Limited believes these flowers deserve a second, sacred life. We
+              are a women-led enterprise based in Salem, Tamil Nadu, committed
+              to transforming temple-blessed flowers into premium, carbon-free
+              agarbathi sticks.
+            </p>
+          </div>
+
+          <div class="key-points">
+            <div class="point-card">
+              <div class="point-icon eco">
+                <img class="small" src="/assets/images/images/temp.jpg" alt="Temple image" />
+              </div>
+              <div class="point-content">
+                <h3>Women-Led Innovation</h3>
+                <p>
+                  A skilled women’s team leads our flower processing,
+                  fragrance blending, and hand-rolling, creating dignified
+                  livelihoods across Salem.
+                </p>
+              </div>
+            </div>
+
+            <div class="point-card">
+              <div class="point-icon women">
+                <img class="small" src="/assets/images/images/temp.jpg" alt="Temple image" />
+              </div>
+              <div class="point-content">
+                <h3>Salem-Rooted, Temple-Focused</h3>
+                <p>
+                  Based in Salem we partner with temples across the region to
+                  respectfully collect sacred flowers before disposal.
+                </p>
+              </div>
+            </div>
+
+            <div class="point-card">
+              <div class="point-icon temple">
+                <img class="small" src="/assets/images/images/temp.jpg" alt="Temple image" />
+              </div>
+              <div class="point-content">
+                <h3>Purpose-Driven Model</h3>
+                <p>
+                  We prevent sacred flowers from becoming waste, giving them a
+                  renewed spiritual purpose through eco-friendly, respectful
+                  transformation.
+                </p>
+              </div>
+            </div>
+            <div class="point-card">
+              <div class="point-icon temple">
+                <img class="small" src="/assets/images/images/temp.jpg" alt="Temple image" />
+              </div>
+              <div class="point-content">
+                <h3>Purpose-Driven Model</h3>
+                <p>
+                  We prevent sacred flowers from becoming waste, giving them a
+                  renewed spiritual purpose through eco-friendly, respectful
+                  transformation.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="company-details">
+            <div class="detail-item">
+              <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+              <div>
+                <span class="detail-label">Headquarters</span><span class="detail-value">Salem, Tamil Nadu</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-id-card" aria-hidden="true"></i>
+              <div>
+                <span class="detail-label">Registration</span><span class="detail-value">U20238TZ2025PTC035616</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="highlights-sidebar">
+          <div class="section-label">
+            <span>Key Highlights</span>
+            <div class="label-line"></div>
+          </div>
+
+          <div class="highlight-card">
+            <div class="card-header">
+              <div class="card-icon innovation">
+                <i class="fas fa-seedling" aria-hidden="true"></i>
+              </div>
+              <div class="card-title">
+                <h3>Women-Led Innovation</h3>
+                <span class="card-subtitle">Artisan-led sustainable craft</span>
+              </div>
+            </div>
+            <p class="card-desc">
+              Dignified livelihoods for women artisans — blending traditional
+              skills with modern quality control.
+            </p>
+            <div class="card-features">
+              <span class="feature-tag">Training & Fair Wages</span><span class="feature-tag">Handcraft + QC</span>
+            </div>
+          </div>
+
+          <div class="highlight-card">
+            <div class="card-header">
+              <div class="card-icon impact">
+                <i class="fas fa-city" aria-hidden="true"></i>
+              </div>
+              <div class="card-title">
+                <h3>Salem-Rooted & Temple-Focused</h3>
+                <span class="card-subtitle">Ethical sourcing partnerships</span>
+              </div>
+            </div>
+            <p class="card-desc">
+              We partner respectfully with temples across Salem and nearby
+              regions to collect offerings before disposal.
+            </p>
+          </div>
+
+          <div class="highlight-card">
+            <div class="card-header">
+              <div class="card-icon partnership">
+                <i class="fas fa-heart" aria-hidden="true"></i>
+              </div>
+              <div class="card-title">
+                <h3>Quality & Transparency</h3>
+                <span class="card-subtitle">Handcrafted • Charcoal-free • Rigorous QC</span>
+              </div>
+            </div>
+            <p class="card-desc">
+              Every stick is handcrafted or semi-mechanized using traditional
+              South Indian methods with strict quality checks.
+            </p>
+          </div>
+          <div class="highlight-card">
+            <div class="card-header">
+              <div class="card-icon innovation">
+                <i class="fas fa-seedling" aria-hidden="true"></i>
+              </div>
+              <div class="card-title">
+                <h3>Temp Data</h3>
+                <span class="card-subtitle">Artisan-led sustainable craft</span>
+              </div>
+            </div>
+            <p class="card-desc">
+              Dignified livelihoods for women artisans — blending traditional
+              skills with modern quality control.
+            </p>
+            <div class="card-features">
+              <span class="feature-tag">Training & Fair Wages</span><span class="feature-tag">Handcraft + QC</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <div class="story-section">
+      <h2 class="section-title fade-up attractive">
+        Our Journey From Temple Blessing to Fragrant Stick
+      </h2>
+      <h3 class="section-subtitle fade-up">
+        The Sacred Journey of Temple-Flower Transformation
+      </h3>
+      <div class="story-container" id="storyContainer"></div>
+      <div class="summary fade-up" id="summaryBox"></div>
+    </div>
+
+    <section id="ourstory">
+      <div class="ourstory-container">
+        <!-- Header -->
+        <div class="ourstory-header">
+          <div class="sparkle-particles">
+            <span class="sparkle"></span>
+            <span class="sparkle"></span>
+            <span class="sparkle"></span>
+            <span class="sparkle"></span>
+            <span class="sparkle"></span>
+            <span class="sparkle"></span>
+          </div>
+          <h1>Shri C Valliappa's Visionary Mentorship</h1>
+          <p>Transforming Temple Waste into a Women-Led Social Enterprise</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+          <button class="tab-btn active" onclick="openTab(event, 'overview')">
+            Overview
+          </button>
+          <button class="tab-btn" onclick="openTab(event, 'problem')">
+            The Problem
+          </button>
+          <button class="tab-btn" onclick="openTab(event, 'vision')">
+            The Vision
+          </button>
+          <button class="tab-btn" onclick="openTab(event, 'solution')">
+            The Solution
+          </button>
+          <button class="tab-btn" onclick="openTab(event, 'impact')">
+            Impact
+          </button>
+        </div>
+
+        <!-- Tab Content: Overview -->
+        <div id="overview" class="tab-content active">
+          <h2 class="os-section-title">
+            A Story of Sustainability, Tradition & Empowerment
+          </h2>
+
+          <p class="content-text">
+            In the ancient Hindu tradition, flowers offered to Lord Almighty in
+            temples symbolize devotion, gratitude, and reverence. Yet, a paradox
+            persists in our sacred spaces: every single day, thousands of tons of
+            these flowers—symbols of spiritual offering—are discarded as waste.
+            This stark contradiction between devotion and waste caught the
+            attention of Shri C Valliappa, the Managing Trustee of three ancient
+            temples in Salem.
+          </p>
+
+          <div class="scroll-container">
+            <div class="scroll-track">
+              <!-- Original Set -->
+              <div class="image-card">
+                <img src="/assets/images/pages/our-story/waste.png" alt="Temple flowers discarded" />
+                <div class="caption">
+                  Temple flowers thrown in the garbage
+                </div>
+              </div>
+              <div class="image-card">
+                <img src="/assets/images/pages/our-story/flowers.png" alt="Blessed flowers as waste" />
+                <div class="caption">
+                  Temple blessed flowers destined for disposal
+                </div>
+              </div>
+              <div class="image-card">
+                <img src="/assets/images/pages/our-story/mentorship.png" alt="Shri C Valliappa" />
+                <div class="caption">
+                  Shri C Valliappa - The Visionary Mentor
+                </div>
+              </div>
+              <div class="image-card">
+                <img src="/assets/images/pages/our-story/flavor.png" alt="Arudhra products" />
+                <div class="caption">
+                  Arudhra Creations - Sacred Agarbathi Products
+                </div>
+              </div>
+
+              <!-- Duplicate Set for Infinite Scroll -->
+              <div class="image-card">
+                <img src="/assets/images/pages/our-story/waste.png" alt="Temple flowers discarded" />
+                <div class="caption">
+                  Fig 1: Temple flowers thrown in the garbage
+                </div>
+              </div>
+              <div class="image-card">
+                <img src="/assets/images/pages/our-story/flowers.png" alt="Blessed flowers as waste" />
+                <div class="caption">
+                  Fig 2: Temple blessed flowers destined for disposal
+                </div>
+              </div>
+              <div class="image-card">
+                <img src="/assets/images/pages/our-story/mentorship.png" alt="Shri C Valliappa" />
+                <div class="caption">
+                  Fig 3: Shri C Valliappa - The Visionary Mentor
+                </div>
+              </div>
+              <div class="image-card">
+                <img src="/assets/images/pages/our-story/flavor.png" alt="Arudhra products" />
+                <div class="caption">
+                  Fig 4: Arudhra Creations - Sacred Agarbathi Products
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="quote-box">
+            "This is more than an environmental initiative—it's about aligning
+            spiritual values with entrepreneurial innovation, creating
+            opportunities where waste once existed."
+          </div> -->
+        </div>
+
+        <!-- Tab Content: The Problem -->
+        <div id="problem" class="tab-content">
+          <h2 class="os-section-title">The Paradox of Sacred Waste</h2>
+
+          <p class="content-text">
+            During his tenure as Managing Trustee at Shri Rajaganapathi Temple,
+            Sri Suganvaneswara Temple, and Sri Kashi Vishwanathar Temple in Salem,
+            Shri C Valliappa observed an alarming reality. The daily rituals of
+            temple worship generated enormous quantities of fresh flowers that,
+            despite their purity and fragrance, were destined for landfills.
+          </p>
+
+          <div class="highlight-box">
+            <h3>The Critical Challenge</h3>
+            <p>
+              These flowers, blessed by centuries of spiritual tradition, were
+              treated as waste products rather than valuable resources. The
+              cognitive dissonance between honoring the divine and discarding
+              these offerings troubled his conscience, propelling him to seek
+              solutions that could align spiritual values with environmental
+              responsibility.
+            </p>
+          </div>
+
+          <div class="two-column">
+            <div class="content-block">
+              <h3>Environmental Impact</h3>
+              <p>
+                Thousands of tons of organic waste generated daily from temples
+                across India contribute to:
+              </p>
+              <ul>
+                <li>Landfill burden and methane emissions</li>
+                <li>Loss of valuable organic resources</li>
+                <li>Environmental degradation</li>
+                <li>Missed circular economy opportunities</li>
+              </ul>
+            </div>
+
+            <div class="content-block">
+              <h3>Social-Economic Gap</h3>
+              <p>The waste represented a missed opportunity for:</p>
+              <ul>
+                <li>Sustainable value creation</li>
+                <li>Rural women's employment</li>
+                <li>Economic empowerment initiatives</li>
+                <li>Community development programs</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Content: The Vision -->
+        <div id="vision" class="tab-content">
+          <h2 class="os-section-title">Design Thinking Meets Mentorship</h2>
+
+          <p class="content-text">
+            Recognizing the magnitude of the challenge, Shri C Valliappa mentored
+            Dr M E Paramasivam, a faculty member at Sona College of Technology,
+            whose expertise in business analysis and market research proved
+            invaluable. Together, they embarked on an extensive exploration using
+            design thinking methodology.
+          </p>
+
+          <div class="timeline">
+            <div class="timeline-item">
+              <h4>Problem Definition</h4>
+              <p>
+                Identified the paradox of sacred offerings becoming environmental
+                waste while rural women lacked economic opportunities.
+              </p>
+            </div>
+            <div class="timeline-item">
+              <h4>Market Research</h4>
+              <p>
+                Dr Paramasivam's analysis revealed that dried temple flowers could
+                serve as premium raw material for agarbathi (incense) production.
+              </p>
+            </div>
+            <div class="timeline-item">
+              <h4>Solution Prototyping</h4>
+              <p>
+                Developed circular economy model aligning with India's
+                sustainability vision and growing consumer demand for eco-friendly
+                products.
+              </p>
+            </div>
+            <div class="timeline-item">
+              <h4>Mentorship Catalyst</h4>
+              <p>
+                Shri Valliappa mentored Mrs G C Saranya, transforming her from
+                returning professional to social entrepreneur.
+              </p>
+            </div>
+          </div>
+
+          <div class="highlight-box">
+            <h3>The Transformative Mentorship</h3>
+            <p>
+              The turning point came when Shri C Valliappa discussed this market
+              opportunity with Mrs G C Saranya, an MCA graduate and software
+              professional who had stepped away to embrace motherhood. Rather than
+              encouraging conventional employment, he mentored her toward
+              entrepreneurship—specifically, social entrepreneurship that combined
+              personal agency with community impact.
+            </p>
+          </div>
+
+          <!-- <div class="quote-box">
+            "True mentorship is not about directing people back to familiar
+            paths—it's about illuminating new possibilities that align personal
+            potential with societal need."
+          </div> -->
+        </div>
+
+        <!-- Tab Content: The Solution -->
+        <div id="solution" class="tab-content">
+          <h2 class="os-section-title">
+            Arudhra Creations: From Concept to Reality
+          </h2>
+
+          <div class="solution-layout">
+            <div class="solution-text">
+              <p class="content-text">
+                In August 2025, Arudhra Creations Pvt Limited was formally established
+                as a women-led rural startup dedicated to manufacturing agarbathi from
+                temple-blessed flowers. The name "Arudhra," synonymous with compassion
+                and sacred devotion, encapsulates the enterprise's dual mission:
+                honoring spiritual tradition while creating tangible economic value.
+              </p>
+            </div>
+            <div class="featured-image">
+              <img src="/assets/images/pages/our-story/award.png" alt="Women entrepreneurs at Arudhra Creations" />
+            </div>
+          </div>
+
+          <div class="two-column">
+            <div class="content-block">
+              <h3>Product Innovation</h3>
+              <ul>
+                <li>Sacred raw material from post-worship flower collection</li>
+                <li>Artisanal processing using traditional drying methods</li>
+                <li>Zero-waste manufacturing with composted byproducts</li>
+                <li>Premium positioning with cultural authenticity</li>
+                <li>Natural fragrance and therapeutic properties</li>
+              </ul>
+            </div>
+
+            <div class="content-block">
+              <h3>Institutional Recognition</h3>
+              <ul>
+                <li>Faculty startup under NEP 2020 framework</li>
+                <li>Sona Incubation Foundation support</li>
+                <li>Aligned with Startup India Initiative</li>
+                <li>Women-led enterprise certification</li>
+                <li>Sustainable Development Goals compliance</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="highlight-box">
+            <h3>Circular Economy in Action</h3>
+            <p>
+              The agarbathi produced by Arudhra Creations embodies sustainable
+              entrepreneurship principles. Every aspect of the production
+              process—from sacred flower collection to artisanal processing to
+              zero-waste byproduct management—demonstrates practical
+              implementation of circular economy ideals. Market validation through
+              EXPO events and preliminary sales have demonstrated strong consumer
+              acceptance among temple devotees, spirituality enthusiasts, and
+              eco-conscious consumers.
+            </p>
+          </div>
+        </div>
+
+        <!-- Tab Content: Impact -->
+        <div id="impact" class="tab-content">
+          <h2 class="os-section-title">
+            National Vision Alignment & Scalable Impact
+          </h2>
+
+          <p class="content-text">
+            The Prime Minister's vision of "Startup India" articulates a
+            comprehensive entrepreneurial ecosystem where innovation drives
+            inclusive economic growth and sustainable development. Arudhra
+            Creations embodies this vision across multiple dimensions, creating a
+            blueprint for transformation that extends far beyond Salem.
+          </p>
+
+          <div class="scroll-container">
+            <div class="scroll-track">
+              <!-- Original Set -->
+              <div class="impact-card">
+                <div class="icon">♻️</div>
+                <h4>Circular Economy</h4>
+                <p>
+                  Converting waste into value, supporting India's commitment to
+                  sustainable development and smart waste management
+                </p>
+              </div>
+              <div class="impact-card">
+                <div class="icon">👩‍💼</div>
+                <h4>Women Empowerment</h4>
+                <p>
+                  Creating dignified employment for rural women, advancing gender
+                  equality and economic independence
+                </p>
+              </div>
+              <div class="impact-card">
+                <div class="icon">🌾</div>
+                <h4>Rural Development</h4>
+                <p>
+                  Addressing geographic inequality and supporting rural prosperity
+                  through inclusive growth
+                </p>
+              </div>
+              <div class="impact-card">
+                <div class="icon">🎓</div>
+                <h4>Academic Innovation</h4>
+                <p>
+                  NEP 2020 alignment promoting innovation, problem-solving, and
+                  entrepreneurial education
+                </p>
+              </div>
+              <div class="impact-card">
+                <div class="icon">🇮🇳</div>
+                <h4>Startup India</h4>
+                <p>
+                  Demonstrating that profitability and social impact are mutually
+                  reinforcing when structured with purpose
+                </p>
+              </div>
+              <div class="impact-card">
+                <div class="icon">📈</div>
+                <h4>Scalable Model</h4>
+                <p>
+                  Replicable blueprint for thousands of temples across India,
+                  multiplying positive impact nationwide
+                </p>
+              </div>
+
+              <!-- Duplicate Set for Infinite Scroll -->
+              <div class="impact-card">
+                <div class="icon">♻️</div>
+                <h4>Circular Economy</h4>
+                <p>
+                  Converting waste into value, supporting India's commitment to
+                  sustainable development and smart waste management
+                </p>
+              </div>
+              <div class="impact-card">
+                <div class="icon">👩‍💼</div>
+                <h4>Women Empowerment</h4>
+                <p>
+                  Creating dignified employment for rural women, advancing gender
+                  equality and economic independence
+                </p>
+              </div>
+              <div class="impact-card">
+                <div class="icon">🌾</div>
+                <h4>Rural Development</h4>
+                <p>
+                  Addressing geographic inequality and supporting rural prosperity
+                  through inclusive growth
+                </p>
+              </div>
+              <div class="impact-card">
+                <div class="icon">🎓</div>
+                <h4>Academic Innovation</h4>
+                <p>
+                  NEP 2020 alignment promoting innovation, problem-solving, and
+                  entrepreneurial education
+                </p>
+              </div>
+              <div class="impact-card">
+                <div class="icon">🇮🇳</div>
+                <h4>Startup India</h4>
+                <p>
+                  Demonstrating that profitability and social impact are mutually
+                  reinforcing when structured with purpose
+                </p>
+              </div>
+              <div class="impact-card">
+                <div class="icon">📈</div>
+                <h4>Scalable Model</h4>
+                <p>
+                  Replicable blueprint for thousands of temples across India,
+                  multiplying positive impact nationwide
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="highlight-box">
+            <h3>The Ripple Effect</h3>
+            <p>
+              Perhaps most significantly, Arudhra Creations presents a replicable
+              model that extends far beyond Salem. India contains thousands of
+              temples, each generating daily flower waste. Each represents an
+              opportunity for similar social enterprises. The modular nature of
+              the business model—temple flower collection, artisanal processing,
+              product manufacturing, rural women employment—can be adapted to
+              diverse geographies, products, and communities.
+            </p>
+          </div>
+
+          <div class="quote-box">
+            "In Salem's temples, where flowers continue their daily journey from
+            offering to earth, a new narrative is unfolding—one where ancient
+            spiritual practice intersects with modern entrepreneurship, where
+            waste becomes resource, where returning mothers become enterprise
+            leaders, and where a mentor's vision catalyzes systemic change."
+          </div>
+
+          <div class="two-column">
+            <div class="content-block">
+              <h3>Key Success Factors</h3>
+              <ul>
+                <li>Visionary mentorship approach</li>
+                <li>Design thinking methodology</li>
+                <li>Academic-industry collaboration</li>
+                <li>Women-centric empowerment model</li>
+                <li>Cultural sensitivity and respect</li>
+              </ul>
+            </div>
+
+            <div class="content-block">
+              <h3>Future Potential</h3>
+              <ul>
+                <li>National temple network integration</li>
+                <li>Product line diversification</li>
+                <li>Export market expansion</li>
+                <li>Franchise model development</li>
+                <li>Technology integration for scale</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="body" id="contact">
+      <div class="form-container">
+        <div class="form-header-section">
+          <h1>Enquiry & Order Information</h1>
+          <p class="tagline">
+            We welcome inquiries for bulk orders, partnerships, and customized
+            solutions. Please fill out the form below, and our team will
+            respond within 24 business hours.
+          </p>
+        </div>
+
+        <div class="content-wrapper">
+          <section class="info-section">
+            <h2>
+              <i class="fas fa-info-circle" aria-hidden="true"></i> Our
+              Services
+            </h2>
+            <ul class="info-list">
+              <li>
+                <i class="fas fa-boxes" aria-hidden="true"></i> Bulk Orders
+                for Retail & B2B
+              </li>
+              <li>
+                <i class="fas fa-hands-praying" aria-hidden="true"></i> Temple
+                Supply Agreements
+              </li>
+              <li>
+                <i class="fas fa-gift" aria-hidden="true"></i> Return Gift
+                Customization
+              </li>
+              <li>
+                <i class="fas fa-building" aria-hidden="true"></i> Corporate
+                Gifting Solutions
+              </li>
+              <li>
+                <i class="fas fa-handshake" aria-hidden="true"></i> Wholesale
+                & Distributor Partnerships
+              </li>
+              <li>
+                <i class="fas fa-store" aria-hidden="true"></i> Retail
+                Stockist Opportunities
+              </li>
+              <li>
+                <i class="fas fa-wind" aria-hidden="true"></i> Customized
+                Fragrance Development
+              </li>
+              <li>
+                <i class="fas fa-calendar-star" aria-hidden="true"></i>
+                Event-Specific Gifting Solutions
+              </li>
+            </ul>
+
+            <div class="business-hours">
+              <h3>
+                <i class="fas fa-clock" aria-hidden="true"></i> Business Hours
+                & Response Policy
+              </h3>
+              <p>
+                <i class="fas fa-reply" aria-hidden="true"></i>
+                <span class="highlight">Typical response time:</span> Within
+                24 business hours
+              </p>
+              <p>
+                <i class="fas fa-cogs" aria-hidden="true"></i>
+                <span class="highlight">Orders processed:</span> Monday to
+                Friday, 9 AM to 6 PM IST
+              </p>
+              <p>
+                <i class="fas fa-bolt" aria-hidden="true"></i>
+                <span class="highlight">Emergency inquiries:</span> WhatsApp
+                recommended for faster response
+              </p>
+
+              <a href="https://wa.me/1234567890" class="whatsapp-contact" target="_blank" rel="noopener noreferrer"><i
+                  class="fab fa-whatsapp" aria-hidden="true"></i> Contact
+                via WhatsApp</a>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <div class="form-header">
+              <div class="form-title">
+                <h2>
+                  <i class="fas fa-edit" aria-hidden="true"></i> Contact Form
+                </h2>
+              </div>
+              <div class="required-note">
+                Fields marked with <span>*</span> are required
+              </div>
+            </div>
+
+            <form id="inquiryForm">
+              <div class="form-group">
+                <label for="fullName" class="required"><i class="fas fa-user" aria-hidden="true"></i> Full
+                  Name</label>
+                <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" />
+                <div class="error-message" id="fullNameError">
+                  Please enter your full name
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="mobile" class="required"><i class="fas fa-mobile-alt" aria-hidden="true"></i> Mobile
+                  Number</label>
+                <input type="tel" id="mobile" name="mobile" placeholder="Enter your 10-digit mobile number" />
+                <div class="error-message" id="mobileError">
+                  Please enter a valid 10-digit mobile number
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="email" class="required"><i class="fas fa-envelope" aria-hidden="true"></i> Email
+                  Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email address" />
+                <div class="error-message" id="emailError">
+                  Please enter a valid email address
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="city"><i class="fas fa-city" aria-hidden="true"></i> City/Region
+                  <span class="optional">(Optional)</span></label>
+                <input type="text" id="city" name="city" placeholder="Enter your city or region" />
+              </div>
+
+              <div class="form-group">
+                <label for="purpose" class="required"><i class="fas fa-bullseye" aria-hidden="true"></i> Purpose
+                  of Inquiry</label>
+                <select id="purpose" name="purpose">
+                  <option value="" disabled selected>
+                    Select your inquiry purpose
+                  </option>
+                  <option>Bulk Order Inquiry</option>
+                  <option>Retail / B2B Inquiry</option>
+                  <option>Temple Supply Partnership</option>
+                  <option>Return Gift Customization</option>
+                  <option>Corporate Gifting</option>
+                  <option>Wholesale / Distributor Interest</option>
+                  <option>Event-Specific Inquiry</option>
+                  <option>Product Customization</option>
+                  <option>General Enquiry</option>
+                </select>
+                <div class="error-message" id="purposeError">
+                  Please select a purpose for your inquiry
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="message"><i class="fas fa-comment-dots" aria-hidden="true"></i>
+                  Message <span class="optional">(Optional)</span></label>
+                <textarea id="message" name="message" rows="5"
+                  placeholder="Please provide any additional details about your inquiry..."></textarea>
+              </div>
+
+              <button type="submit" class="submit-btn">
+                <i class="fas fa-paper-plane" aria-hidden="true"></i> Submit
+                Inquiry
+              </button>
+              <div class="response-message" id="responseMessage"></div>
+            </form>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <footer class="modern-footer">
+      <div class="footer-container">
+        <div class="footer-row">
+          <div class="footer-col about">
+            <h3>Address</h3>
+            <p>Arudhra Creations Private Limited, Salem, Tamil Nadu, India</p>
+            <div class="email">
+              <p><strong>Email :</strong> arudhra2025@gmail.com</p>
+            </div>
+          </div>
+
+          <div class="footer-col">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#products">Products</a></li>
+              <li><a href="#about">About Us</a></li>
+              <li><a href="#ourstory">Our Story</a></li>
+              <li><a href="#contact">Contact Us</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col social">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+              <a target="_blank" rel="noopener noreferrer" href="https://www.facebook.com/share/16n2n7rprz/"><i
+                  class="fab fa-facebook-f" aria-hidden="true"></i></a>
+              <a target="_blank" rel="noopener noreferrer"
+                href="https://www.instagram.com/shri__brand?igsh=czc1YWQ5c291M3E4"><i class="fab fa-instagram"
+                  aria-hidden="true"></i></a>
+              <a href="#"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <hr />
+        <div class="footer-bottom">
+          <p>
+            © Arudhra Creations Private Limited, Salem | All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // ==================== LOGOUT ====================
+    async function logoutUser() {
+      try {
+        const token = localStorage.getItem('token');
+        // Call backend logout endpoint
+        await fetch('http://localhost:5000/api/v1/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          credentials: 'include'
+        });
+      } catch (err) {
+        // Even if API call fails, still clear local data
+        console.log('Logout API call failed:', err);
+      }
+      // Clear local storage
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      // Redirect to auth page
+      // window.location.href = 'auth.html';
+    }
+
+    function toggleCard() {
+      const card = document.getElementById("card");
+      const backdrop = document.getElementById("cart-backdrop");
+      const menuCheckbox = document.getElementById("menu-toggle");
+
+      // Close mobile menu if open (uncheck the checkbox)
+      if (menuCheckbox && menuCheckbox.checked) {
+        menuCheckbox.checked = false;
+      }
+
+      document.body.classList.toggle("no-scroll");
+      card.classList.toggle("active");
+      backdrop.classList.toggle("active");
+    }
+
+    // Quantity buttons are handled by updateQuantity() in products.js
+  </script>
+
+  <!-- Product Card Click Navigation -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.card[data-slug], .gift-card[data-slug]').forEach(function (card) {
+        card.addEventListener('click', function (e) {
+          // Don't navigate if clicking the Add to Cart button
+          if (e.target.closest('.addtoplate')) return;
+          const slug = card.getAttribute('data-slug');
+          if (slug) window.location.href = '/product/' + slug;
+        });
+      });
+    });
+  </script>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/form.js"></script>
+  <script src="/js/products.js"></script>
+  <script src="/js/ourstory.js"></script>
+</body>
+
+</html>

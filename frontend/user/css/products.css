@@ -1,0 +1,287 @@
+/* ========================================
+   Product Cards Styles
+   ======================================== */
+
+/* Product Card Container */
+.card {
+    width: 250px !important;
+    padding: 10px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    color: black;
+    cursor: pointer;
+    position: relative;
+}
+
+.card:hover img {
+    transform: scale(1.2);
+}
+
+.card-img {
+    overflow: hidden;
+}
+
+.card .card-img img {
+    transition: all 0.3s ease;
+    aspect-ratio: 2 / 2;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Price Styles */
+.rupees {
+    font-weight: bolder;
+    display: inline;
+    font-size: 20px;
+}
+
+.product-description .light {
+    font-size: 14px;
+    color: rgba(51, 51, 51, 0.8941176471);
+}
+
+/* Add to Cart Button - Premium Pill Style */
+.card .addtoplate {
+    width: 100%;
+    height: 40px;
+    border-radius: 50px;
+    /* Pill shape like navbar buttons */
+    outline: none;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+
+    /* Gold Gradient to match theme */
+    background: linear-gradient(135deg, #ffc406 0%, #ffb000 100%);
+    color: #7f0403;
+
+    margin: 10px 0 5px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(255, 176, 0, 0.3);
+}
+
+.card .addtoplate:hover {
+    background: linear-gradient(135deg, #ffd700 0%, #ffc406 100%);
+    box-shadow: 0 6px 15px rgba(255, 176, 0, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Product Title */
+.product-title {
+    font-size: 20px;
+    margin: 3px;
+    font-weight: 600;
+}
+
+/* Image */
+.img {
+    width: 100%;
+}
+
+/* Sample Text */
+.sample {
+    color: #666666;
+}
+
+/* Products Grid */
+.products-ul {
+    display: grid;
+    grid-template-columns: repeat(8, auto);
+    gap: 10px;
+    overflow: scroll;
+}
+
+/* Show Card Container */
+.showcard {
+
+    padding: 10px;
+    width: 100%;
+}
+
+.showcard h3 {
+    font-family: "Playfair Display", serif;
+    font-size: 2.5rem;
+    color: #7f0403;
+    text-align: center;
+    margin: 20px 0 15px;
+    /* Reduced spacing ("Compact") */
+    position: relative;
+    display: table;
+    /* shrinks width to text */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Decorative Gold Underline */
+.showcard h3::after {
+    content: "";
+    display: block;
+    width: 60%;
+    /* partial width underline */
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #ffc406, transparent);
+    margin: 5px auto 0;
+    /* Tighten underline spacing too */
+    border-radius: 2px;
+}
+
+/* Product Section Container */
+.pro-cont {
+    width: 100%;
+    max-width: 1200px;
+    /* Standard site width */
+    margin: 0 auto;
+    /* Center the container */
+    padding: 0;
+    /* Remove default padding */
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    color: black;
+    flex-direction: column;
+}
+
+/* Stock Label */
+.stock-label {
+    position: absolute;
+    top: 15px;
+    right: 12px;
+    border-radius: 10px;
+    background-color: #7f030382;
+    font-size: 14px;
+    padding: 2px 10px;
+    color: #ffffff;
+}
+
+/* Cards Container for Gift Pack */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(8, auto);
+    gap: 10px;
+    overflow: scroll;
+}
+
+/* ========================================
+   Cart Styles
+   ======================================== */
+
+/* Cart Header */
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 15px;
+    border-bottom: 2px solid #7f0403;
+    background: linear-gradient(to right, #fdfcfb, #f9f5eb);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.cart-header h3 {
+    margin: 0;
+    color: #7f0403;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.cart-header #cart-item-count {
+    background: #7f0403;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Cart Items Container */
+#cart-items-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+/* Empty Cart Message */
+.empty-cart-message {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+    text-align: center;
+    color: #999;
+}
+
+.empty-cart-message p {
+    margin: 10px 0 5px;
+    font-size: 16px;
+    color: #666;
+}
+
+.empty-cart-message small {
+    color: #999;
+    font-size: 13px;
+}
+
+/* Cart Summary */
+.cart-summary {
+    padding: 15px;
+    border-top: 1px solid #ddd;
+    background: #f9f9f9;
+    position: sticky;
+    bottom: 0;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.summary-row.total {
+    border-top: 2px solid #7f0403;
+    margin-top: 8px;
+    padding-top: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #7f0403;
+}
+
+.summary-row .savings {
+    color: #28a745;
+    font-weight: 600;
+}
+
+/* Checkout Button */
+.checkout-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 12px;
+    background: linear-gradient(135deg, #7f0403, #a00505);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(127, 4, 3, 0.3);
+}
+
+.checkout-btn:hover {
+    background: linear-gradient(135deg, #a00505, #7f0403);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(127, 4, 3, 0.4);
+}
+
+.checkout-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}

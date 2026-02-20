@@ -1,0 +1,670 @@
+/* ============================================
+   Order History - Clean Professional Design
+   Matching bill.css Apple/Stripe aesthetic
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ===== CSS VARIABLES ===== */
+:root {
+  --erp-bg: #f5f5f7;
+  --erp-surface: #ffffff;
+  --erp-border: #e5e5e5;
+  --erp-text: #1d1d1f;
+  --erp-text-secondary: #6e6e73;
+  --erp-accent: #0071e3;
+  --erp-accent-hover: #0077ed;
+  --erp-success: #34c759;
+  --erp-warning: #ff9500;
+  --erp-danger: #ff3b30;
+  --erp-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --erp-shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.12);
+  --erp-radius: 12px;
+  --erp-radius-sm: 8px;
+}
+
+[data-theme="dark"] {
+  --erp-bg: #1d1d1f;
+  --erp-surface: #2d2d2f;
+  --erp-border: #424245;
+  --erp-text: #f5f5f7;
+  --erp-text-secondary: #a1a1a6;
+  --erp-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  --erp-shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* ===== HEADER ===== */
+.erp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.erp-header h1 {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--erp-text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.erp-header h1 i {
+  color: var(--erp-accent);
+}
+
+.erp-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ===== BUTTONS ===== */
+.erp-btn {
+  padding: 10px 16px;
+  border-radius: var(--erp-radius-sm);
+  border: 1px solid var(--erp-border);
+  background: var(--erp-surface);
+  color: var(--erp-text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+
+.erp-btn:hover {
+  border-color: var(--erp-accent);
+  color: var(--erp-accent);
+}
+
+.erp-primary {
+  background: var(--erp-accent);
+  border-color: var(--erp-accent);
+  color: white;
+}
+
+.erp-primary:hover {
+  background: var(--erp-accent-hover);
+  border-color: var(--erp-accent-hover);
+  color: white;
+}
+
+/* ===== CONTROLS / FILTERS ===== */
+.erp-controls {
+  background: var(--erp-surface);
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius);
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+  box-shadow: var(--erp-shadow);
+}
+
+.erp-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.erp-filter-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--erp-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.erp-controls input,
+.erp-controls select {
+  padding: 10px 14px;
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius-sm);
+  background: var(--erp-bg);
+  color: var(--erp-text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.erp-controls input:focus,
+.erp-controls select:focus {
+  border-color: var(--erp-accent);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+.erp-controls input::placeholder {
+  color: var(--erp-text-secondary);
+}
+
+/* Search Wrapper */
+.erp-search-wrapper {
+  position: relative;
+  grid-column: 1 / -1;
+}
+
+.erp-search-wrapper i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--erp-text-secondary);
+  font-size: 14px;
+}
+
+.erp-search-wrapper input {
+  padding-left: 40px;
+}
+
+/* Date Wrapper */
+.erp-date-wrapper {
+  position: relative;
+}
+
+.erp-date-wrapper i {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--erp-text-secondary);
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.erp-date-wrapper input {
+  padding-right: 40px;
+}
+
+/* ===== CALENDAR ===== */
+.erp-calendar-container {
+  position: relative;
+}
+
+.erp-calendar-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: var(--erp-surface);
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius);
+  padding: 16px;
+  box-shadow: var(--erp-shadow-hover);
+  z-index: 1000;
+  min-width: 280px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.erp-calendar-popup.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.erp-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.erp-calendar-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.erp-calendar-nav button {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--erp-bg);
+  border: 1px solid var(--erp-border);
+  color: var(--erp-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.erp-calendar-nav button:hover {
+  border-color: var(--erp-accent);
+  color: var(--erp-accent);
+}
+
+.erp-calendar-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--erp-text);
+}
+
+.erp-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.erp-calendar-day {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--erp-text-secondary);
+}
+
+.erp-calendar-date {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: var(--erp-text);
+  transition: all 0.15s ease;
+}
+
+.erp-calendar-date:hover {
+  background: var(--erp-bg);
+}
+
+.erp-calendar-date.today {
+  font-weight: 600;
+  color: var(--erp-accent);
+}
+
+.erp-calendar-date.selected {
+  background: var(--erp-accent);
+  color: white;
+  font-weight: 500;
+}
+
+.erp-calendar-date.other-month {
+  color: var(--erp-text-secondary);
+  opacity: 0.5;
+}
+
+.erp-calendar-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.erp-calendar-actions button {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.erp-calendar-actions .apply-btn {
+  background: var(--erp-accent);
+  border: none;
+  color: white;
+}
+
+.erp-calendar-actions .apply-btn:hover {
+  background: var(--erp-accent-hover);
+}
+
+.erp-calendar-actions .cancel-btn {
+  background: var(--erp-bg);
+  border: 1px solid var(--erp-border);
+  color: var(--erp-text);
+}
+
+.erp-calendar-actions .cancel-btn:hover {
+  background: var(--erp-border);
+}
+
+/* ===== TABLE CARD ===== */
+.erp-card {
+  background: var(--erp-surface);
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius);
+  overflow: hidden;
+  box-shadow: var(--erp-shadow);
+}
+
+/* ===== TABLE ===== */
+.erp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Inter', sans-serif;
+}
+
+.erp-table thead {
+  cursor: pointer;
+}
+
+.erp-table th {
+  padding: 14px 18px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--erp-text-secondary);
+  background: var(--erp-bg);
+  border-bottom: 1px solid var(--erp-border);
+}
+
+.erp-table td {
+  padding: 14px 18px;
+  font-size: 14px;
+  color: var(--erp-text);
+  border-bottom: 1px solid var(--erp-border);
+}
+
+.erp-tbody tr {
+  transition: background 0.15s ease;
+}
+
+.erp-tbody tr:hover {
+  background: var(--erp-bg);
+}
+
+.erp-tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Customer Cell */
+.erp-customer-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.erp-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.erp-avatar-color-1 {
+  background: #0071e3;
+}
+
+.erp-avatar-color-2 {
+  background: #34c759;
+}
+
+.erp-avatar-color-3 {
+  background: #ff9500;
+}
+
+.erp-avatar-color-4 {
+  background: #af52de;
+}
+
+.erp-avatar-color-5 {
+  background: #ff3b30;
+}
+
+.erp-avatar-color-6 {
+  background: #5856d6;
+}
+
+.erp-avatar-color-7 {
+  background: #ff2d55;
+}
+
+.erp-avatar-color-8 {
+  background: #00c7be;
+}
+
+.erp-avatar-color-9 {
+  background: #007aff;
+}
+
+.erp-avatar-color-10 {
+  background: #ff6482;
+}
+
+.erp-customer-info h4 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--erp-text);
+  margin-bottom: 2px;
+}
+
+.erp-customer-info p {
+  font-size: 12px;
+  color: var(--erp-text-secondary);
+  margin: 0;
+}
+
+/* ===== BADGES ===== */
+.erp-badge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.erp-upi {
+  background: rgba(0, 113, 227, 0.1);
+  color: var(--erp-accent);
+}
+
+.erp-cash {
+  background: rgba(52, 199, 89, 0.1);
+  color: var(--erp-success);
+}
+
+/* ===== PAGINATION ===== */
+.erp-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 16px;
+  border-top: 1px solid var(--erp-border);
+  flex-wrap: wrap;
+}
+
+.erp-pagination button {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: var(--erp-surface);
+  border: 1px solid var(--erp-border);
+  color: var(--erp-text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.erp-pagination button:hover:not(.active) {
+  border-color: var(--erp-accent);
+  color: var(--erp-accent);
+}
+
+.erp-pagination button.active {
+  background: var(--erp-accent);
+  border-color: var(--erp-accent);
+  color: white;
+}
+
+.erp-pagination-info {
+  font-size: 13px;
+  color: var(--erp-text-secondary);
+  margin: 0 12px;
+}
+
+/* ===== EMPTY STATE ===== */
+.erp-empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  display: none;
+}
+
+.erp-empty-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--erp-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 24px;
+  color: var(--erp-text-secondary);
+}
+
+.erp-empty-state h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--erp-text);
+  margin-bottom: 8px;
+}
+
+.erp-empty-state p {
+  font-size: 14px;
+  color: var(--erp-text-secondary);
+  max-width: 360px;
+  margin: 0 auto 20px;
+}
+
+/* ===== TOAST ===== */
+.erp-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--erp-surface);
+  border: 1px solid var(--erp-border);
+  border-left: 3px solid var(--erp-success);
+  border-radius: var(--erp-radius-sm);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transform: translateX(120%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  box-shadow: var(--erp-shadow-hover);
+}
+
+.erp-toast.show {
+  transform: translateX(0);
+}
+
+.erp-toast-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(52, 199, 89, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--erp-success);
+  font-size: 12px;
+}
+
+.erp-toast-message {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--erp-text);
+}
+
+.erp-toast-time {
+  font-size: 12px;
+  color: var(--erp-text-secondary);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .erp-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .erp-actions {
+    width: 100%;
+  }
+
+  .erp-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .erp-controls {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .erp-search-wrapper {
+    grid-column: 1;
+  }
+
+  .erp-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .erp-table th,
+  .erp-table td {
+    padding: 12px 14px;
+    min-width: 120px;
+  }
+
+  .erp-pagination-info {
+    order: -1;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .erp-header h1 {
+    font-size: 20px;
+  }
+
+  .erp-btn {
+    width: 100%;
+  }
+
+  .erp-pagination button {
+    width: 32px;
+    height: 32px;
+  }
+}

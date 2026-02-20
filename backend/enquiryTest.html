@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inquiry API Tester — InstaStick</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --maroon: #800000;
+      --maroon-dark: #5a0000;
+      --maroon-light: #a80000;
+      --gold: #FFD700;
+      --gold-dim: #c9a800;
+      --bg: #0d0d0d;
+      --surface: #141414;
+      --surface2: #1c1c1c;
+      --surface3: #242424;
+      --border: #2a2a2a;
+      --text: #e8e8e8;
+      --text-dim: #888;
+      --text-muted: #555;
+      --green: #22c55e;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --orange: #f97316;
+      --radius: 10px;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, var(--maroon-dark) 0%, var(--maroon) 60%, #9a1515 100%);
+      padding: 22px 40px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 2px solid var(--gold);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 22px; font-weight: 800; letter-spacing: 1px; }
+    .logo span { color: var(--gold); }
+    .tagline { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 2px; margin-left: auto; }
+
+    /* ── Layout ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── Sidebar ── */
+    aside {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 24px 0;
+      position: sticky;
+      top: 73px;
+      height: calc(100vh - 73px);
+      overflow-y: auto;
+    }
+    .sidebar-section { padding: 0 16px; margin-bottom: 24px; }
+    .sidebar-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      padding: 0 8px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-dim);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      margin-bottom: 4px;
+      text-align: left;
+    }
+    .nav-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--border); }
+    .nav-btn.active { background: rgba(128,0,0,0.25); color: white; border-color: var(--maroon); }
+    .method-badge {
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      min-width: 38px;
+      text-align: center;
+    }
+    .POST { background: rgba(34,197,94,0.2); color: var(--green); }
+    .GET  { background: rgba(59,130,246,0.2); color: var(--blue); }
+    .PATCH{ background: rgba(249,115,22,0.2); color: var(--orange); }
+    .DELETE{ background: rgba(239,68,68,0.2); color: var(--red); }
+
+    /* ── Config bar ── */
+    .config-bar {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .config-bar label { font-family: var(--mono); font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+    .config-bar input {
+      flex: 1;
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .config-bar input:focus { border-color: var(--maroon); }
+    .token-input { max-width: 360px; }
+
+    /* ── Main ── */
+    main { padding: 32px; display: flex; flex-direction: column; gap: 0; overflow-y: auto; }
+
+    /* ── Panel ── */
+    .panel { display: none; flex-direction: column; gap: 20px; animation: fadeIn 0.2s ease; }
+    .panel.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .panel-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-header .method-badge { font-size: 11px; padding: 4px 10px; margin-top: 3px; }
+    .panel-title { font-size: 22px; font-weight: 800; }
+    .panel-subtitle { font-family: var(--mono); font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── Form grid ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-grid.full { grid-template-columns: 1fr; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.5px; }
+    .field input, .field select, .field textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: vertical;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--maroon);
+      box-shadow: 0 0 0 3px rgba(128,0,0,0.15);
+    }
+    .field select option { background: var(--surface2); }
+
+    /* ── Btn ── */
+    .btn-send {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--maroon), var(--maroon-dark));
+      color: white;
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 12px 28px;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-send::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.08);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .btn-send:hover::after { opacity: 1; }
+    .btn-send:active { transform: scale(0.97); }
+    .btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-send svg { width: 15px; height: 15px; }
+
+    .btn-clear {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-clear:hover { border-color: var(--text-muted); color: var(--text-dim); }
+
+    .actions { display: flex; gap: 10px; align-items: center; }
+
+    /* ── Response ── */
+    .response-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .response-header {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .response-title { font-family: var(--mono); font-size: 11px; color: var(--text-muted); letter-spacing: 1px; }
+    .status-pill {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .status-ok   { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+    .status-err  { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+    .status-idle { background: var(--surface3); color: var(--text-muted); border: 1px solid var(--border); }
+
+    .response-body {
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.7;
+      padding: 18px;
+      color: #a8d8a8;
+      max-height: 380px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .response-body.empty { color: var(--text-muted); font-style: italic; }
+
+    /* JSON syntax highlight */
+    .j-key   { color: #7dd3fc; }
+    .j-str   { color: #86efac; }
+    .j-num   { color: #fbbf24; }
+    .j-bool  { color: #f472b6; }
+    .j-null  { color: #94a3b8; }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Hint cards ── */
+    .hint {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--maroon);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+    .hint strong { color: var(--gold); }
+
+    /* ── ID Store ── */
+    .id-store {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .id-store label { font-family: var(--mono); font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+    .id-store input {
+      flex: 1;
+      min-width: 220px;
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 7px 12px;
+      border-radius: 6px;
+      outline: none;
+    }
+    .id-store input:focus { border-color: var(--gold-dim); }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🎯 InstaStick <span>API</span> Tester</div>
+  <div class="tagline">INQUIRY CRUD — DEV TOOL</div>
+</header>
+
+<!-- Config bar -->
+<div class="config-bar">
+  <label>BASE URL</label>
+  <input id="baseUrl" value="http://localhost:5000/api/v1" />
+  <label>ADMIN TOKEN</label>
+  <input id="adminToken" class="token-input" placeholder="Paste JWT token for admin routes..." />
+</div>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Public</div>
+      <button class="nav-btn active" onclick="showPanel('submit')">
+        <span class="method-badge POST">POST</span> Submit Inquiry
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Admin Only</div>
+      <button class="nav-btn" onclick="showPanel('getAll')">
+        <span class="method-badge GET">GET</span> All Inquiries
+      </button>
+      <button class="nav-btn" onclick="showPanel('getOne')">
+        <span class="method-badge GET">GET</span> Get by ID
+      </button>
+      <button class="nav-btn" onclick="showPanel('updateStatus')">
+        <span class="method-badge PATCH">PATCH</span> Update Status
+      </button>
+      <button class="nav-btn" onclick="showPanel('delete')">
+        <span class="method-badge DELETE">DEL</span> Delete Inquiry
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Saved ID</div>
+      <div style="padding: 0 4px;">
+        <input id="savedId" placeholder="Auto-filled after submit..." style="width:100%; background:var(--surface3); border:1px solid var(--border); color:var(--gold); font-family:var(--mono); font-size:11px; padding:8px 10px; border-radius:6px; outline:none;"/>
+        <p style="font-family:var(--mono); font-size:10px; color:var(--text-muted); margin-top:6px; padding:0 2px;">
+          Saved from last submit response. Used by ID-based routes automatically.
+        </p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main>
+
+    <!-- ① Submit Inquiry -->
+    <div class="panel active" id="panel-submit">
+      <div class="panel-header">
+        <span class="method-badge POST" style="font-size:11px; padding:5px 12px;">POST</span>
+        <div>
+          <div class="panel-title">Submit Inquiry</div>
+          <div class="panel-subtitle">/api/v1/inquiries — Public route</div>
+        </div>
+      </div>
+
+      <div class="hint">
+        <strong>Note:</strong> Rate-limited to 3 requests/hour per IP. No auth token required.
+        After success, the <strong>inquiryId</strong> will be auto-saved to the Saved ID field.
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>FULL NAME *</label>
+          <input id="s_fullName" placeholder="e.g. Ravi Kumar" value="Ravi Kumar"/>
+        </div>
+        <div class="field">
+          <label>MOBILE NUMBER * (10 digits)</label>
+          <input id="s_mobile" placeholder="9876543210" value="9876543210" maxlength="10"/>
+        </div>
+        <div class="field">
+          <label>EMAIL ADDRESS *</label>
+          <input id="s_email" placeholder="ravi@example.com" value="ravi@example.com"/>
+        </div>
+        <div class="field">
+          <label>CITY / REGION (optional)</label>
+          <input id="s_city" placeholder="Chennai" value="Chennai"/>
+        </div>
+        <div class="field">
+          <label>PURPOSE OF INQUIRY *</label>
+          <select id="s_purpose">
+            <option value="">— Select —</option>
+            <option value="General Inquiry">General Inquiry</option>
+            <option value="Product Information" selected>Product Information</option>
+            <option value="Order Support">Order Support</option>
+            <option value="Bulk Order">Bulk Order</option>
+            <option value="Partnership">Partnership</option>
+            <option value="Complaint">Complaint</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid full">
+        <div class="field">
+          <label>MESSAGE (optional, max 1000 chars)</label>
+          <textarea id="s_message" rows="4" placeholder="Describe your inquiry...">I would like to know more about your bulk sticker options for corporate events.</textarea>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-send" onclick="submitInquiry()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send Request
+        </button>
+        <button class="btn-clear" onclick="clearResponse('submit')">Clear</button>
+      </div>
+      <div class="response-box">
+        <div class="response-header">
+          <span class="response-title">RESPONSE</span>
+          <span class="status-pill status-idle" id="status-submit">IDLE</span>
+        </div>
+        <div class="response-body empty" id="res-submit">Hit "Send Request" to see the response here...</div>
+      </div>
+    </div>
+
+    <!-- ② Get All Inquiries -->
+    <div class="panel" id="panel-getAll">
+      <div class="panel-header">
+        <span class="method-badge GET" style="font-size:11px; padding:5px 12px;">GET</span>
+        <div>
+          <div class="panel-title">Get All Inquiries</div>
+          <div class="panel-subtitle">/api/v1/inquiries — Admin only</div>
+        </div>
+      </div>
+
+      <div class="hint">
+        <strong>Admin token required.</strong> Supports optional query filters. Leave blank to fetch all.
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>STATUS FILTER</label>
+          <select id="g_status">
+            <option value="">All</option>
+            <option value="pending">pending</option>
+            <option value="reviewed">reviewed</option>
+            <option value="resolved">resolved</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>PURPOSE FILTER</label>
+          <select id="g_purpose">
+            <option value="">All</option>
+            <option value="General Inquiry">General Inquiry</option>
+            <option value="Product Information">Product Information</option>
+            <option value="Order Support">Order Support</option>
+            <option value="Bulk Order">Bulk Order</option>
+            <option value="Partnership">Partnership</option>
+            <option value="Complaint">Complaint</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>PAGE</label>
+          <input id="g_page" type="number" value="1" min="1"/>
+        </div>
+        <div class="field">
+          <label>LIMIT (max 100)</label>
+          <input id="g_limit" type="number" value="10" min="1" max="100"/>
+        </div>
+        <div class="field">
+          <label>SORT BY</label>
+          <select id="g_sortBy">
+            <option value="createdAt">createdAt</option>
+            <option value="updatedAt">updatedAt</option>
+            <option value="status">status</option>
+            <option value="purposeOfInquiry">purposeOfInquiry</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>ORDER</label>
+          <select id="g_order">
+            <option value="desc">desc (newest first)</option>
+            <option value="asc">asc (oldest first)</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-send" onclick="getAllInquiries()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Fetch Inquiries
+        </button>
+        <button class="btn-clear" onclick="clearResponse('getAll')">Clear</button>
+      </div>
+      <div class="response-box">
+        <div class="response-header">
+          <span class="response-title">RESPONSE</span>
+          <span class="status-pill status-idle" id="status-getAll">IDLE</span>
+        </div>
+        <div class="response-body empty" id="res-getAll">Hit "Fetch Inquiries" to see results...</div>
+      </div>
+    </div>
+
+    <!-- ③ Get by ID -->
+    <div class="panel" id="panel-getOne">
+      <div class="panel-header">
+        <span class="method-badge GET" style="font-size:11px; padding:5px 12px;">GET</span>
+        <div>
+          <div class="panel-title">Get Inquiry by ID</div>
+          <div class="panel-subtitle">/api/v1/inquiries/:id — Admin only</div>
+        </div>
+      </div>
+
+      <div class="hint">
+        <strong>Tip:</strong> The Saved ID is auto-populated after a successful submit. You can also paste any MongoDB ObjectId manually.
+      </div>
+
+      <div class="id-store">
+        <label>INQUIRY ID</label>
+        <input id="go_id" placeholder="MongoDB ObjectId e.g. 6650f3a1..." oninput="syncId('go_id')"/>
+      </div>
+      <div class="actions">
+        <button class="btn-send" onclick="getOneInquiry()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Fetch Inquiry
+        </button>
+        <button class="btn-clear" onclick="clearResponse('getOne')">Clear</button>
+      </div>
+      <div class="response-box">
+        <div class="response-header">
+          <span class="response-title">RESPONSE</span>
+          <span class="status-pill status-idle" id="status-getOne">IDLE</span>
+        </div>
+        <div class="response-body empty" id="res-getOne">Enter an ID and hit "Fetch Inquiry"...</div>
+      </div>
+    </div>
+
+    <!-- ④ Update Status -->
+    <div class="panel" id="panel-updateStatus">
+      <div class="panel-header">
+        <span class="method-badge PATCH" style="font-size:11px; padding:5px 12px;">PATCH</span>
+        <div>
+          <div class="panel-title">Update Inquiry Status</div>
+          <div class="panel-subtitle">/api/v1/inquiries/:id/status — Admin only</div>
+        </div>
+      </div>
+
+      <div class="hint">
+        <strong>Workflow:</strong> Submit a form → copy ID → paste here → set new status → send.
+      </div>
+
+      <div class="id-store">
+        <label>INQUIRY ID</label>
+        <input id="us_id" placeholder="MongoDB ObjectId..." oninput="syncId('us_id')"/>
+      </div>
+      <div class="form-grid full">
+        <div class="field">
+          <label>NEW STATUS *</label>
+          <select id="us_status">
+            <option value="pending">pending</option>
+            <option value="reviewed" selected>reviewed</option>
+            <option value="resolved">resolved</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-send" onclick="updateStatus()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Update Status
+        </button>
+        <button class="btn-clear" onclick="clearResponse('updateStatus')">Clear</button>
+      </div>
+      <div class="response-box">
+        <div class="response-header">
+          <span class="response-title">RESPONSE</span>
+          <span class="status-pill status-idle" id="status-updateStatus">IDLE</span>
+        </div>
+        <div class="response-body empty" id="res-updateStatus">Fill in the ID and new status, then send...</div>
+      </div>
+    </div>
+
+    <!-- ⑤ Delete -->
+    <div class="panel" id="panel-delete">
+      <div class="panel-header">
+        <span class="method-badge DELETE" style="font-size:11px; padding:5px 12px;">DELETE</span>
+        <div>
+          <div class="panel-title">Delete Inquiry</div>
+          <div class="panel-subtitle">/api/v1/inquiries/:id — Admin only</div>
+        </div>
+      </div>
+
+      <div class="hint" style="border-left-color: var(--red);">
+        ⚠ <strong style="color: var(--red);">Destructive action.</strong> This permanently deletes the inquiry from the database.
+      </div>
+
+      <div class="id-store">
+        <label>INQUIRY ID</label>
+        <input id="d_id" placeholder="MongoDB ObjectId..." oninput="syncId('d_id')"/>
+      </div>
+      <div class="actions">
+        <button class="btn-send" style="background: linear-gradient(135deg, #7f1d1d, #450a0a);" onclick="deleteInquiry()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Delete Inquiry
+        </button>
+        <button class="btn-clear" onclick="clearResponse('delete')">Clear</button>
+      </div>
+      <div class="response-box">
+        <div class="response-header">
+          <span class="response-title">RESPONSE</span>
+          <span class="status-pill status-idle" id="status-delete">IDLE</span>
+        </div>
+        <div class="response-body empty" id="res-delete">Enter an ID and confirm deletion...</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // ─── Utils ────────────────────────────────────────────
+  const $ = id => document.getElementById(id);
+  const base = () => $('baseUrl').value.replace(/\/$/, '');
+  const token = () => $('adminToken').value.trim();
+  const savedId = () => $('savedId').value.trim();
+
+  function authHeaders() {
+    const t = token();
+    return t
+      ? { 'Content-Type': 'application/json', 'Authorization': `Bearer ${t}` }
+      : { 'Content-Type': 'application/json' };
+  }
+
+  function syncId(sourceId) {
+    const val = $(sourceId).value;
+    $('savedId').value = val;
+    ['go_id', 'us_id', 'd_id'].forEach(id => { if (id !== sourceId) $(id).value = val; });
+  }
+
+  function pushSavedId(id) {
+    $('savedId').value = id;
+    ['go_id', 'us_id', 'd_id'].forEach(fid => $(fid).value = id);
+  }
+
+  // Panel navigation
+  function showPanel(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    $(`panel-${name}`).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  // Set button loading state
+  function setLoading(btn, loading) {
+    if (loading) {
+      btn._orig = btn.innerHTML;
+      btn.innerHTML = `<span class="spinner"></span> Sending...`;
+      btn.disabled = true;
+    } else {
+      btn.innerHTML = btn._orig;
+      btn.disabled = false;
+    }
+  }
+
+  // Render response
+  function showResponse(panelId, httpStatus, data) {
+    const el = $(`res-${panelId}`);
+    const pill = $(`status-${panelId}`);
+    const ok = httpStatus >= 200 && httpStatus < 300;
+
+    pill.textContent = `${httpStatus} ${ok ? '✓' : '✗'}`;
+    pill.className = `status-pill ${ok ? 'status-ok' : 'status-err'}`;
+    el.className = 'response-body';
+    el.innerHTML = syntaxHighlight(data);
+  }
+
+  function clearResponse(panelId) {
+    $(`res-${panelId}`).className = 'response-body empty';
+    $(`res-${panelId}`).textContent = 'Cleared.';
+    $(`status-${panelId}`).textContent = 'IDLE';
+    $(`status-${panelId}`).className = 'status-pill status-idle';
+  }
+
+  // JSON syntax highlighter
+  function syntaxHighlight(obj) {
+    const json = JSON.stringify(obj, null, 2);
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match) => {
+      let cls = 'j-num';
+      if (/^"/.test(match)) {
+        cls = /:$/.test(match) ? 'j-key' : 'j-str';
+      } else if (/true|false/.test(match)) {
+        cls = 'j-bool';
+      } else if (/null/.test(match)) {
+        cls = 'j-null';
+      }
+      return `<span class="${cls}">${match}</span>`;
+    });
+  }
+
+  // Generic fetch helper
+  async function apiFetch(panelId, url, options, btn) {
+    setLoading(btn, true);
+    try {
+      const res = await fetch(url, options);
+      let data;
+      try { data = await res.json(); } catch { data = { raw: await res.text() }; }
+      showResponse(panelId, res.status, data);
+
+      // Auto-save inquiry ID on successful submit
+      if (panelId === 'submit' && res.status === 201 && data?.data?.inquiryId) {
+        pushSavedId(data.data.inquiryId);
+      }
+    } catch (err) {
+      showResponse(panelId, 0, { error: 'Network error — is the server running?', detail: err.message });
+    } finally {
+      setLoading(btn, false);
+    }
+  }
+
+  // ─── Route Handlers ───────────────────────────────────
+
+  async function submitInquiry() {
+    const btn = event.currentTarget;
+    const body = {
+      fullName: $('s_fullName').value,
+      mobileNumber: $('s_mobile').value,
+      email: $('s_email').value,
+      cityRegion: $('s_city').value,
+      purposeOfInquiry: $('s_purpose').value,
+      message: $('s_message').value
+    };
+    await apiFetch('submit', `${base()}/inquiries`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }, btn);
+  }
+
+  async function getAllInquiries() {
+    const btn = event.currentTarget;
+    const params = new URLSearchParams();
+    const status = $('g_status').value;
+    const purpose = $('g_purpose').value;
+    if (status) params.set('status', status);
+    if (purpose) params.set('purpose', purpose);
+    params.set('page', $('g_page').value);
+    params.set('limit', $('g_limit').value);
+    params.set('sortBy', $('g_sortBy').value);
+    params.set('order', $('g_order').value);
+
+    await apiFetch('getAll', `${base()}/inquiries?${params}`, {
+      method: 'GET',
+      headers: authHeaders()
+    }, btn);
+  }
+
+  async function getOneInquiry() {
+    const btn = event.currentTarget;
+    const id = $('go_id').value.trim() || savedId();
+    if (!id) return alert('Please enter an Inquiry ID');
+    await apiFetch('getOne', `${base()}/inquiries/${id}`, {
+      method: 'GET',
+      headers: authHeaders()
+    }, btn);
+  }
+
+  async function updateStatus() {
+    const btn = event.currentTarget;
+    const id = $('us_id').value.trim() || savedId();
+    if (!id) return alert('Please enter an Inquiry ID');
+    await apiFetch('updateStatus', `${base()}/inquiries/${id}/status`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: JSON.stringify({ status: $('us_status').value })
+    }, btn);
+  }
+
+  async function deleteInquiry() {
+    const btn = event.currentTarget;
+    const id = $('d_id').value.trim() || savedId();
+    if (!id) return alert('Please enter an Inquiry ID');
+    if (!confirm(`Delete inquiry ${id}?\nThis cannot be undone.`)) return;
+    await apiFetch('delete', `${base()}/inquiries/${id}`, {
+      method: 'DELETE',
+      headers: authHeaders()
+    }, btn);
+  }
+
+  // Sync saved ID to all ID fields on load
+  document.querySelectorAll('#go_id, #us_id, #d_id').forEach(el => {
+    el.addEventListener('focus', () => { if (!el.value && savedId()) el.value = savedId(); });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shri Brand</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="./assets/images/logo/Logo.png" />
+
+  <!-- Fonts & Icons -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Project styles -->
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/footer.css" />
+  <link rel="stylesheet" href="./css/mediaquery.css" />
+
+  <!-- Small page-scoped styles (merged/trimmed) -->
+  <style>
+    /* layout helpers used on this page (kept minimal) */
+    #home {
+      display: flex;
+      justify-content: center;
+      align-items: start;
+      width: 100%;
+      height: 100vh;
+      position: relative;
+    }
+
+    .hero-content {
+      display: flex;
+      justify-content: center;
+      align-items: start;
+      width: 100%;
+      height: 100%;
+      margin-top: 107px;
+    }
+
+    /* hero buttons */
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      z-index: 5;
+    }
+
+    .btn2 {
+      display: inline-block;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      border: none;
+      font-family: "Poppins", sans-serif;
+      font-size: 1rem;
+      z-index: 3;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .btn-primary {
+      background-color: #7f0403;
+      color: var(--white);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: #7f0403;
+      border: 2px solid #8b4513;
+    }
+
+
+    #viewerImg {
+      position: relative;
+      z-index: 2;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.6s ease;
+      will-change: transform, opacity;
+    }
+
+    /* small utility used for thumbnails */
+    .small {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header" role="banner">
+    <nav class="container" aria-label="Main navigation">
+      <div class="nav-row">
+        <div class="logo-wrap">
+          <img id="site-logo" class="logo" src="./assets/images/logo/Logo.png" alt="Shri Brand" />
+        </div>
+
+        <div id="desktop-nav" class="desktop-nav" role="menubar" aria-label="Primary">
+          <a class="nav-link" href="#home" role="menuitem">Home<span class="underline" aria-hidden="true"></span></a>
+          <a class="nav-link" href="#products" role="menuitem">Products<span class="underline"
+              aria-hidden="true"></span></a>
+          <a class="nav-link" href="#about" role="menuitem">About Us<span class="underline"
+              aria-hidden="true"></span></a>
+          <a class="nav-link" href="#ourstory" role="menuitem">Our Story<span class="underline"
+              aria-hidden="true"></span></a>
+          <a class="nav-link" href="#contact" role="menuitem">Contact Us<span class="underline"
+              aria-hidden="true"></span></a>
+        </div>
+
+        <div class="mobile-button-wrap">
+          <input id="menu-toggle" class="menu-checkbox" type="checkbox" aria-hidden="true" />
+          <label for="menu-toggle" class="menu-label" aria-controls="mobile-menu">
+            <span class="sr-only">Toggle navigation</span>
+
+            <svg class="icon-open" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+
+            <svg class="icon-close" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12"></path>
+            </svg>
+          </label>
+        </div>
+      </div>
+
+      <div id="mobile-menu" class="mobile-menu" role="menu" aria-label="Mobile primary">
+        <div class="mobile-links">
+          <a class="mobile-link" href="#home" role="menuitem">Home</a>
+          <a class="mobile-link" href="#products" role="menuitem">Products</a>
+          <a class="mobile-link" href="#about" role="menuitem">About Us</a>
+          <a class="mobile-link" href="#ourstory" role="menuitem">Our Story</a>
+          <a class="mobile-link" href="#contact" role="menuitem">Contact Us</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home">
+      <div class="hero-content">
+        <h1>Divine Fragrances</h1>
+      </div>
+    </section>
+
+    <section class="split-section" id="products">
+      <div class="split-inner">
+        <div class="split-left">
+          <div class="content">
+            <h2 class="attractive">
+              Shri Agarbathi Premium Quality Sacred Origins
+            </h2>
+            <p class="lead">
+              Crafted to capture the sacred ambience, spiritual depth, and
+              timeless fragrance traditions of South Indian temples—bringing
+              their serene essence into every moment.
+            </p>
+
+            <div class="counters">
+              <div class="counter" role="status" aria-live="polite">
+                <div class="num" data-target="8">0</div>
+                <div class="label">Fragrances</div>
+              </div>
+              <div class="counter" role="status" aria-live="polite">
+                <div class="num" data-target="120">0</div>
+                <div class="label">Temp Data</div>
+              </div>
+              <div class="counter" role="status" aria-live="polite">
+                <div class="num" data-target="15">0</div>
+                <div class="label">Temp Data</div>
+              </div>
+            </div>
+
+            <div class="hero-btns">
+              <a href="#page3" class="btn2 btn-primary">Explore Our Fragrances</a>
+              <a href="#contact" class="btn2 btn-secondary">Enquire for Orders</a>
+            </div>
+          </div>
+
+          <span class="shape shape-1"></span>
+          <span class="shape shape-2"></span>
+        </div>
+
+        <div class="split-right" aria-hidden="true">
+          <div class="image-wrap">
+            <img src="./assets/images/images/8fragrances.png" alt="Decorative hero" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="page3" aria-label="Image viewer">
+      <div class="viewer-container" id="page-three">
+        <div class="gallery-container">
+          <button class="viewer-btn prev" aria-label="Previous image" id="viewerPrev">
+            &larr;
+          </button>
+
+          <div class="viewer" id="viewer" role="region" aria-roledescription="image gallery"
+            aria-label="Product gallery">
+            <img id="viewerImg" src="./assets/images/Fragrances/1.png" alt="Gallery image" />
+            <div id="viewerCaption" class="viewer-caption" style="display: none">
+              Image 1 of 8
+            </div>
+          </div>
+
+          <button class="viewer-btn next" aria-label="Next image" id="viewerNext">
+            &rarr;
+          </button>
+        </div>
+      </div>
+
+      <div class="fragrance-details">
+        <div class="fd-advanced">
+          <svg class="fd-flourish" viewBox="0 0 200 60" aria-hidden="true">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1">
+                <stop offset="0" stop-color="#f6e7b4" />
+                <stop offset="1" stop-color="#b8860b" />
+              </linearGradient>
+            </defs>
+            <path d="M2 40 C40 -10, 160 -10, 198 40" fill="none" stroke="url(#g1)" stroke-width="2.8"
+              stroke-linecap="round" stroke-linejoin="round" opacity="0.9" />
+          </svg>
+
+          <div class="fd-left-deco"></div>
+
+          <header class="fd-head">
+            <h1 id="flavorTitle" class="flavor-title">Jasmine</h1>
+            <div class="fd-meta">
+              <span class="meta-chip">Temple • Floral</span>
+            </div>
+          </header>
+
+          <p id="flavorShort" class="flavor-short">
+            Fresh, floral jasmine aroma
+          </p>
+
+          <div id="flavorDesc" class="flavor-desc">
+            <ul>
+              <li>Inspired by jasmine garlands in Tamil temples</li>
+              <li>Perfect for festive and spiritual gatherings</li>
+              <li>Gentle, long-lasting ceremonial warmth</li>
+            </ul>
+          </div>
+
+          <div class="fd-actions">
+            <div class="fd-price">From <span class="price">₹</span></div>
+            <button class="btn-glow" aria-label="Shop Jasmine">
+              <span class="btn-inner">Shop Now
+                <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="currentColor" d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </span>
+            </button>
+          </div>
+
+          <div class="fd-particles" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section" id="about">
+      <div class="about-container">
+        <div class="main-content">
+          <div class="company-header">
+            <div class="logo-container">
+              <div class="logo-gradient">
+                <img src="./assets/images/logo/ARUDHRA_CREATIONS_LOGO_page-0001.jpg" alt="Arudhra Creations"
+                  class="company-logo" />
+              </div>
+            </div>
+
+            <div class="company-info">
+              <div class="badge-row">
+                <span class="est-badge">Est. 2025</span>
+                <span class="type-badge"><i class="fas fa-certificate" aria-hidden="true"></i>
+                  Private Limited</span>
+              </div>
+              <h1 class="company-name">Arudhra Creations Private Limited</h1>
+              <p class="company-tagline">Women-led · Temple-inspired</p>
+            </div>
+          </div>
+
+          <div class="mission-statement">
+            <div class="mission-icon">
+              <i class="fas fa-praying-hands" aria-hidden="true"></i>
+            </div>
+            <p class="mission-text">
+              Every day, South Indian temples receive beautiful flowers
+              offered with reverence and devotion... Arudhra Creations Private
+              Limited believes these flowers deserve a second, sacred life. We
+              are a women-led enterprise based in Salem, Tamil Nadu, committed
+              to transforming temple-blessed flowers into premium, carbon-free
+              agarbathi sticks.
+            </p>
+          </div>
+
+          <div class="key-points">
+            <div class="point-card">
+              <div class="point-icon eco">
+                <img class="small" src="./assets/images/images/temp.jpg" alt="Temple image" />
+              </div>
+              <div class="point-content">
+                <h3>Women-Led Innovation</h3>
+                <p>
+                  A skilled women’s team leads our flower processing,
+                  fragrance blending, and hand-rolling, creating dignified
+                  livelihoods across Salem.
+                </p>
+              </div>
+            </div>
+
+            <div class="point-card">
+              <div class="point-icon women">
+                <img class="small" src="./assets/images/images/temp.jpg" alt="Temple image" />
+              </div>
+              <div class="point-content">
+                <h3>Salem-Rooted, Temple-Focused</h3>
+                <p>
+                  Based in Salem we partner with temples across the region to
+                  respectfully collect sacred flowers before disposal.
+                </p>
+              </div>
+            </div>
+
+            <div class="point-card">
+              <div class="point-icon temple">
+                <img class="small" src="./assets/images/images/temp.jpg" alt="Temple image" />
+              </div>
+              <div class="point-content">
+                <h3>Purpose-Driven Model</h3>
+                <p>
+                  We prevent sacred flowers from becoming waste, giving them a
+                  renewed spiritual purpose through eco-friendly, respectful
+                  transformation.
+                </p>
+              </div>
+            </div>
+            <div class="point-card">
+              <div class="point-icon temple">
+                <img class="small" src="./assets/images/images/temp.jpg" alt="Temple image" />
+              </div>
+              <div class="point-content">
+                <h3>Purpose-Driven Model</h3>
+                <p>
+                  We prevent sacred flowers from becoming waste, giving them a
+                  renewed spiritual purpose through eco-friendly, respectful
+                  transformation.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="company-details">
+            <div class="detail-item">
+              <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+              <div>
+                <span class="detail-label">Headquarters</span><span class="detail-value">Salem, Tamil Nadu</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-id-card" aria-hidden="true"></i>
+              <div>
+                <span class="detail-label">Registration</span><span class="detail-value">U20238TZ2025PTC035616</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="highlights-sidebar">
+          <div class="section-label">
+            <span>Key Highlights</span>
+            <div class="label-line"></div>
+          </div>
+
+          <div class="highlight-card">
+            <div class="card-header">
+              <div class="card-icon innovation">
+                <i class="fas fa-seedling" aria-hidden="true"></i>
+              </div>
+              <div class="card-title">
+                <h3>Women-Led Innovation</h3>
+                <span class="card-subtitle">Artisan-led sustainable craft</span>
+              </div>
+            </div>
+            <p class="card-desc">
+              Dignified livelihoods for women artisans — blending traditional
+              skills with modern quality control.
+            </p>
+            <div class="card-features">
+              <span class="feature-tag">Training & Fair Wages</span><span class="feature-tag">Handcraft + QC</span>
+            </div>
+          </div>
+
+          <div class="highlight-card">
+            <div class="card-header">
+              <div class="card-icon impact">
+                <i class="fas fa-city" aria-hidden="true"></i>
+              </div>
+              <div class="card-title">
+                <h3>Salem-Rooted & Temple-Focused</h3>
+                <span class="card-subtitle">Ethical sourcing partnerships</span>
+              </div>
+            </div>
+            <p class="card-desc">
+              We partner respectfully with temples across Salem and nearby
+              regions to collect offerings before disposal.
+            </p>
+          </div>
+
+          <div class="highlight-card">
+            <div class="card-header">
+              <div class="card-icon partnership">
+                <i class="fas fa-heart" aria-hidden="true"></i>
+              </div>
+              <div class="card-title">
+                <h3>Quality & Transparency</h3>
+                <span class="card-subtitle">Handcrafted • Charcoal-free • Rigorous QC</span>
+              </div>
+            </div>
+            <p class="card-desc">
+              Every stick is handcrafted or semi-mechanized using traditional
+              South Indian methods with strict quality checks.
+            </p>
+          </div>
+          <div class="highlight-card">
+            <div class="card-header">
+              <div class="card-icon innovation">
+                <i class="fas fa-seedling" aria-hidden="true"></i>
+              </div>
+              <div class="card-title">
+                <h3>Temp Data</h3>
+                <span class="card-subtitle">Artisan-led sustainable craft</span>
+              </div>
+            </div>
+            <p class="card-desc">
+              Dignified livelihoods for women artisans — blending traditional
+              skills with modern quality control.
+            </p>
+            <div class="card-features">
+              <span class="feature-tag">Training & Fair Wages</span><span class="feature-tag">Handcraft + QC</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <div class="story-section">
+      <h2 class="section-title fade-up attractive">
+        Our Journey From Temple Blessing to Fragrant Stick
+      </h2>
+      <h3 class="section-subtitle fade-up">
+        The Sacred Journey of Temple-Flower Transformation
+      </h3>
+      <div class="story-container" id="storyContainer"></div>
+      <div class="summary fade-up" id="summaryBox"></div>
+    </div>
+
+    <section id="ourstory">
+      <div class="divider-section">
+        <div class="divider-line"></div>
+        <h1 class="divider-text attractive">Our Story</h1>
+        <div class="divider-line"></div>
+      </div>
+    </section>
+
+    <div class="body" id="contact">
+      <div class="form-container">
+        <div class="form-header-section">
+          <h1>Enquiry & Order Information</h1>
+          <p class="tagline">
+            We welcome inquiries for bulk orders, partnerships, and customized
+            solutions. Please fill out the form below, and our team will
+            respond within 24 business hours.
+          </p>
+        </div>
+
+        <div class="content-wrapper">
+          <section class="info-section">
+            <h2>
+              <i class="fas fa-info-circle" aria-hidden="true"></i> Our
+              Services
+            </h2>
+            <ul class="info-list">
+              <li>
+                <i class="fas fa-boxes" aria-hidden="true"></i> Bulk Orders
+                for Retail & B2B
+              </li>
+              <li>
+                <i class="fas fa-hands-praying" aria-hidden="true"></i> Temple
+                Supply Agreements
+              </li>
+              <li>
+                <i class="fas fa-gift" aria-hidden="true"></i> Return Gift
+                Customization
+              </li>
+              <li>
+                <i class="fas fa-building" aria-hidden="true"></i> Corporate
+                Gifting Solutions
+              </li>
+              <li>
+                <i class="fas fa-handshake" aria-hidden="true"></i> Wholesale
+                & Distributor Partnerships
+              </li>
+              <li>
+                <i class="fas fa-store" aria-hidden="true"></i> Retail
+                Stockist Opportunities
+              </li>
+              <li>
+                <i class="fas fa-wind" aria-hidden="true"></i> Customized
+                Fragrance Development
+              </li>
+              <li>
+                <i class="fas fa-calendar-star" aria-hidden="true"></i>
+                Event-Specific Gifting Solutions
+              </li>
+            </ul>
+
+            <div class="business-hours">
+              <h3>
+                <i class="fas fa-clock" aria-hidden="true"></i> Business Hours
+                & Response Policy
+              </h3>
+              <p>
+                <i class="fas fa-reply" aria-hidden="true"></i>
+                <span class="highlight">Typical response time:</span> Within
+                24 business hours
+              </p>
+              <p>
+                <i class="fas fa-cogs" aria-hidden="true"></i>
+                <span class="highlight">Orders processed:</span> Monday to
+                Friday, 9 AM to 6 PM IST
+              </p>
+              <p>
+                <i class="fas fa-bolt" aria-hidden="true"></i>
+                <span class="highlight">Emergency inquiries:</span> WhatsApp
+                recommended for faster response
+              </p>
+
+              <a href="https://wa.me/1234567890" class="whatsapp-contact" target="_blank" rel="noopener noreferrer"><i
+                  class="fab fa-whatsapp" aria-hidden="true"></i> Contact
+                via WhatsApp</a>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <div class="form-header">
+              <div class="form-title">
+                <h2>
+                  <i class="fas fa-edit" aria-hidden="true"></i> Contact Form
+                </h2>
+              </div>
+              <div class="required-note">
+                Fields marked with <span>*</span> are required
+              </div>
+            </div>
+
+            <form id="inquiryForm">
+              <div class="form-group">
+                <label for="fullName" class="required"><i class="fas fa-user" aria-hidden="true"></i> Full
+                  Name</label>
+                <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" />
+                <div class="error-message" id="fullNameError">
+                  Please enter your full name
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="mobile" class="required"><i class="fas fa-mobile-alt" aria-hidden="true"></i> Mobile
+                  Number</label>
+                <input type="tel" id="mobile" name="mobile" placeholder="Enter your 10-digit mobile number" />
+                <div class="error-message" id="mobileError">
+                  Please enter a valid 10-digit mobile number
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="email" class="required"><i class="fas fa-envelope" aria-hidden="true"></i> Email
+                  Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email address" />
+                <div class="error-message" id="emailError">
+                  Please enter a valid email address
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="city"><i class="fas fa-city" aria-hidden="true"></i> City/Region
+                  <span class="optional">(Optional)</span></label>
+                <input type="text" id="city" name="city" placeholder="Enter your city or region" />
+              </div>
+
+              <div class="form-group">
+                <label for="purpose" class="required"><i class="fas fa-bullseye" aria-hidden="true"></i> Purpose
+                  of Inquiry</label>
+                <select id="purpose" name="purpose">
+                  <option value="" disabled selected>
+                    Select your inquiry purpose
+                  </option>
+                  <option>Bulk Order Inquiry</option>
+                  <option>Retail / B2B Inquiry</option>
+                  <option>Temple Supply Partnership</option>
+                  <option>Return Gift Customization</option>
+                  <option>Corporate Gifting</option>
+                  <option>Wholesale / Distributor Interest</option>
+                  <option>Event-Specific Inquiry</option>
+                  <option>Product Customization</option>
+                  <option>General Enquiry</option>
+                </select>
+                <div class="error-message" id="purposeError">
+                  Please select a purpose for your inquiry
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="message"><i class="fas fa-comment-dots" aria-hidden="true"></i>
+                  Message <span class="optional">(Optional)</span></label>
+                <textarea id="message" name="message" rows="5"
+                  placeholder="Please provide any additional details about your inquiry..."></textarea>
+              </div>
+
+              <button type="submit" class="submit-btn">
+                <i class="fas fa-paper-plane" aria-hidden="true"></i> Submit
+                Inquiry
+              </button>
+              <div class="response-message" id="responseMessage"></div>
+            </form>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <footer class="modern-footer">
+      <div class="footer-container">
+        <div class="footer-row">
+          <div class="footer-col about">
+            <h3>Address</h3>
+            <p>Arudhra Creations Private Limited, Salem, Tamil Nadu, India</p>
+            <div class="email">
+              <p><strong>Email :</strong> arudhra2025@gmail.com</p>
+            </div>
+          </div>
+
+          <div class="footer-col">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#products">Products</a></li>
+              <li><a href="#about">About Us</a></li>
+              <li><a href="#ourstory">Our Story</a></li>
+              <li><a href="#contact">Contact Us</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col social">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+              <a target="_blank" rel="noopener noreferrer" href="https://www.facebook.com/share/16n2n7rprz/"><i
+                  class="fab fa-facebook-f" aria-hidden="true"></i></a>
+              <a target="_blank" rel="noopener noreferrer"
+                href="https://www.instagram.com/shri__brand?igsh=czc1YWQ5c291M3E4"><i class="fab fa-instagram"
+                  aria-hidden="true"></i></a>
+              <a href="#"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <hr />
+        <div class="footer-bottom">
+          <p>
+            © Arudhra Creations Private Limited, Salem | All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="./js/app.js"></script>
+  <script src="./js/form.js"></script>
+</body>
+
+</html>
