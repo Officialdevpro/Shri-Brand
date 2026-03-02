@@ -2,410 +2,457 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Checkout - Shri Brand</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Checkout - Shri Brand</title>
+  <link rel="icon" type="image/png" href="/assets/images/logo/Logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/checkout.css" />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="./assets/images/logo/Logo.png" />
-
-    <!-- Fonts & Icons -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap"
-        rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
-    <!-- Project styles -->
-    <link rel="stylesheet" href="./css/style.css" />
-    <link rel="stylesheet" href="./css/checkout.css" />
+  <!-- Razorpay SDK — must load before our script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 
 <body>
-    <div class="checkout-page">
-        <!-- Checkout Header -->
-        <header class="checkout-header">
-            <a href="./index.html" class="back-link">
-                <i class="fas fa-arrow-left"></i>
-                <span>Back to Shop</span>
-            </a>
-            <div class="logo-wrap">
-                <img class="logo" src="./assets/images/logo/Logo.png" alt="Shri Brand" />
+  <div class="checkout-page">
+
+    <!-- Header -->
+    <header class="checkout-header">
+      <a href="/" class="back-link">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back to Shop</span>
+      </a>
+      <div class="logo-wrap">
+        <img class="logo" src="/assets/images/logo/Logo.png" alt="Shri Brand" />
+      </div>
+    </header>
+
+    <div class="checkout-container">
+
+      <!-- Progress Steps -->
+      <div class="progress-steps">
+        <div class="step active" data-step="1">
+          <div class="step-number">1</div>
+          <span class="step-label">Shipping</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step" data-step="2">
+          <div class="step-number">2</div>
+          <span class="step-label">Payment</span>
+        </div>
+      </div>
+
+      <div class="checkout-content">
+
+        <!-- LEFT: Shipping Form only (payment is handled by Razorpay popup) -->
+        <div class="checkout-forms">
+          <form id="shipping-form" class="checkout-form active" novalidate>
+            <h2 class="form-title">
+              <i class="fas fa-shipping-fast"></i> Shipping Information
+            </h2>
+
+            <div class="form-group">
+              <label for="fullName">Full Name <span class="required">*</span></label>
+              <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" />
+              <div class="error-message" id="fullNameError">Please enter your full name</div>
             </div>
-        </header>
 
-        <div class="checkout-container">
-            <!-- Progress Steps -->
-            <div class="progress-steps">
-                <div class="step active" data-step="1">
-                    <div class="step-number">1</div>
-                    <span class="step-label">Shipping</span>
-                </div>
-                <div class="step-connector"></div>
-                <div class="step" data-step="2">
-                    <div class="step-number">2</div>
-                    <span class="step-label">Payment</span>
-                </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email">Email <span class="required">*</span></label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" />
+                <div class="error-message" id="emailError">Please enter a valid email</div>
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone <span class="required">*</span></label>
+                <input type="tel" id="phone" name="phone" placeholder="10-digit phone number" maxlength="10" />
+                <div class="error-message" id="phoneError">Please enter a valid 10-digit number</div>
+              </div>
             </div>
 
-            <div class="checkout-content">
-                <!-- Left Side: Forms -->
-                <div class="checkout-forms">
-                    <!-- Shipping Form -->
-                    <form id="shipping-form" class="checkout-form active">
-                        <h2 class="form-title">
-                            <i class="fas fa-shipping-fast"></i>
-                            Shipping Information
-                        </h2>
-
-                        <div class="form-group">
-                            <label for="fullName">Full Name <span class="required">*</span></label>
-                            <input type="text" id="fullName" name="fullName" placeholder="Enter your full name"
-                                required />
-                            <div class="error-message" id="fullNameError">Please enter your full name</div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="email">Email <span class="required">*</span></label>
-                                <input type="email" id="email" name="email" placeholder="Enter your email" required />
-                                <div class="error-message" id="emailError">Please enter a valid email</div>
-                            </div>
-                            <div class="form-group">
-                                <label for="phone">Phone Number <span class="required">*</span></label>
-                                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number"
-                                    required />
-                                <div class="error-message" id="phoneError">Please enter a valid phone number</div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="pincode">PIN Code <span class="required">*</span></label>
-                            <input type="text" id="pincode" name="pincode" placeholder="Enter PIN code" maxlength="6"
-                                required />
-                            <div class="error-message" id="pincodeError">Please enter a valid 6-digit PIN code</div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="address">Street Address <span class="required">*</span></label>
-                            <textarea id="address" name="address" rows="2" placeholder="Enter your street address"
-                                required></textarea>
-                            <div class="error-message" id="addressError">Please enter your address</div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="city">City <span class="required">*</span></label>
-                                <input type="text" id="city" name="city" placeholder="Enter your city" required />
-                                <div class="error-message" id="cityError">Please enter your city</div>
-                            </div>
-                            <div class="form-group">
-                                <label for="state">State <span class="required">*</span></label>
-                                <input type="text" id="state" name="state" placeholder="Enter your state" required />
-                                <div class="error-message" id="stateError">Please enter your state</div>
-                            </div>
-                        </div>
-
-                        <button type="button" class="btn-continue" id="continue-to-payment">
-                            Continue to Payment
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </form>
-
-                    <!-- Payment Form -->
-                    <form id="payment-form" class="checkout-form">
-                        <h2 class="form-title">
-                            <i class="fas fa-credit-card"></i>
-                            Payment Method
-                        </h2>
-
-                        <div class="payment-options">
-                            <label class="payment-option">
-                                <input type="radio" name="paymentMethod" value="cod" checked />
-                                <div class="option-content">
-                                    <div class="option-icon">
-                                        <i class="fas fa-money-bill-wave"></i>
-                                    </div>
-                                    <div class="option-details">
-                                        <span class="option-title">Cash on Delivery</span>
-                                        <span class="option-desc">Pay when you receive your order</span>
-                                    </div>
-                                </div>
-                            </label>
-
-                            <label class="payment-option">
-                                <input type="radio" name="paymentMethod" value="upi" />
-                                <div class="option-content">
-                                    <div class="option-icon">
-                                        <i class="fas fa-qrcode"></i>
-                                    </div>
-                                    <div class="option-details">
-                                        <span class="option-title">UPI Payment</span>
-                                        <span class="option-desc">Pay using UPI apps like GPay, PhonePe</span>
-                                    </div>
-                                </div>
-                            </label>
-
-                            <label class="payment-option">
-                                <input type="radio" name="paymentMethod" value="card" />
-                                <div class="option-content">
-                                    <div class="option-icon">
-                                        <i class="fas fa-credit-card"></i>
-                                    </div>
-                                    <div class="option-details">
-                                        <span class="option-title">Credit/Debit Card</span>
-                                        <span class="option-desc">Pay securely with your card</span>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-back" id="back-to-shipping">
-                                <i class="fas fa-arrow-left"></i>
-                                Back to Shipping
-                            </button>
-                            <button type="submit" class="btn-place-order" id="place-order-btn">
-                                <i class="fas fa-check"></i>
-                                Place Order
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Right Side: Order Summary -->
-                <aside class="order-summary">
-                    <h2 class="summary-title">
-                        <i class="fas fa-shopping-bag"></i>
-                        Order Summary
-                    </h2>
-
-                    <div class="cart-items" id="checkout-cart-items">
-                        <!-- Cart items loaded dynamically -->
-                    </div>
-
-                    <div class="summary-details">
-                        <div class="summary-row">
-                            <span>Subtotal</span>
-                            <span id="checkout-subtotal">₹0</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Shipping</span>
-                            <span id="checkout-shipping">Free</span>
-                        </div>
-                        <div class="summary-row discount" id="discount-row" style="display: none;">
-                            <span>Discount</span>
-                            <span id="checkout-discount">-₹0</span>
-                        </div>
-                        <div class="summary-divider"></div>
-                        <div class="summary-row total">
-                            <span>Total</span>
-                            <span id="checkout-total">₹0</span>
-                        </div>
-                    </div>
-                </aside>
+            <div class="form-group">
+              <label for="pincode">PIN Code <span class="required">*</span></label>
+              <input type="text" id="pincode" name="pincode" placeholder="6-digit PIN code" maxlength="6" />
+              <div class="error-message" id="pincodeError">Please enter a valid 6-digit PIN code</div>
             </div>
+
+            <div class="form-group">
+              <label for="address">Street Address <span class="required">*</span></label>
+              <textarea id="address" name="address" rows="2" placeholder="House no., street, area"></textarea>
+              <div class="error-message" id="addressError">Please enter your address</div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="city">City <span class="required">*</span></label>
+                <input type="text" id="city" name="city" placeholder="City" />
+                <div class="error-message" id="cityError">Please enter your city</div>
+              </div>
+              <div class="form-group">
+                <label for="state">State <span class="required">*</span></label>
+                <input type="text" id="state" name="state" placeholder="State" />
+                <div class="error-message" id="stateError">Please enter your state</div>
+              </div>
+            </div>
+
+            <!-- This button triggers Razorpay directly -->
+            <button type="button" class="btn-place-order" id="pay-btn">
+              <i class="fas fa-lock"></i>
+              Proceed to Pay
+            </button>
+          </form>
         </div>
 
-        <!-- Success Modal -->
-        <div class="modal-overlay" id="success-modal">
-            <div class="modal-content">
-                <div class="success-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <h2>Order Placed Successfully!</h2>
-                <p>Thank you for your order. We'll send you a confirmation email shortly.</p>
-                <a href="./index.html" class="btn-continue">
-                    Continue Shopping
-                    <i class="fas fa-arrow-right"></i>
-                </a>
+        <!-- RIGHT: Order Summary -->
+        <aside class="order-summary">
+          <h2 class="summary-title">
+            <i class="fas fa-shopping-bag"></i> Order Summary
+          </h2>
+
+          <div class="cart-items" id="checkout-cart-items">
+            <div class="cart-loading" style="text-align:center;padding:24px;color:#888;">
+              <i class="fas fa-spinner fa-spin"></i> Loading your cart...
             </div>
-        </div>
+          </div>
+
+          <div class="summary-details">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span id="checkout-subtotal">₹0</span>
+            </div>
+            <div class="summary-row">
+              <span>Shipping</span>
+              <span id="checkout-shipping">Free</span>
+            </div>
+            <div class="summary-row discount" id="discount-row" style="display:none;">
+              <span>You Save</span>
+              <span id="checkout-discount" style="color:#10b981;">-₹0</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-row total">
+              <span>Total</span>
+              <span id="checkout-total">₹0</span>
+            </div>
+          </div>
+        </aside>
+
+      </div>
     </div>
 
-    <script>
-        // Product data (same as products.js)
-        const productsData = [
-            { id: 1, name: "Jasmine", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/1.png" },
-            { id: 2, name: "Champa", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/2.png" },
-            { id: 3, name: "Lavender", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/3.png" },
-            { id: 4, name: "Screw Pine", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/4.png" },
-            { id: 5, name: "Rose", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/5.png" },
-            { id: 6, name: "Sandal", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/6.png" },
-            { id: 7, name: "Sacred Resin", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/7.png" },
-            { id: 8, name: "Javathu", price: 120, originalPrice: 199, image: "./assets/images/Fragrances/8.png" }
-        ];
-        const comboPackData = [
-            { id: 101, name: "8 Fragrances Pack", price: 799, originalPrice: 1199, image: "./assets/images/images/8fragrances.png" },
-            { id: 102, name: "Temple Essentials", price: 399, originalPrice: 599, image: "./assets/images/Fragrances/c1.png" },
-            { id: 103, name: "Floral Collection", price: 349, originalPrice: 499, image: "./assets/images/Fragrances/c1.png" }
-        ];
-        const giftPackData = [
-            { id: 201, name: "Premium Gift Set", price: 499, originalPrice: 699, image: "./assets/images/images/8fragrances.png" },
-            { id: 202, name: "Festive Gift Box", price: 399, originalPrice: 549, image: "./assets/images/Fragrances/c1.png" }
-        ];
+    <!-- Success Modal — shown after payment verified -->
+    <div class="modal-overlay" id="success-modal">
+      <div class="modal-content">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>Order Placed Successfully!</h2>
+        <p id="success-order-number" style="color:#7d1f1f;font-weight:600;font-size:18px;"></p>
+        <p>Thank you for your order. We'll keep you updated on the delivery.</p>
+        <a href="/" class="btn-continue">
+          Continue Shopping <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
 
-        function getAllProducts() {
-            return [...productsData, ...comboPackData, ...giftPackData];
+    <!-- Error Toast -->
+    <div id="toast" style="
+      display:none;
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+      background:#dc3545;color:#fff;padding:14px 28px;border-radius:8px;
+      font-size:14px;font-weight:600;z-index:9999;
+      box-shadow:0 6px 24px rgba(0,0,0,0.2);
+      animation:slideUp 0.3s ease;">
+    </div>
+
+    <style>
+      @keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+      .btn-place-order { width:100%; padding:16px; font-size:15px; font-weight:700; background:#7d1f1f; color:#fff; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; margin-top:8px; transition:all 0.3s; }
+      .btn-place-order:hover:not(:disabled) { background:#5a1616; transform:translateY(-2px); box-shadow:0 6px 20px rgba(125,31,31,0.3); }
+      .btn-place-order:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+    </style>
+
+  </div>
+
+  <script>
+    const CART_API  = '/api/v1/cart';
+    const ORDER_API = '/api/v1/orders';
+
+    // ── Toast ───────────────────────────────────────────────────────
+    function showToast(msg, color = '#dc3545') {
+      const t = document.getElementById('toast');
+      t.textContent    = msg;
+      t.style.background = color;
+      t.style.display  = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 4000);
+    }
+
+    // ── Load cart from API ──────────────────────────────────────────
+    async function loadCheckoutCart() {
+      const container  = document.getElementById('checkout-cart-items');
+      const subtotalEl = document.getElementById('checkout-subtotal');
+      const totalEl    = document.getElementById('checkout-total');
+      const discountRow = document.getElementById('discount-row');
+      const discountEl = document.getElementById('checkout-discount');
+      const payBtn     = document.getElementById('pay-btn');
+
+      try {
+        const res = await fetch(CART_API, { credentials: 'include' });
+
+        if (res.status === 401) { window.location.href = '/auth'; return; }
+        if (!res.ok) throw new Error('Failed to load cart');
+
+        const { data } = await res.json();
+        const cart = data?.cart;
+
+        if (!cart || !cart.items || cart.items.length === 0) {
+          container.innerHTML = `
+            <div style="text-align:center;padding:24px;color:#888;">
+              <i class="fas fa-shopping-cart" style="font-size:32px;display:block;margin-bottom:8px;"></i>
+              Cart is empty. <a href="/" style="color:#7d1f1f;font-weight:600;">Shop now</a>
+            </div>`;
+          payBtn.disabled = true;
+          return;
         }
 
-        function findProductById(id) {
-            return getAllProducts().find(p => p.id === parseInt(id));
+        // Render items
+        container.innerHTML = cart.items.map(item => `
+          <div class="cart-item">
+            <img src="${item.mainImage}" alt="${item.name}" class="item-image"
+              onerror="this.src='/assets/images/logo/Logo.png'" />
+            <div class="item-details">
+              <span class="item-name">${item.name}</span>
+              <span class="item-qty">Qty: ${item.quantity}</span>
+            </div>
+            <span class="item-price">₹${(item.price * item.quantity).toFixed(0)}</span>
+          </div>
+        `).join('');
+
+        const s = cart.summary;
+        subtotalEl.textContent = `₹${s.subtotal}`;
+        totalEl.textContent    = `₹${s.subtotal}`;
+
+        if (s.totalDiscount > 0) {
+          discountEl.textContent    = `-₹${s.totalDiscount}`;
+          discountRow.style.display = 'flex';
         }
 
-        // Load cart from localStorage and display
-        function loadCheckoutCart() {
-            const cartData = localStorage.getItem('shriCart');
-            const cartContainer = document.getElementById('checkout-cart-items');
-            const subtotalEl = document.getElementById('checkout-subtotal');
-            const totalEl = document.getElementById('checkout-total');
+      } catch (err) {
+        container.innerHTML = `<div style="text-align:center;padding:24px;color:#dc3545;">Could not load cart. <a href="/">Go back</a></div>`;
+        document.getElementById('pay-btn').disabled = true;
+      }
+    }
 
-            if (!cartData) {
-                cartContainer.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
-                return;
-            }
+    // ── Form Validation ─────────────────────────────────────────────
+    const VALIDATORS = {
+      fullName: v => v.trim().length > 1,
+      email:    v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+      phone:    v => /^[0-9]{10}$/.test(v.replace(/\D/g, '')),
+      pincode:  v => /^[0-9]{6}$/.test(v),
+      address:  v => v.trim().length > 5,
+      city:     v => v.trim().length > 1,
+      state:    v => v.trim().length > 1,
+    };
 
-            const savedCart = JSON.parse(cartData);
+    function validateField(id) {
+      const input = document.getElementById(id);
+      const errEl = document.getElementById(id + 'Error');
+      const valid = VALIDATORS[id](input.value);
+      input.classList.toggle('error', !valid);
+      if (errEl) errEl.style.display = valid ? 'none' : 'block';
+      return valid;
+    }
 
-            if (savedCart.length === 0) {
-                cartContainer.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
-                return;
-            }
+    function validateAll() {
+      return Object.keys(VALIDATORS).map(validateField).every(Boolean);
+    }
 
-            // Rebuild cart with product details
-            const cart = savedCart.map(item => {
-                const product = findProductById(item.id);
-                if (product) {
-                    return { id: item.id, quantity: item.quantity, product: product };
-                }
-                return null;
-            }).filter(Boolean);
+    function getShippingData() {
+      return {
+        fullName: document.getElementById('fullName').value.trim(),
+        email:    document.getElementById('email').value.trim(),
+        phone:    document.getElementById('phone').value.trim(),
+        address:  document.getElementById('address').value.trim(),
+        city:     document.getElementById('city').value.trim(),
+        state:    document.getElementById('state').value.trim(),
+        pincode:  document.getElementById('pincode').value.trim(),
+      };
+    }
 
-            if (cart.length === 0) {
-                cartContainer.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
-                return;
-            }
+    // ── Main Payment Flow ───────────────────────────────────────────
+    //
+    //  Step 1: Validate form
+    //  Step 2: POST /orders/create-order  → get razorpayOrderId + keyId
+    //  Step 3: Open Razorpay popup
+    //  Step 4: On success → POST /orders/verify-payment
+    //  Step 5: Show success modal
+    //
+    async function startPayment() {
+      // Step 1 — Validate shipping form
+      if (!validateAll()) {
+        showToast('Please fill all required fields correctly.');
+        return;
+      }
 
-            let subtotal = 0;
-            let itemsHTML = '';
+      const payBtn = document.getElementById('pay-btn');
+      payBtn.innerHTML  = '<i class="fas fa-spinner fa-spin"></i> Creating order...';
+      payBtn.disabled   = true;
 
-            cart.forEach(item => {
-                const itemTotal = item.product.price * item.quantity;
-                subtotal += itemTotal;
+      let orderData;
 
-                itemsHTML += `
-                    <div class="cart-item">
-                        <img src="${item.product.image}" alt="${item.product.name}" class="item-image" />
-                        <div class="item-details">
-                            <span class="item-name">${item.product.name}</span>
-                            <span class="item-qty">Qty: ${item.quantity}</span>
-                        </div>
-                        <span class="item-price">₹${itemTotal}</span>
-                    </div>
-                `;
-            });
-
-            cartContainer.innerHTML = itemsHTML;
-            subtotalEl.textContent = `₹${subtotal}`;
-            totalEl.textContent = `₹${subtotal}`;
-        }
-
-        // Form validation
-        function validateShippingForm() {
-            let isValid = true;
-            const fields = ['fullName', 'email', 'phone', 'pincode', 'address', 'city', 'state'];
-
-            fields.forEach(field => {
-                const input = document.getElementById(field);
-                const errorEl = document.getElementById(field + 'Error');
-                const value = input.value.trim();
-
-                if (!value) {
-                    input.classList.add('error');
-                    if (errorEl) errorEl.style.display = 'block';
-                    isValid = false;
-                } else {
-                    input.classList.remove('error');
-                    if (errorEl) errorEl.style.display = 'none';
-                }
-            });
-
-            // Email validation
-            const email = document.getElementById('email');
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (email.value && !emailRegex.test(email.value)) {
-                email.classList.add('error');
-                document.getElementById('emailError').style.display = 'block';
-                isValid = false;
-            }
-
-            // Phone validation
-            const phone = document.getElementById('phone');
-            const phoneRegex = /^[0-9]{10}$/;
-            if (phone.value && !phoneRegex.test(phone.value.replace(/\D/g, ''))) {
-                phone.classList.add('error');
-                document.getElementById('phoneError').style.display = 'block';
-                isValid = false;
-            }
-
-            // PIN code validation
-            const pincode = document.getElementById('pincode');
-            const pincodeRegex = /^[0-9]{6}$/;
-            if (pincode.value && !pincodeRegex.test(pincode.value)) {
-                pincode.classList.add('error');
-                document.getElementById('pincodeError').style.display = 'block';
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
-        // Switch between forms
-        function showPaymentForm() {
-            if (validateShippingForm()) {
-                document.getElementById('shipping-form').classList.remove('active');
-                document.getElementById('payment-form').classList.add('active');
-                document.querySelector('.step[data-step="1"]').classList.remove('active');
-                document.querySelector('.step[data-step="1"]').classList.add('completed');
-                document.querySelector('.step[data-step="2"]').classList.add('active');
-            }
-        }
-
-        function showShippingForm() {
-            document.getElementById('payment-form').classList.remove('active');
-            document.getElementById('shipping-form').classList.add('active');
-            document.querySelector('.step[data-step="2"]').classList.remove('active');
-            document.querySelector('.step[data-step="1"]').classList.remove('completed');
-            document.querySelector('.step[data-step="1"]').classList.add('active');
-        }
-
-        // Place order
-        function placeOrder(e) {
-            e.preventDefault();
-            const modal = document.getElementById('success-modal');
-            modal.classList.add('active');
-
-            // Clear cart
-            localStorage.removeItem('shriCart');
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadCheckoutCart();
-
-            document.getElementById('continue-to-payment').addEventListener('click', showPaymentForm);
-            document.getElementById('back-to-shipping').addEventListener('click', showShippingForm);
-            document.getElementById('payment-form').addEventListener('submit', placeOrder);
-
-            // Input focus effects
-            document.querySelectorAll('input, textarea').forEach(input => {
-                input.addEventListener('focus', function () {
-                    this.classList.remove('error');
-                    const errorEl = document.getElementById(this.id + 'Error');
-                    if (errorEl) errorEl.style.display = 'none';
-                });
-            });
+      try {
+        // Step 2 — Create order on backend
+        const res = await fetch(`${ORDER_API}/create-order`, {
+          method:      'POST',
+          headers:     { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body:        JSON.stringify(getShippingData()),
         });
-    </script>
-</body>
 
+        const json = await res.json();
+
+        if (res.status === 401) { window.location.href = '/auth'; return; }
+
+        if (!res.ok) {
+          showToast(json.message || 'Failed to create order. Please try again.');
+          payBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Pay';
+          payBtn.disabled  = false;
+          return;
+        }
+
+        orderData = json.data;
+
+      } catch (err) {
+        showToast('Network error. Please check your connection.');
+        payBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Pay';
+        payBtn.disabled  = false;
+        return;
+      }
+
+      // Step 3 — Open Razorpay popup
+      const options = {
+        key:         orderData.keyId,
+        amount:      orderData.amount,          // in paise
+        currency:    orderData.currency || 'INR',
+        name:        'Shri Brand',
+        description: 'Premium Dhoop Products',
+        image:       '/assets/images/logo/Logo.png',
+        order_id:    orderData.razorpayOrderId,
+
+        prefill: {
+          name:    orderData.prefill.name,
+          email:   orderData.prefill.email,
+          contact: orderData.prefill.contact,
+        },
+
+        theme: { color: '#7d1f1f' },
+
+        // Step 4a — Payment succeeded inside Razorpay popup
+        handler: async function (response) {
+          payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying payment...';
+
+          try {
+            const verifyRes = await fetch(`${ORDER_API}/verify-payment`, {
+              method:      'POST',
+              headers:     { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({
+                orderId:            orderData.orderId,
+                razorpayOrderId:    response.razorpay_order_id,
+                razorpayPaymentId:  response.razorpay_payment_id,
+                razorpaySignature:  response.razorpay_signature,
+              }),
+            });
+
+            const verifyJson = await verifyRes.json();
+
+            if (!verifyRes.ok) {
+              showToast(verifyJson.message || 'Payment verification failed. Contact support.');
+              payBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Pay';
+              payBtn.disabled  = false;
+              return;
+            }
+
+            // Step 5 — Show success
+            document.getElementById('success-order-number').textContent =
+              `Order #${verifyJson.data.orderNumber}`;
+            document.getElementById('success-modal').classList.add('active');
+
+          } catch {
+            showToast('Verification error. Your payment may have gone through — contact support.');
+            payBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Pay';
+            payBtn.disabled  = false;
+          }
+        },
+
+        // Step 4b — User dismissed or payment failed inside popup
+        modal: {
+          ondismiss: async function () {
+            // Notify backend so the order is marked failed (not left as "pending" forever)
+            try {
+              await fetch(`${ORDER_API}/payment-failed`, {
+                method:      'POST',
+                headers:     { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                  orderId: orderData.orderId,
+                  reason:  'User dismissed payment popup',
+                }),
+              });
+            } catch { /* silent — best effort */ }
+
+            showToast('Payment cancelled. Your cart is still saved.', '#6b6b6b');
+            payBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Pay';
+            payBtn.disabled  = false;
+          },
+        },
+      };
+
+      const rzp = new Razorpay(options);
+
+      // Handle Razorpay's own error event (card declined, bank error, etc.)
+      rzp.on('payment.failed', async function (response) {
+        try {
+          await fetch(`${ORDER_API}/payment-failed`, {
+            method:      'POST',
+            headers:     { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              orderId: orderData.orderId,
+              reason:  response.error?.description || 'Payment failed',
+            }),
+          });
+        } catch { /* silent */ }
+
+        showToast(`Payment failed: ${response.error?.description || 'Please try again.'}`);
+        payBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Pay';
+        payBtn.disabled  = false;
+      });
+
+      rzp.open();
+    }
+
+    // ── Init ────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCheckoutCart();
+
+      document.getElementById('pay-btn').addEventListener('click', startPayment);
+
+      // Live field validation
+      Object.keys(VALIDATORS).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', () => validateField(id));
+      });
+
+      // Update step indicator when pay button is clicked
+      document.getElementById('pay-btn').addEventListener('click', () => {
+        document.querySelector('.step[data-step="1"]').classList.remove('active');
+        document.querySelector('.step[data-step="1"]').classList.add('completed');
+        document.querySelector('.step[data-step="2"]').classList.add('active');
+      });
+    });
+  </script>
+
+</body>
 </html>

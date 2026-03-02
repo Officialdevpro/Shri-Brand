@@ -1,4 +1,4 @@
-const Product = require("../models/product");
+const Product = require("../models/productModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
 const cloudinary = require("../config/cloudinary");
@@ -199,6 +199,15 @@ const createProduct = catchAsync(async (req, res, next) => {
     if (!req.body.sku) req.body.sku = generateSku(req.body.fragranceCategory);
     if (!req.body.slug && req.body.name) req.body.slug = generateSlug(req.body.name);
 
+    // Parse packs if sent as JSON string (from form-data)
+    if (typeof req.body.packs === "string") {
+        try {
+            req.body.packs = JSON.parse(req.body.packs);
+        } catch (e) {
+            return next(new AppError("Invalid packs JSON format.", 400));
+        }
+    }
+
     // Build product data
     const productData = {
         ...req.body,
@@ -337,28 +346,13 @@ const updateProduct = catchAsync(async (req, res, next) => {
         };
     }
 
-    // 7. Manual price validation
-    //    Mongoose's custom validator for originalPrice uses `this.price`, but during
-    //    findByIdAndUpdate `this` is the Query object — so `this.price` is undefined
-    //    and the validator always fails. We validate manually here instead.
-    const finalPrice = req.body.price != null ? Number(req.body.price) : product.price;
-    const finalOriginalPrice = req.body.originalPrice != null
-        ? Number(req.body.originalPrice)
-        : product.originalPrice;
-
-    if (finalOriginalPrice != null && finalOriginalPrice < finalPrice) {
-        return next(
-            new AppError("Original price must be greater than or equal to current price", 400)
-        );
-    }
-
-    // Remove originalPrice from the $set if it hasn't changed, to avoid
-    // triggering the broken Mongoose update validator
-    if (req.body.originalPrice != null) {
-        req.body.originalPrice = Number(req.body.originalPrice);
-    }
-    if (req.body.price != null) {
-        req.body.price = Number(req.body.price);
+    // 7. Parse packs if sent as JSON string (from form-data)
+    if (typeof req.body.packs === "string") {
+        try {
+            req.body.packs = JSON.parse(req.body.packs);
+        } catch (e) {
+            return next(new AppError("Invalid packs JSON format.", 400));
+        }
     }
 
     // 8. Apply updates
@@ -375,7 +369,7 @@ const updateProduct = catchAsync(async (req, res, next) => {
     });
 });
 
-// @desc    Delete product (soft delete) + remove Cloudinary images
+// @desc    Delete product (soft delete) + remove Cloudinary images + clean carts
 // @route   DELETE /api/v1/products/:id
 // @access  Private/Admin
 const deleteProduct = catchAsync(async (req, res, next) => {
@@ -403,6 +397,17 @@ const deleteProduct = catchAsync(async (req, res, next) => {
     // Soft delete: set isActive to false
     product.isActive = false;
     await product.save();
+
+    // ── Clean up all user carts that contain this product ──
+    const Cart = require("../models/cartModel");
+    const affectedCarts = await Cart.find({ "items.productId": product._id });
+    for (const cart of affectedCarts) {
+        cart.items = cart.items.filter(
+            (item) => item.productId.toString() !== product._id.toString()
+        );
+        cart.calculateSummary();
+        await cart.save();
+    }
 
     res.status(200).json({
         success: true,
@@ -476,7 +481,7 @@ const getProductsByCategory = catchAsync(async (req, res, next) => {
 // @route   PATCH /api/v1/products/:id/stock
 // @access  Private/Admin
 const updateStock = catchAsync(async (req, res, next) => {
-    const { quantity, operation = "decrease" } = req.body;
+    const { quantity, operation = "decrease", packWeight } = req.body;
 
     if (!quantity || quantity <= 0) {
         return next(new AppError("Quantity must be a positive number", 400));
@@ -486,31 +491,42 @@ const updateStock = catchAsync(async (req, res, next) => {
         return next(new AppError("Operation must be 'increase' or 'decrease'", 400));
     }
 
+    if (!packWeight) {
+        return next(new AppError("Pack weight is required (e.g. '40g')", 400));
+    }
+
     const product = await Product.findById(req.params.id);
 
     if (!product) {
         return next(new AppError("Product not found", 404));
     }
 
+    const pack = product.getPackByWeight(packWeight);
+    if (!pack) {
+        return next(new AppError(`Pack "${packWeight}" not found on this product`, 404));
+    }
+
     if (operation === "decrease") {
-        if (product.stock < quantity) {
+        if (pack.stock < quantity) {
             return next(
-                new AppError(`Insufficient stock. Available: ${product.stock}`, 400)
+                new AppError(`Insufficient stock for ${packWeight}. Available: ${pack.stock}`, 400)
             );
         }
-        product.stock -= quantity;
-        product.totalSold += quantity;
+        pack.stock -= quantity;
+        pack.totalSold = (pack.totalSold || 0) + quantity;
     } else {
-        product.stock += quantity;
+        pack.stock += quantity;
     }
 
     await product.save();
 
     res.status(200).json({
         success: true,
-        message: "Stock updated successfully",
+        message: `Stock for ${packWeight} updated successfully`,
         data: {
-            stock: product.stock,
+            packWeight: pack.weight,
+            packStock: pack.stock,
+            totalStock: product.stock,
             totalSold: product.totalSold,
             isLowStock: product.isLowStock,
             isInStock: product.isInStock,

@@ -4,1379 +4,1326 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Product Dashboard | Admin Panel</title>
+  <title>Shri Brand — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="./css/mItem.css" />
-
-  <link rel="stylesheet" href="./css/mediaquery.css" />
-
-
-  <link rel="stylesheet" href="./css/order.css" />
-  <link rel="stylesheet" href="./css/mUser.css" />
-  <link rel="stylesheet" href="./css/dashboard.css" />
+  <link rel="stylesheet" href="./css/order-history.css" />
   <link rel="stylesheet" href="./css/index.css" />
-  <link rel="stylesheet" href="./css/settings.css" />
+  <link rel="stylesheet" href="./css/product.css" />
+  <link rel="stylesheet" href="./css/message.css" />
+  <link rel="stylesheet" href="./css/user.css" />
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Segoe UI", system-ui, sans-serif;
-    }
-
-    :root {
-      --primary: #4f46e5;
-      --primary-dark: #4338ca;
-      --secondary: #7c3aed;
-      --accent: #06b6d4;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --light: #f8fafc;
-      --dark: #1e293b;
-      --gray: #64748b;
-      --light-gray: #e2e8f0;
-      --border: #cbd5e1;
-      --sidebar-bg: #1e293b;
-      --card-bg: #ffffff;
-      --shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-lg:
-        0 10px 15px -3px rgba(0, 0, 0, 0.1),
-        0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      --radius: 12px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    [data-theme="dark"] {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --secondary: #8b5cf6;
-      --accent: #06b6d4;
-      --light: #0f172a;
-      --dark: #f1f5f9;
-      --gray: #94a3b8;
-      --light-gray: #1e293b;
-      --border: #334155;
-      --sidebar-bg: #0f172a;
-      --card-bg: #0f172a;
-      ;
-      --shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-      --shadow-lg:
-        0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-    }
-
-    body {
-      background-color: #f1f5f9;
-      color: var(--dark);
-      line-height: 1.6;
-      min-height: 100vh;
-      display: flex;
-      transition: var(--transition);
-    }
-
-    body.dark-theme-transition {
-      transition:
-        background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-        color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* Main Content */
-    .main-content {
-      flex: 1;
-      margin-left: 250px;
-      /* sidebar width */
-      padding: 20px;
+    /* ── Pack Manager (uses product.css variables) ──────────── */
+    .pack-row {
+      background: var(--parchment, #f7f3ed);
+      border: 1px solid var(--border, rgba(184, 134, 11, 0.18));
+      border-left: 3px solid var(--gold, #b8860b);
+      padding: 14px 14px 12px;
+      margin-bottom: 10px;
       position: relative;
-      background-color: var(--card-bg);
     }
 
-    /* ALL sections */
-    .main-content section {
-      display: none;
-      width: 100%;
-      min-height: calc(100vh - 60px);
+    .pack-row-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
     }
 
-    /* ONLY active section */
-    .main-content section.active-section {
+    .pack-row-num {
+      font-size: 9.5px;
+      font-family: 'Jost', sans-serif;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gold, #b8860b);
+      background: var(--gold-pale, rgba(184, 134, 11, 0.11));
+      border: 1px solid var(--gold-border, rgba(184, 134, 11, 0.25));
+      padding: 2px 9px;
+    }
+
+    .pack-row-title {
+      font-size: 11px;
+      color: var(--ink-muted, #7a6a58);
+      font-family: 'Jost', sans-serif;
+      flex: 1;
+      letter-spacing: .04em;
+    }
+
+    .pack-row-rm {
+      background: none;
+      border: 1px solid rgba(127, 4, 3, .2);
+      cursor: pointer;
+      color: var(--crimson, #7f0403);
+      font-size: 11px;
+      padding: 3px 9px;
+      font-family: 'Jost', sans-serif;
+      font-weight: 500;
+      letter-spacing: .04em;
+      transition: background .15s, border-color .15s;
+    }
+
+    .pack-row-rm:hover {
+      background: rgba(127, 4, 3, .06);
+      border-color: var(--crimson, #7f0403);
+    }
+
+    .pack-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px 14px;
+    }
+
+    @media (max-width: 500px) {
+      .pack-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pack-field label {
       display: block;
+      font-size: 9.5px;
+      font-family: 'Jost', sans-serif;
+      font-weight: 600;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--ink-muted, #7a6a58);
+      margin-bottom: 4px;
     }
 
-    #settings {
-      background-color: #0f172a00;
+    .pack-field input {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--surface, #fff);
+      border: 1px solid var(--border, rgba(184, 134, 11, 0.18));
+      color: var(--ink, #1c1410);
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      padding: 7px 11px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
     }
 
-    #mUsers {
-      background-color: #00000000;
+    .pack-field input:focus {
+      border-color: var(--gold, #b8860b);
+      box-shadow: 0 0 0 3px var(--gold-pale, rgba(184, 134, 11, 0.11));
     }
 
-    #mitems {
-      background-color: #20352e00;
+    .pack-field input[readonly] {
+      background: var(--parchment, #f7f3ed);
+      color: var(--ink-faint, #aa9988);
+      cursor: default;
     }
 
-
-    #dashboard {
-      background-color: #f59f0b00;
+    .btn-add-pack {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Jost', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--gold, #b8860b);
+      background: var(--gold-pale, rgba(184, 134, 11, 0.08));
+      border: 1px dashed var(--gold-border, rgba(184, 134, 11, 0.35));
+      padding: 8px 18px;
+      cursor: pointer;
+      transition: background .2s, border-color .2s;
+      margin-top: 6px;
     }
 
-    /* Smooth theme transition effects */
+    .btn-add-pack:hover {
+      background: rgba(184, 134, 11, .15);
+      border-color: var(--gold, #b8860b);
+    }
   </style>
 </head>
 
-<body data-theme="light">
-  <!-- Sidebar Navigation -->
-  <nav class="sidebar">
-    <div class="logo">
-      <img src="./assets/logo/Logo.png" alt="Shri Brand Logo" />
-      <h1>Shri Brand</h1>
-    </div>
 
-    <ul class="nav-menu">
-      <li class="nav-item">
-        <a href="#" class="nav-link active" data-section="dashboard">
-          <i class="fas fa-tachometer-alt"></i>
-          <span>DASHBOARD</span>
-        </a>
-      </li>
-
-      <li class="nav-item">
-        <a href="#" class="nav-link" data-section="mItems">
-          <i class="fas fa-boxes"></i>
-          <span>MANAGE ITEMS</span>
-        </a>
-      </li>
-
-      <!-- <li class="nav-item">
-          <a href="#" class="nav-link" data-section="mUsers">
-            <i class="fas fa-users"></i>
-            <span>MANAGE USERS</span>
-          </a>
-        </li> -->
-
-      <li class="nav-item">
-        <a href="#" class="nav-link" data-section="orderHistory">
-          <i class="fas fa-history"></i>
-          <span>ORDER HISTORY</span>
-        </a>
-      </li>
-
-      <li class="nav-item">
-        <a href="#" class="nav-link" data-section="settings">
-          <i class="fas fa-gear"></i>
-          <span>SETTINGS</span>
-        </a>
-      </li>
-    </ul>
-
-    <!-- Theme Toggle -->
-    <div class="theme-toggle-container">
-      <div class="theme-toggle" id="themeToggle">
-        <div class="theme-slider" id="themeSlider"></div>
-
-        <div class="theme-option active" id="lightTheme">
-          <i class="fas fa-sun"></i>
-          <span class="theme-text">Light</span>
-        </div>
-
-        <div class="theme-option" id="darkTheme">
-          <i class="fas fa-moon"></i>
-          <span class="theme-text">Dark</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Admin Profile -->
-    <div class="admin-profile" id="adminProfile">
-      <div class="admin-profile-content">
-        <div class="admin-avatar" id="adminAvatar">AJ</div>
-
-        <div class="admin-info">
-          <div class="admin-name" id="adminName">Admin User</div>
-          <div class="admin-role">Administrator</div>
-        </div>
-
-        <i class="fas fa-chevron-down admin-dropdown-icon" id="dropdownIcon"></i>
-      </div>
-
-      <!-- Dropdown -->
-      <div class="admin-dropdown-menu" id="adminDropdown">
-        <div class="admin-dropdown-header">
-          <div class="admin-avatar" style="width: 50px; height: 50px; margin: 0 auto 10px">
-            AJ
-          </div>
-          <div class="admin-name">Admin User</div>
-          <div class="admin-email">admin@shribrand.com</div>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Overlay for mobile -->
+<body>
   <div class="overlay" id="overlay"></div>
-
-  <!-- Main Content -->
-  <main class="main-content">
-    <!-- Top Bar -->
-
-    <button hidden class="menu-toggle" id="menuToggle">
-      <i class="fas fa-bars"></i>
-    </button>
-
-    <!-- Current Product Display -->
-
-    <section id="dashboard" class="active-section">
-      <div class="dashboard-container">
-        <!-- Header -->
-
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-title">Total Revenue</div>
-              <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
-            </div>
-            <div class="stat-content">
-              <div class="stat-value" id="totalRevenue">₹24,500</div>
-              <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>12.5% from last month</span>
-              </div>
-            </div>
-            <div class="stat-trend">
-              <div class="trend-fill" style="width: 75%"></div>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-title">Active Customers</div>
-              <div class="stat-icon"><i class="fas fa-users"></i></div>
-            </div>
-            <div class="stat-content">
-              <div class="stat-value" id="activeCustomers">12,458</div>
-              <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>8.2% growth</span>
-              </div>
-            </div>
-            <div class="stat-trend">
-              <div class="trend-fill" style="width: 62%"></div>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-title">Monthly Orders</div>
-              <div class="stat-icon">
-                <i class="fas fa-shopping-cart"></i>
-              </div>
-            </div>
-            <div class="stat-content">
-              <div class="stat-value" id="monthlyOrders">8,924</div>
-              <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>15.3% increase</span>
-              </div>
-            </div>
-            <div class="stat-trend">
-              <div class="trend-fill" style="width: 85%"></div>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-title">Avg. Order Value</div>
-              <div class="stat-icon"><i class="fas fa-chart-pie"></i></div>
-            </div>
-            <div class="stat-content">
-              <div class="stat-value" id="avgOrderValue">₹2,755</div>
-              <div class="stat-change negative">
-                <i class="fas fa-arrow-down"></i>
-                <span>3.2% decrease</span>
-              </div>
-            </div>
-            <div class="stat-trend">
-              <div class="trend-fill" style="width: 45%"></div>
-            </div>
-          </div>
+  <div class="shell">
+    <!-- ═══ HEADER ═══ -->
+    <header>
+      <div class="header-brand">
+        <div class="emblem">
+          <div class="emblem-outer"></div>
+          <div class="emblem-inner"></div>
+          <div class="emblem-letter">S</div>
         </div>
-
-        <!-- Main Dashboard Grid -->
-        <div class="dashboard-grid">
-          <!-- Revenue Chart -->
-          <div class="chart-card">
-            <div class="chart-header">
-              <h2><i class="fas fa-chart-line"></i> Revenue Analytics</h2>
-              <div class="chart-actions">
-                <div class="time-filter">
-                  <button class="time-btn active" onclick="setTimeRange('7d')">
-                    7D
-                  </button>
-                  <button class="time-btn" onclick="setTimeRange('30d')">
-                    30D
-                  </button>
-                  <button class="time-btn" onclick="setTimeRange('90d')">
-                    90D
-                  </button>
-                  <button class="time-btn" onclick="setTimeRange('1y')">
-                    1Y
-                  </button>
-                </div>
-                <button class="time-btn" onclick="exportChart('revenueChart')">
-                  <i class="fas fa-download"></i>
-                </button>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="revenueChart"></canvas>
-            </div>
-          </div>
-
-          <!-- Payment Methods -->
-          <div class="chart-card">
-            <div class="chart-header">
-              <h2><i class="fas fa-credit-card"></i> Payment Distribution</h2>
-              <div class="chart-actions">
-                <select class="time-btn" id="paymentFilter" onchange="updatePaymentChart()">
-                  <option value="month">This Month</option>
-                  <option value="quarter">This Quarter</option>
-                  <option value="year">This Year</option>
-                </select>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="paymentChart"></canvas>
-            </div>
-            <div class="mini-stats" style="margin-top: 20px">
-              <div class="mini-stat">
-                <div class="mini-stat-value" id="upiPercent">48%</div>
-                <div class="mini-stat-label">UPI</div>
-              </div>
-              <div class="mini-stat">
-                <div class="mini-stat-value" id="cardPercent">32%</div>
-                <div class="mini-stat-label">Cards</div>
-              </div>
-              <div class="mini-stat">
-                <div class="mini-stat-value" id="cashPercent">20%</div>
-                <div class="mini-stat-label">Cash</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Second Row -->
-        <div class="second-row">
-          <!-- Daily Sales -->
-          <div class="chart-card">
-            <div class="chart-header">
-              <h2>
-                <i class="fas fa-calendar-day"></i> Daily Sales Performance
-              </h2>
-              <div class="chart-actions">
-                <button class="time-btn" onclick="updateDailySales()">
-                  <i class="fas fa-sync"></i> Refresh
-                </button>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="dailySalesChart"></canvas>
-            </div>
-          </div>
-
-          <!-- Top Products -->
-          <div class="top-products">
-            <div class="chart-header">
-              <h2><i class="fas fa-crown"></i> Top Selling Products</h2>
-              <div class="chart-actions">
-                <select class="time-btn" onchange="updateTopProducts()">
-                  <option value="week">This Week</option>
-                  <option value="month">This Month</option>
-                  <option value="quarter">This Quarter</option>
-                </select>
-              </div>
-            </div>
-            <div class="product-list" id="topProductsList">
-              <!-- Products will be dynamically loaded -->
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="mItems">
-      <div class="message-box-pd" id="messageBoxPd">
-        <div class="message-content-pd">
-          <div class="message-icon-pd">
-            <i class="fas fa-check"></i>
-          </div>
-          <div class="message-text-pd">
-            <h4 id="messageTitlePd">Success!</h4>
-            <p id="messageBodyPd">Operation completed successfully.</p>
-          </div>
-          <button class="message-close-pd" id="closeMessagePd">
-            <i class="fas fa-times"></i>
-          </button>
+        <div class="brand-info">
+          <div class="brand-name">Shri <span>Brand</span></div>
         </div>
       </div>
 
-      <!-- Overlay for mobile -->
-      <div class="overlay-pd" id="overlayPd"></div>
+      <div class="header-right">
+        <!-- Notifications -->
+        <div class="h-icon h-icon-notif" title="Notifications">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+        </div>
 
-      <!-- Stock Update Modal -->
-      <div class="modal-pd" id="stockModalPd">
-        <div class="modal-content-pd">
-          <div class="modal-header-pd">
-            <h3 class="modal-title-pd">
-              <i class="fas fa-boxes"></i> Update Stock
-            </h3>
-            <button class="modal-close-pd" id="closeModalPd">&times;</button>
+        <div class="h-divider"></div>
+
+        <div class="h-avatar" title="Admin">AD</div>
+
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside id="sidebar">
+      <!-- Navigation -->
+      <nav class="nav-section">
+        <div class="nav-group-label">Main</div>
+
+        <button class="nav-item active" data-page="dashboard">
+          <div class="nav-item-icon">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
           </div>
-          <div class="form-group-pd">
-            <label for="modalProductNamePd" class="pd-label">Product</label>
-            <input type="text" id="modalProductNamePd" class="form-control-pd" readonly />
+          Dashboard
+        </button>
+
+        <button class="nav-item" data-page="products">
+          <div class="nav-item-icon">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
           </div>
-          <div class="form-row-pd">
-            <div class="form-group-pd">
-              <label for="currentStockPd" class="pd-label">Current Stock</label>
-              <input type="number" id="currentStockPd" class="form-control-pd" readonly />
-            </div>
-            <div class="form-group-pd">
-              <label for="stockChangePd" class="pd-label">Stock Change (+/-)</label>
-              <input type="number" id="stockChangePd" class="form-control-pd"
-                placeholder="Enter stock change (e.g., +15 or -10)" />
-            </div>
+          Products
+        </button>
+
+        <button class="nav-item" data-page="inventory">
+          <div class="nav-item-icon">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+              <path
+                d="M21 8h-4V4a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v4H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1zM9 5h6v3H9V5z" />
+            </svg>
           </div>
-          <div class="form-group-pd">
-            <label for="resultStockPd" class="pd-label">Result Stock</label>
-            <input type="number" id="resultStockPd" class="form-control-pd" readonly />
+          Inventory
+        </button>
+
+        <button class="nav-item" data-page="users">
+          <div class="nav-item-icon">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
           </div>
-          <div class="form-group-pd" style="margin-top: 20px">
-            <div style="
-                  background-color: var(--light-gray);
-                  padding: 15px;
-                  border-radius: 8px;
-                ">
-              <p style="color: var(--gray); font-size: 0.9rem; margin: 0">
-                <i class="fas fa-info-circle"></i> Enter positive number to
-                add stock, negative to remove stock. Example: Current 85 +
-                Change 15 = Result 100
+          Users
+        </button>
+
+        <!-- Ornamental separator -->
+        <div class="orn-divider" style="margin-top: 6px">
+          <div class="orn-line"></div>
+          <div class="orn-diamond"></div>
+          <div class="orn-line"></div>
+        </div>
+
+        <div class="nav-group-label">Orders</div>
+
+        <button class="nav-item" data-page="recent-orders">
+          <div class="nav-item-icon">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+          </div>
+          Recent Orders
+          <span class="nav-badge">12</span>
+        </button>
+
+        <button class="nav-item" data-page="order-history">
+          <div class="nav-item-icon">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+              <polyline points="12 8 12 12 14 14" />
+              <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5" />
+            </svg>
+          </div>
+          Order History
+        </button>
+
+        <!-- Ornamental separator -->
+        <div class="orn-divider" style="margin-top: 6px">
+          <div class="orn-line"></div>
+          <div class="orn-diamond"></div>
+          <div class="orn-line"></div>
+        </div>
+
+        <div class="nav-group-label">Communications</div>
+
+        <button class="nav-item" data-page="messages">
+          <div class="nav-item-icon">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+          </div>
+          Messages
+          <span class="nav-badge">3</span>
+        </button>
+
+        <button class="nav-item" data-page="blog">
+          <div class="nav-item-icon">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <line x1="12" y1="18" x2="12" y2="6" />
+            </svg>
+          </div>
+          Blog
+        </button>
+
+        <!-- Ornamental separator -->
+        <div class="orn-divider" style="margin-top: 6px">
+          <div class="orn-line"></div>
+          <div class="orn-diamond"></div>
+          <div class="orn-line"></div>
+        </div>
+
+        <div class="nav-group-label">System</div>
+
+        <button class="nav-item" data-page="settings">
+          <div class="nav-item-icon">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </div>
+          Settings
+        </button>
+      </nav>
+
+      <!-- Footer -->
+      <div class="sidebar-footer">
+        <button class="signout-btn">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- ═══ MAIN (empty — your content goes here) ═══ -->
+    <main>
+      <div class="page active" id="page-dashboard"></div>
+      <div class="page" id="page-products">
+        <div id="notif" class="notif" role="alert">
+          <i id="notifIcon" class="fas fa-check-circle"></i>
+          <span id="notifText">Product saved.</span>
+        </div>
+
+        <!-- PAGE -->
+        <div class="page-shell">
+          <div class="page-top">
+            <div>
+              <div class="page-eyebrow">Shri Brand Admin</div>
+              <h1 class="page-title">Product Collection</h1>
+              <p class="page-subtitle">
+                Manage your sacred fragrance catalogue
               </p>
             </div>
-          </div>
-          <button class="btn-pd btn-success-pd btn-save-pd" id="updateStockBtnPd">
-            <i class="fas fa-sync-alt"></i> Update Stock
-          </button>
-        </div>
-      </div>
-
-      <!-- Main Content -->
-      <main class="main-content-pd">
-        <section id="mItemsPd" class="active-section-pd">
-          <div class="current-product-pd">
-            <h3><i class="fas fa-chart-line"></i> Product Statistics</h3>
-            <div class="product-details-pd">
-              <div class="detail-item-pd">
-                <div class="detail-label-pd">
-                  <i class="fas fa-boxes"></i> Total Products
-                </div>
-                <h1 class="detail-value-pd counter-pd" id="totalProductsPd">
-                  0
-                </h1>
+            <div class="page-top-right">
+              <div class="count-pill">
+                <div class="count-pill-num" id="countNum">0</div>
+                <div class="count-pill-label">Products</div>
               </div>
-              <div class="detail-item-pd">
-                <div class="detail-label-pd">
-                  <i class="fas fa-layer-group"></i> Total Stocks
-                </div>
-                <div class="detail-value-pd counter-pd" id="totalStocksPd">
-                  0
-                </div>
-              </div>
-              <div class="detail-item-pd">
-                <div class="detail-label-pd">
-                  <i class="fas fa-arrow-down"></i> Football lowers stock
-                </div>
-                <div class="detail-value-pd counter-pd" id="lowStockPd">
-                  10
-                  <i class="fas fa-arrow-down stock-down-pd stock-indicator-pd"></i>
-                </div>
-              </div>
-              <div class="detail-item-pd">
-                <div class="detail-label-pd">
-                  <i class="fas fa-arrow-up"></i> Insa stick 3(high quty)
-                </div>
-                <div class="detail-value-pd counter-pd" id="highStockPd">
-                  1002
-                  <i class="fas fa-arrow-up stock-up-pd stock-indicator-pd"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="content-area-pd">
-            <div class="card-pd">
-              <div class="card-title-pd addEdit-pd">
-                <div><i class="fas fa-edit"></i> Add/Edit Product</div>
-                <button class="reset-form-btn-pd" id="resetFormBtnPd" title="Reset Form">
-                  <i class="fas fa-redo"></i>
-                </button>
-              </div>
-              <form id="productFormPd">
-                <input type="hidden" id="productIdPd" value="" />
-
-                <div class="image-upload-container-pd">
-                  <div class="image-preview-pd" id="imagePreviewPd">
-                    <div class="upload-placeholder-pd">
-                      <i class="fas fa-cloud-upload-alt"></i>
-                      <p class="txt-samll-pd">
-                        Click to upload product image
-                      </p>
-                      <span class="upload-btn-pd" id="uploadTriggerPd">Choose Image</span>
-                    </div>
-                  </div>
-                  <input type="file" id="productImagePd" class="image-upload-input-pd" accept="image/*" />
-                </div>
-
-                <div class="form-group-pd">
-                  <label for="productNamePd" class="pd-label required-pd">Product Name</label>
-                  <input type="text" id="productNamePd" class="form-control-pd" placeholder="Enter product name"
-                    required />
-                </div>
-
-                <div class="form-row-pd">
-                  <div class="form-group-pd">
-                    <label for="productPricePd" class="pd-label required-pd">Price ($)</label>
-                    <input type="number" id="productPricePd" class="form-control-pd" placeholder="Enter price" min="0"
-                      step="0.01" required />
-                  </div>
-
-                  <div class="form-group-pd">
-                    <label for="productStockPd" class="pd-label">Stock Quantity</label>
-                    <input type="number" id="productStockPd" class="form-control-pd" placeholder="Enter stock quantity"
-                      value="0" min="0" />
-                  </div>
-                </div>
-
-                <div class="form-group-pd">
-                  <label for="productDescriptionPd" class="pd-label">Description</label>
-                  <textarea id="productDescriptionPd" class="form-control-pd" placeholder="Enter product description"
-                    rows="4"></textarea>
-                </div>
-
-                <div class="form-buttons-pd">
-                  <button type="button" class="btn-pd btn-secondary-pd btn-clear-pd" id="clearBtnPd">
-                    <i class="fas fa-plus"></i> Add New Product
-                  </button>
-                  <button type="submit" class="btn-pd btn-primary-pd">
-                    <i class="fas fa-save"></i> Save Product
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            <div class="card-pd">
-              <div class="products-header-pd">
-                <h3 class="card-title-pd">
-                  <i class="fas fa-list"></i> Product List
-                </h3>
-                <div class="search-box-pd">
-                  <i class="fas fa-search"></i>
-                  <input autocomplete="off" type="text" id="searchInputPd" placeholder="Search by keyword" />
-                </div>
-              </div>
-
-              <div class="products-list-pd" id="productsListPd">
-                <!-- Products will be dynamically added here -->
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-    </section>
-    <section id="mUsers">
-      <!-- Main Content -->
-      <div class="um-main-content">
-        <!-- Top Bar -->
-        <div class="um-top-bar">
-          <h2>User Management</h2>
-          <div class="um-top-actions">
-            <button class="um-btn um-btn-secondary" id="umMsgBtn">
-              <i class="fas fa-paper-plane"></i> Send Message
-            </button>
-            <button class="um-btn um-btn-primary" id="umAddBtn">
-              <i class="fas fa-user-plus"></i> Add User
-            </button>
-          </div>
-        </div>
-
-        <!-- Main Card -->
-        <div class="um-main-card">
-          <!-- Selection Bar -->
-          <div class="um-selection-bar" id="umSelectionBar">
-            <div class="um-selection-info">
-              <i class="fas fa-users"></i>
-              <span id="umSelectedUsersCount">0</span> users selected
-            </div>
-            <div class="um-selection-actions">
-              <button class="um-btn um-btn-secondary um-btn-sm" onclick="umClearSelection()">
-                <i class="fas fa-times"></i> Clear
-              </button>
-              <button class="um-btn um-btn-primary um-btn-sm" onclick="umSendMessageToSelected()">
-                <i class="fas fa-paper-plane"></i> Message Selected
+              <button class="btn-add" id="btnAddProduct">
+                <i class="fas fa-plus"></i> Add New Product
               </button>
             </div>
           </div>
 
-          <!-- Card Header -->
-          <div class="um-card-header">
-            <div class="um-controls">
-              <div class="um-search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="umSearch" placeholder="Search users..." />
-              </div>
-              <div class="um-filter-group">
-                <span class="um-filter-label">Status:</span>
-                <select class="um-filter-select" id="umStatusFilter" onchange="umFilterByStatus()">
-                  <option value="all">All</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
-              <div class="um-filter-group">
-                <span class="um-filter-label">Sort by:</span>
-                <select class="um-filter-select" id="umSortFilter" onchange="umSortUsers()">
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                  <option value="name">Name A-Z</option>
-                </select>
-              </div>
+          <div class="toolbar">
+            <div class="search-wrap">
+              <i class="fas fa-search"></i>
+              <input type="text" id="searchInput" placeholder="Search by name, SKU or description…" />
             </div>
+            <select class="filter-sel" id="filterType">
+              <option value="">All Types</option>
+              <option value="single">Single</option>
+              <option value="combo">Combo</option>
+              <option value="gift">Gift</option>
+            </select>
+            <select class="filter-sel" id="filterCat">
+              <option value="">All Categories</option>
+              <option value="floral">Floral</option>
+              <option value="woody">Woody</option>
+              <option value="resin">Resin</option>
+              <option value="heritage">Heritage</option>
+              <option value="mixed">Mixed</option>
+            </select>
           </div>
 
-          <!-- Filter Bar with Custom Calendar -->
-          <div class="um-filter-bar">
-            <div class="um-filter-group">
-              <span class="um-filter-label">Account Age:</span>
-              <select class="um-filter-select" id="umAgeFilter" onchange="umFilterByAge()">
-                <option value="all">All Users</option>
-                <option value="new">New (7 days)</option>
-                <option value="old">Old (30+ days)</option>
-              </select>
-            </div>
-            <div class="um-calendar-container">
-              <div class="um-calendar-input-wrapper">
-                <i class="fas fa-calendar-alt"></i>
-                <input type="date" id="umDateFrom" class="um-calendar-field" placeholder="From date" />
-              </div>
-              <span class="um-date-separator">to</span>
-              <div class="um-calendar-input-wrapper">
-                <i class="fas fa-calendar-alt"></i>
-                <input type="date" id="umDateTo" class="um-calendar-field" placeholder="To date" />
-              </div>
-            </div>
-            <button class="um-btn um-btn-secondary um-btn-sm" onclick="umResetFilters()">
-              <i class="fas fa-redo"></i> Reset
-            </button>
+          <div class="orn">
+            <div class="orn-line"></div>
+            <div class="orn-diamond"></div>
+            <div class="orn-line"></div>
           </div>
 
-          <!-- Table -->
-          <div class="um-table-container">
-            <table class="um-user-table">
-              <thead>
-                <tr>
-                  <th class="um-checkbox-cell">
-                    <div class="um-checkbox-ui" id="umSelectAllCheckbox" onclick="umToggleSelectAll()"></div>
-                  </th>
-                  <th>User</th>
-                  <th>Status</th>
-                  <th>Created</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="umTbody">
-                <!-- Users will be populated here -->
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Pagination -->
-          <div class="um-pagination">
-            <div class="um-pagination-info">
-              Showing <span id="umStartRow">0</span>-<span id="umEndRow">0</span>
-              of <span id="umTotalRows">0</span> users
-            </div>
-            <div class="um-pagination-controls" id="umPagination">
-              <!-- Pagination buttons will be added here -->
+          <div class="product-grid" id="productGrid">
+            <div class="empty-state">
+              <div class="empty-icon"><i class="fas fa-spa"></i></div>
+              <h3>Loading Collection…</h3>
+              <p>Fetching your products from the server.</p>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Add/Edit User Modal -->
-      <div class="um-modal-overlay" id="umUserModal">
-        <div class="um-modal-content">
-          <div class="um-modal-header">
-            <h3>
-              <i class="fas fa-user-edit"></i>
-              <span id="umUserModalTitle">Add New User</span>
-            </h3>
-            <button class="um-modal-close" onclick="umCloseModal()">
+        <!-- DRAWER OVERLAY -->
+        <div class="drawer-overlay" id="drawerOverlay"></div>
+
+        <!-- FORM DRAWER -->
+        <div class="drawer" id="drawer">
+          <div class="drawer-head">
+            <div>
+              <div class="drawer-head-label">Product Management</div>
+              <div class="drawer-title" id="drawerTitle">Add New Product</div>
+            </div>
+            <button class="drawer-close" id="drawerClose" aria-label="Close">
               <i class="fas fa-times"></i>
             </button>
           </div>
-          <div class="um-modal-body">
-            <div class="um-form-group">
-              <label for="umUserName">Full Name</label>
-              <input type="text" id="umUserName" class="um-form-control" placeholder="Enter full name" />
-            </div>
-            <div class="um-form-group">
-              <label for="umUserMobile">Mobile Number</label>
-              <input type="tel" id="umUserMobile" class="um-form-control" placeholder="Enter mobile number" />
-            </div>
-            <div class="um-form-group">
-              <label for="umUserStatus">Status</label>
-              <select id="umUserStatus" class="um-form-control">
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
-          </div>
-          <div class="um-modal-footer">
-            <button class="um-btn um-btn-secondary" onclick="umCloseModal()">
-              Cancel
-            </button>
-            <button class="um-btn um-btn-primary" onclick="umSaveUser()">
-              Save User
-            </button>
-          </div>
-        </div>
-      </div>
 
-      <!-- WhatsApp Style Message Modal -->
-      <div class="um-modal-overlay" id="umMsgModal">
-        <div class="um-modal-content um-message-modal">
-          <div class="um-message-header">
-            <i class="fab fa-whatsapp"></i>
-            <h3>Send Message</h3>
-          </div>
-          <div class="um-recipient-options">
-            <div class="um-recipient-option">
-              <input type="radio" id="umAllUsers" name="umMessageOption" value="all" checked
-                onchange="umToggleRecipientType()" />
-              <label for="umAllUsers">All Users</label>
-            </div>
-            <div class="um-recipient-option">
-              <input type="radio" id="umSelectedUsers" name="umMessageOption" value="selected"
-                onchange="umToggleRecipientType()" />
-              <label for="umSelectedUsers">Selected Users</label>
-            </div>
-            <div class="um-recipient-option">
-              <input type="radio" id="umSingleUser" name="umMessageOption" value="single"
-                onchange="umToggleRecipientType()" />
-              <label for="umSingleUser">Single User</label>
-            </div>
-          </div>
+          <div class="drawer-body">
+            <form id="prodForm" novalidate>
+              <input type="hidden" id="prodId" />
 
-          <!-- WhatsApp Style Recipient Area -->
-          <div class="um-recipient-area">
-            <div class="um-recipient-tags" id="umRecipientTags">
-              <span class="um-recipient-placeholder">
-                <i class="fas fa-user-friends"></i>
-                Select users to message...
-              </span>
-            </div>
-            <div class="um-recipient-count" id="umRecipientCount">
-              0 recipients selected
-            </div>
+              <!-- Section 1 -->
+              <div class="form-section">
+                <div class="form-sec-head">
+                  <div class="form-sec-num">1</div>
+                  <div class="form-sec-title">Product Identity</div>
+                  <div class="form-sec-line"></div>
+                </div>
+                <div class="field">
+                  <div class="field-label">
+                    <i class="fas fa-tag"></i> Product Name
+                    <span class="req">*</span>
+                  </div>
+                  <input type="text" id="fName" placeholder="e.g. Rose Divine" required />
+                </div>
+                <div class="field-row">
+                  <div class="field">
+                    <div class="field-label">
+                      <i class="fas fa-link"></i> Slug
+                    </div>
+                    <input type="text" id="fSlug" placeholder="rose-divine" />
+                    <div class="field-hint">Auto-generated from name</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">
+                      <i class="fas fa-barcode"></i> SKU
+                    </div>
+                    <input type="text" id="fSku" placeholder="SB-001" />
+                  </div>
+                </div>
+                <div class="field-row">
+                  <div class="field">
+                    <div class="field-label">
+                      <i class="fas fa-list"></i> Product Type
+                    </div>
+                    <select id="fType">
+                      <option value="single">Single</option>
+                      <option value="combo">Combo</option>
+                      <option value="gift">Gift</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">
+                      <i class="fas fa-seedling"></i> Fragrance Category
+                    </div>
+                    <select id="fCategory">
+                      <option value="floral">Floral</option>
+                      <option value="woody">Woody</option>
+                      <option value="resin">Resin</option>
+                      <option value="heritage">Heritage</option>
+                      <option value="mixed">Mixed</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
-            <!-- Single User Select -->
-            <div class="um-user-select-container" id="umSingleUserContainer" style="display: none; margin-top: 15px">
-              <select class="um-user-select" id="umSingleUserSelect" onchange="umAddSingleUserTag()">
-                <option value="">Select a user</option>
-              </select>
-            </div>
-          </div>
+              <!-- Section 2 -->
+              <div class="form-section">
+                <div class="form-sec-head">
+                  <div class="form-sec-num">2</div>
+                  <div class="form-sec-title">Descriptions</div>
+                  <div class="form-sec-line"></div>
+                </div>
+                <div class="field">
+                  <div class="field-label">
+                    <i class="fas fa-align-left"></i> Short Description
+                    <span class="req">*</span>
+                  </div>
+                  <textarea id="fShortDesc" maxlength="200"
+                    placeholder="Premium rose fragrance crafted with natural petals…" required></textarea>
+                  <div class="field-hint">
+                    Max 200 characters — shown on product cards
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="field-label">
+                    <i class="fas fa-file-alt"></i> Full Description
+                    <span class="req">*</span>
+                  </div>
+                  <textarea id="fFullDesc" maxlength="2000" style="min-height: 100px"
+                    placeholder="Handcrafted using natural rose extracts sourced from the Mysore valley…"
+                    required></textarea>
+                </div>
+              </div>
 
-          <!-- WhatsApp Style Message Input -->
-          <div class="um-message-input-area">
-            <div class="um-message-input-container">
-              <textarea class="um-message-input" id="umMessageText" placeholder="Type your message here..."
-                oninput="umUpdateCharCount()" maxlength="1000"></textarea>
-              <div class="um-message-input-actions">
-                <button class="um-message-action-btn um-attach-btn" title="Attach File">
-                  <i class="fas fa-paperclip"></i>
+              <!-- Section 3: Pack Manager -->
+              <div class="form-section">
+                <div class="form-sec-head">
+                  <div class="form-sec-num">3</div>
+                  <div class="form-sec-title">Packs — Pricing &amp; Stock</div>
+                  <div class="form-sec-line"></div>
+                </div>
+                <div class="field-hint" style="margin-bottom:10px;">
+                  Each pack has its own weight, price, and stock. At least one pack is required.
+                </div>
+                <div id="packsContainer"></div>
+                <button type="button" class="btn-add-pack" id="btnAddPack">
+                  <i class="fas fa-plus"></i> Add Pack
                 </button>
-                <button class="um-message-action-btn" title="Send Message" onclick="umSendMessage()">
-                  <i class="fas fa-paper-plane"></i>
-                </button>
               </div>
-            </div>
-            <div class="um-message-footer">
-              <div class="um-char-count" id="umCharCount">
-                <span id="umCharCountNumber">0</span>/1000 characters
+
+              <!-- Section 4: Specifications -->
+              <div class="form-section">
+                <div class="form-sec-head">
+                  <div class="form-sec-num">4</div>
+                  <div class="form-sec-title">Product Specifications</div>
+                  <div class="form-sec-line"></div>
+                </div>
+                <div class="field-row">
+                  <div class="field">
+                    <div class="field-label">
+                      <i class="fas fa-fire"></i> Burn Time
+                    </div>
+                    <input type="text" id="fBurnTime" placeholder="45 minutes" />
+                  </div>
+                  <div class="field">
+                    <div class="field-label">
+                      <i class="fas fa-pray"></i> Used For
+                    </div>
+                    <input type="text" id="fUsedFor" placeholder="pooja, meditation, yoga" />
+                  </div>
+                </div>
               </div>
-              <div>
-                <i class="fas fa-smile" style="color: #666; cursor: pointer; font-size: 18px"></i>
+
+              <!-- Section 5: REDESIGNED IMAGE UPLOAD -->
+              <div class="form-section">
+                <div class="form-sec-head">
+                  <div class="form-sec-num">5</div>
+                  <div class="form-sec-title">Product Images</div>
+                  <div class="form-sec-line"></div>
+                </div>
+
+                <div class="img-uploader">
+                  <!-- Hero / Main Image -->
+                  <div class="img-hero" id="heroSlot">
+                    <div class="img-hero-inner"></div>
+                    <input type="file" accept="image/*" id="heroFile" />
+                    <div class="img-hero-placeholder" id="heroPlaceholder">
+                      <div class="img-hero-icon">
+                        <i class="fas fa-camera"></i>
+                      </div>
+                      <div class="img-hero-label">Main Product Image</div>
+                      <div class="img-hero-sub">
+                        Click to upload · JPG, PNG, WebP
+                      </div>
+                      <div class="img-hero-badge">Required</div>
+                    </div>
+                    <img class="img-hero-preview" id="heroPreview" src="" alt="" style="display: none" />
+                    <div class="img-hero-overlay" id="heroOverlay">
+                      <i class="fas fa-camera-retro"></i>
+                      <span>Replace Image</span>
+                    </div>
+                  </div>
+
+                  <!-- Gallery Strip Label -->
+                  <div class="img-gallery-label">
+                    <div class="img-gallery-label-text">Gallery Images</div>
+                    <div class="img-gallery-label-line"></div>
+                    <div class="img-gallery-label-badge">
+                      Optional · up to 4
+                    </div>
+                  </div>
+
+                  <!-- 4 Strip Slots -->
+                  <div class="img-strip" id="imgStrip"></div>
+                </div>
               </div>
-            </div>
+
+              <!-- Section 6 -->
+              <div class="form-section">
+                <div class="form-sec-head">
+                  <div class="form-sec-num">6</div>
+                  <div class="form-sec-title">Visibility &amp; Settings</div>
+                  <div class="form-sec-line"></div>
+                </div>
+                <div class="check-row">
+                  <label class="check-item">
+                    <input type="checkbox" id="fFeatured" />
+                    <span>Mark as Featured</span>
+                  </label>
+                  <label class="check-item">
+                    <input type="checkbox" id="fActive" checked />
+                    <span>Active (visible)</span>
+                  </label>
+                </div>
+              </div>
+            </form>
           </div>
 
-          <div class="um-modal-footer">
-            <button class="um-btn um-btn-secondary" onclick="umCloseModal()">
-              Cancel
+          <div class="drawer-foot">
+            <button type="button" class="btn-cancel" id="btnCancel">
+              <i class="fas fa-times"></i> Cancel
             </button>
-            <button class="um-btn um-btn-success" onclick="umSendMessage()"
-              style="background: #25d366; border-color: #25d366">
-              <i class="fas fa-paper-plane"></i> Send Message
+            <button type="button" class="btn-save" id="btnSave">
+              <i class="fas fa-save"></i> Save Product
             </button>
           </div>
         </div>
-      </div>
 
-      <!-- Delete Confirmation Modal -->
-      <div class="um-modal-overlay" id="umDeleteModal">
-        <div class="um-modal-content um-delete-modal">
-          <div class="um-delete-header">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>Confirm Deletion</h3>
-          </div>
-          <div class="um-delete-body">
-            <i class="fas fa-trash"></i>
-            <h4>Delete User</h4>
-            <p>Are you sure you want to delete this user?</p>
-            <p>This action cannot be undone.</p>
-            <div class="um-user-to-delete" id="umUserToDeleteName">
-              User Name
-            </div>
-          </div>
-          <div class="um-delete-footer">
-            <button class="um-btn um-btn-secondary" onclick="umCloseModal()">
-              Cancel
-            </button>
-            <button class="um-btn um-btn-danger" onclick="umConfirmDelete()">
-              Delete User
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Toast -->
-      <div class="um-toast" id="umToast">
-        <i class="fas fa-check-circle"></i>
-        <div class="um-toast-content">
-          <h4 id="umToastTitle">Success</h4>
-          <p id="umToastMessage">Your message has been sent.</p>
-        </div>
-      </div>
-    </section>
-    <section id="orderHistory">
-      <div class="erp-toast" id="erpToast">
-        <div class="erp-toast-icon">
-          <i class="fas fa-check"></i>
-        </div>
-        <div>
-          <div class="erp-toast-message" id="erpToastMessage">
-            Filters cleared successfully
-          </div>
-          <div class="erp-toast-time" id="erpToastTime">Just now</div>
-        </div>
-      </div>
-
-      <!-- Calendar Popup -->
-      <div class="erp-calendar-popup" id="erpCalendarPopup">
-        <div class="erp-calendar-header">
-          <div class="erp-calendar-nav">
-            <button id="erpPrevMonth">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <button id="erpNextMonth">
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
-          <div class="erp-calendar-title" id="erpCalendarTitle">
-            April 2024
-          </div>
-        </div>
-        <div class="erp-calendar-grid" id="erpCalendarDays">
-          <!-- Day headers -->
-          <div class="erp-calendar-day">Sun</div>
-          <div class="erp-calendar-day">Mon</div>
-          <div class="erp-calendar-day">Tue</div>
-          <div class="erp-calendar-day">Wed</div>
-          <div class="erp-calendar-day">Thu</div>
-          <div class="erp-calendar-day">Fri</div>
-          <div class="erp-calendar-day">Sat</div>
-        </div>
-        <div class="erp-calendar-grid" id="erpCalendarDates">
-          <!-- Dates will be populated by JavaScript -->
-        </div>
-        <div class="erp-calendar-actions">
-          <button class="cancel-btn" id="erpCancelDate">Cancel</button>
-          <button class="apply-btn" id="erpApplyDate">Apply Date</button>
-        </div>
-      </div>
-
-      <div class="erp-header">
-        <h1><i class="fas fa-cube"></i> ERP Orders</h1>
-        <div class="erp-actions">
-          <button class="erp-btn" id="erpClearBtn">
-            <i class="fas fa-broom"></i> Clear Filters
-          </button>
-          <button class="erp-btn erp-primary" id="erpExportBtn">
-            <i class="fas fa-download"></i> Export
-          </button>
-          <button class="erp-btn" id="erpRefreshBtn">
-            <i class="fas fa-sync-alt"></i> Refresh
-          </button>
-        </div>
-      </div>
-
-      <div class="erp-controls">
-        <div class="erp-search-wrapper">
-          <i class="fas fa-search"></i>
-          <input id="erpSearch" placeholder="Search by Order ID, customer name, items..." />
-        </div>
-
-        <div class="erp-filter-group">
-          <label class="erp-filter-label">Payment Method</label>
-          <select id="erpPayment">
-            <option value="">All Payments</option>
-            <option value="upi">UPI</option>
-            <option value="cash">Cash</option>
-          </select>
-        </div>
-
-        <div class="erp-filter-group erp-calendar-container">
-          <label class="erp-filter-label">Start Date</label>
-          <div class="erp-date-wrapper">
-            <i class="fas fa-calendar-alt"></i>
-            <input type="text" id="erpStartDate" readonly placeholder="Select start date" />
-          </div>
-        </div>
-
-        <div class="erp-filter-group erp-calendar-container">
-          <label class="erp-filter-label">End Date</label>
-          <div class="erp-date-wrapper">
-            <i class="fas fa-calendar-alt"></i>
-            <input type="text" id="erpEndDate" readonly placeholder="Select end date" />
-          </div>
-        </div>
-
-        <div class="erp-filter-group">
-          <label class="erp-filter-label">Min Amount</label>
-          <input type="number" id="erpMin" placeholder="₹ Minimum" min="0" />
-        </div>
-
-        <div class="erp-filter-group">
-          <label class="erp-filter-label">Max Amount</label>
-          <input type="number" id="erpMax" placeholder="₹ Maximum" min="0" />
-        </div>
-      </div>
-
-      <div class="erp-card">
-        <table class="erp-table">
-          <thead>
-            <tr>
-              <th data-erp-sort="id">Order ID</th>
-              <th data-erp-sort="n">Customer</th>
-              <th data-erp-sort="i">Items</th>
-              <th data-erp-sort="t">Total</th>
-              <th data-erp-sort="p">Payment</th>
-              <th data-erp-sort="timestamp">Date</th>
-            </tr>
-          </thead>
-          <tbody id="erpTbody" class="erp-tbody">
-            <!-- Orders will be loaded here -->
-          </tbody>
-        </table>
-
-        <!-- Empty State -->
-        <div class="erp-empty-state" id="erpEmptyState">
-          <div class="erp-empty-icon">
-            <i class="fas fa-inbox"></i>
-          </div>
-          <h3>No Orders Found</h3>
-          <p>
-            Try adjusting your filters or search terms to find what you're
-            looking for.
-          </p>
-          <button class="erp-btn" id="erpClearAllBtn">
-            <i class="fas fa-times"></i> Clear All Filters
-          </button>
-        </div>
-
-        <div class="erp-pagination" id="erpPages">
-          <div class="erp-pagination-info" id="erpPageInfo">
-            Loading orders...
-          </div>
-        </div>
-      </div>
-    </section>
-    <section id="settings">
-      <div class="settings-container-wrapper">
-        <!-- Settings Sections -->
-        <div class="settings-grid-section">
-          <!-- WhatsApp Settings -->
-          <div class="settings-card">
-            <div class="settings-card-header">
-              <h2 class="settings-card-title">
-                <i class="fab fa-whatsapp"></i>
-                WhatsApp Alerts
-              </h2>
-              <div class="toggle-switch-control">
-                <input type="checkbox" id="masterAlertsToggle" checked>
-                <span class="toggle-switch-slider"></span>
-              </div>
-            </div>
-
-            <div class="toggle-container">
-              <div class="toggle-description">
-                <h4>Customer Bill Alerts</h4>
-                <p>Send bill notifications to customers after purchase</p>
-              </div>
-              <div class="toggle-switch-control">
-                <input type="checkbox" id="customerAlertsToggle" checked>
-                <span class="toggle-switch-slider"></span>
-              </div>
-            </div>
-
-            <div class="toggle-container">
-              <div class="toggle-description">
-                <h4>Low Stock Alerts</h4>
-                <p>Receive alerts when stock reaches critical levels</p>
-              </div>
-              <div class="toggle-switch-control">
-                <input type="checkbox" id="stockAlertsToggle" checked>
-                <span class="toggle-switch-slider"></span>
-              </div>
-            </div>
-
-            <div class="threshold-settings-section">
-              <div class="threshold-header-section">
+        <!-- DELETE MODAL -->
+        <div class="modal-back" id="modalBack">
+          <div class="modal">
+            <div class="modal-body">
+              <div class="modal-ico">
                 <i class="fas fa-exclamation-triangle"></i>
-                <h3>Low Stock Threshold</h3>
               </div>
-              <div class="threshold-input-section">
-                <input type="number" id="stockThresholdInput" value="50" min="1" max="1000">
-                <span>units</span>
+              <h3>Delete Product</h3>
+              <p id="modalText">
+                Are you sure you want to delete this product? This cannot be
+                undone.
+              </p>
+            </div>
+            <div class="modal-foot">
+              <button class="modal-cancel-btn" id="modalCancel">
+                Cancel
+              </button>
+              <button class="modal-del-btn" id="modalConfirm">
+                <i class="fas fa-trash-alt"></i> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="page" id="page-users">
+        <div class="page-shell">
+          <div class="page-top">
+            <div>
+              <div class="page-eyebrow">Admin Panel</div>
+              <h1 class="page-title">Users</h1>
+              <p class="page-subtitle">Manage accounts, roles &amp; permissions</p>
+            </div>
+            <div class="page-top-right">
+              <div class="count-pill">
+                <span class="count-pill-num" id="uTotalCount">0</span>
+                <span class="count-pill-label">Total<br>Members</span>
               </div>
-            </div>
-
-            <!-- Contacts Section -->
-            <div class="contacts-header-section">
-              <h3 class="settings-card-title">
-                <i class="fas fa-users"></i>
-                Alert Recipients
-              </h3>
-              <div class="contacts-counter" id="contactsCounter">3 contacts</div>
-            </div>
-
-            <div class="add-contact-form-section">
-              <div class="form-row-layout">
-                <div class="form-group-wrapper">
-                  <label class="form-label-style">
-                    <i class="fas fa-user"></i>
-                    Contact Name
-                  </label>
-                  <input type="text" class="form-input-style" id="contactNameInput" placeholder="Enter full name">
-                </div>
-                <div class="form-group-wrapper">
-                  <label class="form-label-style">
-                    <i class="fas fa-phone"></i>
-                    Phone Number
-                  </label>
-                  <input type="tel" class="form-input-style" id="contactPhoneInput" placeholder="+91 98765 43210">
-                </div>
-                <div class="form-group-wrapper">
-                  <label class="form-label-style">
-                    <i class="fas fa-user-tag"></i>
-                    Role
-                  </label>
-                  <select class="form-select-style" id="contactRoleSelect">
-                    <option value="Admin">Admin</option>
-                    <option value="Sales">Sales</option>
-                    <option value="Manager">Manager</option>
-                    <option value="Warehouse">Warehouse</option>
-                    <option value="Team Member" selected>Team Member</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-actions-container">
-                <button class="settings-button settings-button-success" id="addContactButton" onclick="addNewContact()"
-                  style="flex: 1;">
-                  <i class="fas fa-plus"></i> Add Contact
-                </button>
-                <button class="settings-button" id="cancelEditButton" onclick="cancelContactEdit()"
-                  style="flex: 1; display: none;">
-                  <i class="fas fa-times"></i> Cancel Edit
-                </button>
-              </div>
-            </div>
-
-            <div id="contactsListContainer" class="contacts-list-container">
-              <!-- Contacts will be loaded here -->
-            </div>
-            <div id="emptyContactsState" class="empty-state-container" style="display: none;">
-              <i class="fas fa-user-plus"></i>
-              <h3>No Contacts Added</h3>
-              <p>Add contacts to receive WhatsApp alerts</p>
+              <button class="btn-add" onclick="openAddDrawer()">
+                <i class="fa-solid fa-plus"></i> Add User
+              </button>
             </div>
           </div>
 
-          <!-- Active Sessions -->
-          <div class="settings-card">
-            <div class="settings-card-header">
-              <h2 class="settings-card-title">
-                <i class="fas fa-laptop"></i>
-                Active Sessions
-              </h2>
-              <div class="contacts-counter">
-                <i class="fas fa-shield-alt"></i> 4 devices
+          <div class="toolbar">
+            <div class="search-wrap">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="uSearchInput" placeholder="Search by name or email…" oninput="uApplyFilters()" />
+            </div>
+            <select class="filter-sel" id="uRoleFilter" onchange="uApplyFilters()">
+              <option value="">All Roles</option>
+              <option value="admin">Admin</option>
+              <option value="reseller">Reseller</option>
+              <option value="customer">Customer</option>
+            </select>
+            <select class="filter-sel" id="uSortFilter" onchange="uApplyFilters()">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="name">Name A–Z</option>
+              <option value="orders">Most Orders</option>
+            </select>
+          </div>
+
+          <div class="orn">
+            <div class="orn-line"></div>
+            <div class="orn-diamond"></div>
+            <div class="orn-line"></div>
+          </div>
+
+          <div class="table-outer">
+            <div class="scroll-hint"><i class="fa-solid fa-arrow-right"></i>&nbsp; Swipe to see all columns</div>
+            <div class="table-scroll">
+              <table class="users-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Phone</th>
+                    <th>Orders</th>
+                    <th>Joined</th>
+                    <th class="th-r">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="usersBody"></tbody>
+              </table>
+              <div class="empty-state" id="uEmptyState">
+                <i class="fa-solid fa-users-slash"></i>
+                <h3>No users found</h3>
+                <p>Try adjusting your search or filters</p>
               </div>
             </div>
-
-            <div class="devices-list-container">
-              <!-- Current Device -->
-              <div class="device-item-wrapper current-device">
-                <div class="device-icon-wrapper mobile-device">
-                  <i class="fas fa-mobile-alt"></i>
-                </div>
-                <div class="device-info-wrapper">
-                  <div class="device-name-text">Redmi Note 10 Pro</div>
-                  <div class="device-details-info">
-                    <span><i class="fab fa-android"></i> Android 12</span>
-                    <span><i class="fas fa-clock"></i> Active now</span>
-                  </div>
-                  <div class="device-status-badge">
-                    <i class="fas fa-circle"></i> Current Device
-                  </div>
-                </div>
-                <button class="contact-action-button delete-action" onclick="removeDeviceSession('current')">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-
-              <!-- Other Devices -->
-              <div class="device-item-wrapper">
-                <div class="device-icon-wrapper desktop-device">
-                  <i class="fas fa-desktop"></i>
-                </div>
-                <div class="device-info-wrapper">
-                  <div class="device-name-text">Windows 11 PC</div>
-                  <div class="device-details-info">
-                    <span><i class="fab fa-windows"></i> Chrome</span>
-                    <span><i class="fas fa-clock"></i> 2 hours ago</span>
-                  </div>
-                </div>
-                <button class="contact-action-button delete-action" onclick="removeDeviceSession('windows')">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-
-              <div class="device-item-wrapper">
-                <div class="device-icon-wrapper mobile-device">
-                  <i class="fas fa-mobile-alt"></i>
-                </div>
-                <div class="device-info-wrapper">
-                  <div class="device-name-text">iPhone 14 Pro</div>
-                  <div class="device-details-info">
-                    <span><i class="fab fa-apple"></i> iOS 16</span>
-                    <span><i class="fas fa-clock"></i> 1 day ago</span>
-                  </div>
-                </div>
-                <button class="contact-action-button delete-action" onclick="removeDeviceSession('iphone')">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-
-              <div class="device-item-wrapper">
-                <div class="device-icon-wrapper tablet-device">
-                  <i class="fas fa-tablet-alt"></i>
-                </div>
-                <div class="device-info-wrapper">
-                  <div class="device-name-text">Samsung Tab S8</div>
-                  <div class="device-details-info">
-                    <span><i class="fab fa-android"></i> Android 13</span>
-                    <span><i class="fas fa-clock"></i> 3 days ago</span>
-                  </div>
-                </div>
-                <button class="contact-action-button delete-action" onclick="removeDeviceSession('tablet')">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
+            <div class="table-footer-hint">
+              <i class="fa-regular fa-hand-pointer"></i> Click any row to view full profile
             </div>
+          </div>
 
-            <button class="settings-button settings-button-danger" onclick="logoutAllSessions()"
-              style="width: 100%; margin-top: 2rem;">
-              <i class="fas fa-sign-out-alt"></i>
-              Logout From All Devices
+          <div class="u-pagination">
+            <div class="pg-info" id="uPgInfo"></div>
+            <div class="pg-btns" id="uPgBtns"></div>
+          </div>
+        </div>
+      </div>
+      <div class="page" id="page-recent-orders"></div>
+      <div class="page erp-body" id="page-order-history">
+        <div class="erp-toast" id="erpToast">
+          <div class="erp-toast-icon">
+            <i class="fas fa-check"></i>
+          </div>
+          <div>
+            <div class="erp-toast-message" id="erpToastMessage">
+              Filters cleared successfully
+            </div>
+            <div class="erp-toast-time" id="erpToastTime">Just now</div>
+          </div>
+        </div>
+
+        <!-- Calendar Popup -->
+        <div class="erp-calendar-popup" id="erpCalendarPopup">
+          <div class="erp-calendar-header">
+            <div class="erp-calendar-nav">
+              <button id="erpPrevMonth">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button id="erpNextMonth">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+            <div class="erp-calendar-title" id="erpCalendarTitle">
+              April 2024
+            </div>
+          </div>
+          <div class="erp-calendar-grid" id="erpCalendarDays">
+            <!-- Day headers -->
+            <div class="erp-calendar-day">Sun</div>
+            <div class="erp-calendar-day">Mon</div>
+            <div class="erp-calendar-day">Tue</div>
+            <div class="erp-calendar-day">Wed</div>
+            <div class="erp-calendar-day">Thu</div>
+            <div class="erp-calendar-day">Fri</div>
+            <div class="erp-calendar-day">Sat</div>
+          </div>
+          <div class="erp-calendar-grid" id="erpCalendarDates">
+            <!-- Dates will be populated by JavaScript -->
+          </div>
+          <div class="erp-calendar-actions">
+            <button class="cancel-btn" id="erpCancelDate">Cancel</button>
+            <button class="apply-btn" id="erpApplyDate">Apply Date</button>
+          </div>
+        </div>
+
+        <div class="erp-header">
+          <h1>Orders History</h1>
+          <div class="erp-actions">
+            <button class="erp-btn" id="erpToggleFilters">
+              <i class="fas fa-filter"></i> Filters
+            </button>
+            <button class="erp-btn" id="erpClearBtn">
+              <i class="fas fa-broom"></i> Clear Filters
+            </button>
+            <button class="erp-btn erp-primary" id="erpExportBtn">
+              <i class="fas fa-download"></i> Export
+            </button>
+            <button class="erp-btn" id="erpRefreshBtn">
+              <i class="fas fa-sync-alt"></i> Refresh
             </button>
           </div>
         </div>
+
+        <div class="erp-controls collapsed">
+          <div class="erp-search-wrapper">
+            <i class="fas fa-search"></i>
+            <input id="erpSearch" placeholder="Search by Order ID, customer name, items..." />
+          </div>
+
+          <div class="erp-filter-group">
+            <label class="erp-filter-label">Payment Method</label>
+            <select id="erpPayment">
+              <option value="">All Payments</option>
+              <option value="upi">UPI</option>
+              <option value="cash">Cash</option>
+            </select>
+          </div>
+
+          <div class="erp-filter-group erp-calendar-container">
+            <label class="erp-filter-label">Start Date</label>
+            <div class="erp-date-wrapper">
+              <i class="fas fa-calendar-alt"></i>
+              <input type="text" id="erpStartDate" readonly placeholder="Select start date" />
+            </div>
+          </div>
+
+          <div class="erp-filter-group erp-calendar-container">
+            <label class="erp-filter-label">End Date</label>
+            <div class="erp-date-wrapper">
+              <i class="fas fa-calendar-alt"></i>
+              <input type="text" id="erpEndDate" readonly placeholder="Select end date" />
+            </div>
+          </div>
+
+          <div class="erp-filter-group">
+            <label class="erp-filter-label">Min Amount</label>
+            <input type="number" id="erpMin" placeholder="₹ Minimum" min="0" />
+          </div>
+
+          <div class="erp-filter-group">
+            <label class="erp-filter-label">Max Amount</label>
+            <input type="number" id="erpMax" placeholder="₹ Maximum" min="0" />
+          </div>
+        </div>
+
+        <div class="erp-card">
+          <table class="erp-table">
+            <thead>
+              <tr>
+                <th data-erp-sort="id">Order ID</th>
+                <th data-erp-sort="n">Customer</th>
+                <th data-erp-sort="i">Items</th>
+                <th data-erp-sort="t">Total</th>
+                <th data-erp-sort="p">Payment</th>
+                <th data-erp-sort="timestamp">Date</th>
+              </tr>
+            </thead>
+            <tbody id="erpTbody" class="erp-tbody">
+              <!-- Orders will be loaded here -->
+            </tbody>
+          </table>
+
+          <!-- Empty State -->
+          <div class="erp-empty-state" id="erpEmptyState">
+            <div class="erp-empty-icon">
+              <i class="fas fa-inbox"></i>
+            </div>
+            <h3>No Orders Found</h3>
+            <p>
+              Try adjusting your filters or search terms to find what you're
+              looking for.
+            </p>
+            <button class="erp-btn" id="erpClearAllBtn">
+              <i class="fas fa-times"></i> Clear All Filters
+            </button>
+          </div>
+
+          <div class="erp-pagination" id="erpPages">
+            <div class="erp-pagination-info" id="erpPageInfo">
+              Loading orders...
+            </div>
+          </div>
+        </div>
       </div>
-
-      <!-- Toast -->
-      <div id="notificationToast" class="toast-notification"></div>
-
-      <!-- Modals -->
-      <div id="logoutConfirmModal" class="modal-overlay">
-        <div class="modal-content-wrapper">
-          <div class="modal-header-section">
-            <h3 class="modal-title-text">
-              <i class="fas fa-sign-out-alt"></i>
-              Confirm Logout
-            </h3>
+      <div class="page" id="page-messages">
+        <!-- ─── Topbar ─── -->
+        <div class="msg-topbar">
+          <div class="msg-topbar-left">
+            <div>
+              <div class="msg-page-title">Inquiries</div>
+              <div class="msg-page-sub" id="msgTopbarSub">Customer Messages &amp; Inquiries</div>
+            </div>
           </div>
-          <div class="modal-body-content">
-            Are you sure you want to logout from your current session?
+          <div class="msg-topbar-actions">
+
+            <button class="msg-btn msg-btn-outline msg-btn-sm" onclick="exportCSV()">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Export CSV
+            </button>
+            <button class="msg-btn msg-btn-primary msg-btn-sm" id="msgRefreshBtn" onclick="loadInquiries(true)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <polyline points="1 4 1 10 7 10" />
+                <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
+              </svg>
+              Refresh
+            </button>
           </div>
-          <div class="modal-actions-container">
-            <button class="settings-button" onclick="hideModalOverlay()">Cancel</button>
-            <button class="settings-button settings-button-danger" onclick="confirmLogout()">Logout</button>
+        </div>
+
+        <!-- ─── Error Banner ─── -->
+        <div class="msg-err-bar" id="msgErrorBanner">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="15" y1="9" x2="9" y2="15" />
+            <line x1="9" y1="9" x2="15" y2="15" />
+          </svg>
+          <span class="msg-err-bar-msg" id="msgErrorMsg">An error occurred</span>
+          <button class="msg-btn msg-btn-outline msg-btn-sm" onclick="loadInquiries(true)">Retry</button>
+        </div>
+
+        <!-- ─── Stats ─── -->
+        <div class="msg-stats-row">
+          <div class="msg-stat-card msg-stat-total">
+            <div class="msg-stat-top">
+              <div class="msg-stat-label">Total Inquiries</div>
+              <div class="msg-stat-icon msg-si-red">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path d="M8 10h8M8 14h5M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" />
+                </svg>
+              </div>
+            </div>
+            <div id="msgStatTotal" class="msg-stat-value">
+              <span class="msg-skel-bar" style="display:block;height:32px;width:52px"></span>
+            </div>
+            <div class="msg-stat-meta">All time received</div>
+          </div>
+          <div class="msg-stat-card msg-stat-pending">
+            <div class="msg-stat-top">
+              <div class="msg-stat-label">Pending</div>
+              <div class="msg-stat-icon msg-si-amber">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              </div>
+            </div>
+            <div id="msgStatPending" class="msg-stat-value">
+              <span class="msg-skel-bar" style="display:block;height:32px;width:40px"></span>
+            </div>
+            <div class="msg-stat-meta">Awaiting review</div>
+          </div>
+          <div class="msg-stat-card msg-stat-reviewed">
+            <div class="msg-stat-top">
+              <div class="msg-stat-label">Reviewed</div>
+              <div class="msg-stat-icon msg-si-gold">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </div>
+            </div>
+            <div id="msgStatReviewed" class="msg-stat-value">
+              <span class="msg-skel-bar" style="display:block;height:32px;width:40px"></span>
+            </div>
+            <div class="msg-stat-meta">In progress</div>
+          </div>
+          <div class="msg-stat-card msg-stat-resolved">
+            <div class="msg-stat-top">
+              <div class="msg-stat-label">Resolved</div>
+              <div class="msg-stat-icon msg-si-green">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+            </div>
+            <div id="msgStatResolved" class="msg-stat-value">
+              <span class="msg-skel-bar" style="display:block;height:32px;width:40px"></span>
+            </div>
+            <div class="msg-stat-meta" id="msgStatRate">Calculating…</div>
+          </div>
+        </div>
+
+        <!-- ─── Panel ─── -->
+        <div class="msg-panel">
+          <div class="msg-panel-hd">
+            <div class="msg-panel-title-row">
+              <div class="msg-panel-title">All Inquiries</div>
+              <span class="msg-count-chip" id="msgResultCount">—</span>
+            </div>
+            <div class="msg-panel-filters">
+              <div class="msg-search-box">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input class="msg-search-input" id="msgSearchInput" type="text" placeholder="Search name, email, city…"
+                  oninput="handleSearch()" />
+              </div>
+              <select class="msg-filter-sel" id="msgStatusFilter" onchange="msgResetAndLoad()">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="reviewed">Reviewed</option>
+                <option value="resolved">Resolved</option>
+              </select>
+              <select class="msg-filter-sel" id="msgPurposeFilter" onchange="msgResetAndLoad()">
+                <option value="">All Purposes</option>
+              </select>
+              <select class="msg-filter-sel" id="msgSortBy" onchange="msgResetAndLoad()">
+                <option value="createdAt_desc">Newest First</option>
+                <option value="createdAt_asc">Oldest First</option>
+                <option value="status_asc">Status A–Z</option>
+                <option value="purposeOfInquiry_asc">Purpose A–Z</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="msg-tbl-wrap">
+            <table class="msg-table">
+              <thead>
+                <tr>
+                  <th>Contact</th>
+                  <th>Mobile</th>
+                  <th>Purpose</th>
+                  <th>City</th>
+                  <th>Status</th>
+                  <th>Received</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="msgTableBody"></tbody>
+            </table>
+            <div class="msg-empty-wrap" id="msgEmptyState">
+              <div class="msg-empty-circle">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div class="msg-empty-title">No inquiries found</div>
+              <div class="msg-empty-sub" id="msgEmptySubtext">Try adjusting your filters or search term.</div>
+            </div>
+          </div>
+
+          <div class="msg-panel-ft">
+            <div class="msg-ft-left">
+              <span class="msg-page-info-text" id="msgPageInfo">—</span>
+              <select class="msg-per-page-sel" id="msgPerPageSelect" onchange="msgChangePerPage()">
+                <option value="10">10 / page</option>
+                <option value="20" selected>20 / page</option>
+                <option value="50">50 / page</option>
+              </select>
+            </div>
+            <div class="msg-pag" id="msgPagination"></div>
+          </div>
+        </div>
+      </div>
+      <div class="page" id="page-inventory">
+        <div class="page-shell">
+          <div class="page-top">
+            <div>
+              <div class="page-eyebrow">Shri Brand Admin</div>
+              <h1 class="page-title">Inventory Management</h1>
+              <p class="page-subtitle">Track and manage your sacred stock levels</p>
+            </div>
+          </div>
+          <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-boxes"></i></div>
+            <h3>Inventory Page Placeholder</h3>
+            <p>This section is currently under development.</p>
           </div>
         </div>
       </div>
 
-      <div id="deleteContactModal" class="modal-overlay">
-        <div class="modal-content-wrapper">
-          <div class="modal-header-section">
-            <h3 class="modal-title-text">
-              <i class="fas fa-trash"></i>
-              Delete Contact
-            </h3>
+      <div class="page" id="page-blog">
+        <div class="page-shell">
+          <div class="page-top">
+            <div>
+              <div class="page-eyebrow">Shri Brand Admin</div>
+              <h1 class="page-title">Blog & Content</h1>
+              <p class="page-subtitle">Share your stories and insights with the world</p>
+            </div>
           </div>
-          <div class="modal-body-content">
-            Are you sure you want to delete this contact? This action cannot be undone.
-          </div>
-          <div class="modal-actions-container">
-            <button class="settings-button" onclick="hideModalOverlay()">Cancel</button>
-            <button class="settings-button settings-button-danger" onclick="confirmContactDelete()">Delete</button>
-          </div>
-        </div>
-      </div>
-
-      <div id="logoutAllModal" class="modal-overlay">
-        <div class="modal-content-wrapper">
-          <div class="modal-header-section">
-            <h3 class="modal-title-text">
-              <i class="fas fa-door-open"></i>
-              Logout All Devices
-            </h3>
-          </div>
-          <div class="modal-body-content">
-            This will logout all active sessions across all devices. Are you sure you want to continue?
-          </div>
-          <div class="modal-actions-container">
-            <button class="settings-button" onclick="hideModalOverlay()">Cancel</button>
-            <button class="settings-button settings-button-danger" onclick="confirmLogoutAllSessions()">Logout
-              All</button>
+          <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-pen-nib"></i></div>
+            <h3>Blog Page Placeholder</h3>
+            <p>This section is currently under development.</p>
           </div>
         </div>
       </div>
-    </section>
-  </main>
 
-  <script src="./js/dashboard.js"></script>
-  <script src="./js/mProducts.js"></script>
-  <script src="./js/index.js"></script>
-  <script src="./js/settings.js"></script>
-
-  <script src="./js/order.js"></script>
+      <div class="page" id="page-settings"></div>
+    </main>
+  </div>
+  <script src="./js/orderHistory.js"></script>
+  <script src="./js/product.js"></script>
+  <script src="./js/message.js"></script>
   <script src="./js/user.js"></script>
 
+  <!-- ═════════ MESSAGES: Detail Modal ═════════ -->
+  <div class="msg-modal-backdrop" id="msgModalOverlay">
+    <div class="msg-modal">
+      <div class="msg-modal-hd">
+        <div>
+          <div class="msg-modal-meta">
+            <span class="msg-modal-id-badge" id="msgModalId">—</span>
+            <span id="msgModalStatusBadge"></span>
+          </div>
+          <div class="msg-modal-name" id="msgModalName">—</div>
+          <div class="msg-modal-date" id="msgModalTs">—</div>
+        </div>
+        <button class="msg-modal-x" onclick="closeModal()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="msg-modal-sep"></div>
+      <div class="msg-modal-body">
+        <div class="msg-fields-grid">
+          <div class="msg-field-item">
+            <label>Email Address</label>
+            <div class="msg-field-val">
+              <span id="msgModalEmail">—</span>
+              <button class="msg-copy-ic" onclick="msgCopyText('msgModalEmail')" title="Copy">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="msg-field-item">
+            <label>Mobile Number</label>
+            <div class="msg-field-val msg-field-mono">
+              <span id="msgModalMobile">—</span>
+              <button class="msg-copy-ic" onclick="msgCopyText('msgModalMobile')" title="Copy">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="msg-field-item">
+            <label>City / Region</label>
+            <div class="msg-field-val"><span id="msgModalCity">—</span></div>
+          </div>
+          <div class="msg-field-item">
+            <label>IP Address</label>
+            <div class="msg-field-val msg-field-mono"><span id="msgModalIp">—</span></div>
+          </div>
+          <div class="msg-field-item msg-field-full">
+            <label>Purpose of Inquiry</label>
+            <div class="msg-field-val"><span id="msgModalPurpose">—</span></div>
+          </div>
+        </div>
+        <div class="msg-modal-section-title">Message</div>
+        <div class="msg-msg-area" id="msgModalMessage">—</div>
+        <div class="msg-modal-section-title">Update Status</div>
+        <div class="msg-status-form">
+          <div class="msg-status-group">
+            <label>Change to:</label>
+            <select class="msg-status-sel" id="msgModalStatusSel">
+              <option value="pending">⏳ Pending</option>
+              <option value="reviewed">👁 Reviewed</option>
+              <option value="resolved">✅ Resolved</option>
+            </select>
+          </div>
+          <button class="msg-btn msg-btn-primary" onclick="saveStatus()" id="msgSaveStatusBtn">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            Save Status
+          </button>
+          <button class="msg-btn msg-btn-outline" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════ MESSAGES: Confirm Delete ═════════ -->
+  <div class="msg-confirm-back" id="msgConfirmOverlay">
+    <div class="msg-confirm-box">
+      <div class="msg-confirm-ic">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6l-1 14H6L5 6" />
+          <path d="M10 11v6M14 11v6M9 6V4h6v2" />
+        </svg>
+      </div>
+      <div class="msg-confirm-title">Delete this inquiry?</div>
+      <div class="msg-confirm-sub">
+        This will permanently remove the record from your database. This cannot be undone.
+      </div>
+      <div class="msg-confirm-btns">
+        <button class="msg-btn msg-btn-outline" onclick="closeConfirm()">Cancel</button>
+        <button class="msg-btn msg-btn-danger" onclick="confirmDelete()" id="msgConfirmDeleteBtn">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14H6L5 6" />
+          </svg>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════ MESSAGES: Toast pile ═════════ -->
+  <div class="msg-toast-pile" id="msgToastStack"></div>
+
+  <!-- ═════════ USERS: Overlay ═════════ -->
+  <div id="userOverlay" onclick="uCloseAll()"></div>
+
+  <!-- ═════════ USERS: Add/Edit Drawer ═════════ -->
+  <div class="u-drawer" id="editDrawer">
+    <div class="u-drawer-head">
+      <div>
+        <div class="d-eyebrow" id="editEyebrow">New Record</div>
+        <div class="d-title" id="editTitle">Add User</div>
+      </div>
+      <button class="d-close" onclick="uCloseAll()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="u-drawer-body">
+      <div class="u-form-sec">
+        <div class="u-form-sec-title">Personal Info</div>
+        <div class="u-field-row">
+          <div class="u-field"><label>First Name *</label><input id="f_first" placeholder="e.g. John" /></div>
+          <div class="u-field"><label>Last Name</label><input id="f_last" placeholder="e.g. Doe" /></div>
+        </div>
+        <div class="u-field"><label>Email Address *</label><input type="email" id="f_email"
+            placeholder="user@example.com" /></div>
+        <div class="u-field">
+          <label>Phone <em
+              style="font-size:9px;color:var(--ink-faint);text-transform:none;letter-spacing:0;font-style:normal;">(10
+              digits — optional)</em></label>
+          <input type="tel" id="f_phone" placeholder="9876543210" maxlength="10" />
+        </div>
+      </div>
+      <div class="u-form-sec">
+        <div class="u-form-sec-title">Account Settings</div>
+        <div class="u-field-row">
+          <div class="u-field">
+            <label>Role</label>
+            <select id="f_role">
+              <option value="customer">Customer</option>
+              <option value="reseller">Reseller</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="u-field">
+            <label>Status</label>
+            <select id="f_status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="u-field" id="passWrap">
+          <label>Password *</label>
+          <input type="password" id="f_pass" placeholder="Min 8 characters" />
+        </div>
+      </div>
+    </div>
+    <div class="u-drawer-foot">
+      <button class="u-btn-cancel" onclick="uCloseAll()">Cancel</button>
+      <button class="u-btn-save" onclick="saveUser()"><i class="fa-solid fa-check"
+          style="margin-right:6px;font-size:11px;"></i>Save User</button>
+    </div>
+  </div>
+
+  <!-- ═════════ USERS: View Drawer (tabbed) ═════════ -->
+  <div class="u-drawer wide" id="viewDrawer">
+    <div class="u-drawer-head">
+      <div>
+        <div class="d-eyebrow">Member Profile</div>
+        <div class="d-title" id="vd_name">User</div>
+      </div>
+      <button class="d-close" onclick="uCloseAll()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="vd_hero"></div>
+    <div class="tab-nav" id="vd_tabs">
+      <button class="tab-btn active" onclick="switchTab('profile',this)">Profile</button>
+      <button class="tab-btn" onclick="switchTab('address',this)">Addresses</button>
+      <button class="tab-btn" onclick="switchTab('orders',this)">Order History</button>
+    </div>
+    <div class="tab-content" id="vd_body"></div>
+    <div class="u-drawer-foot">
+      <button class="u-btn-cancel" onclick="uCloseAll()">Close</button>
+      <button class="u-btn-save" onclick="editFromView()"><i class="fa-solid fa-pen"
+          style="margin-right:6px;font-size:11px;"></i>Edit User</button>
+    </div>
+  </div>
+
+  <!-- ═════════ USERS: Delete Modal ═════════ -->
+  <div id="userDelModal">
+    <div class="u-modal">
+      <div class="u-modal-body">
+        <div class="u-modal-ico"><i class="fa-solid fa-trash-can"></i></div>
+        <h3>Remove User?</h3>
+        <p>This is permanent. <strong id="uDelName"></strong> will be deleted along with all their data.</p>
+      </div>
+      <div class="u-modal-foot">
+        <button class="u-m-cancel" onclick="closeDel()">Cancel</button>
+        <button class="u-m-del" onclick="uConfirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════ USERS: Toast ═════════ -->
+  <div id="userToastWrap"></div>
+
   <script>
-    // DOM Elements
+    const navItems = document.querySelectorAll(".nav-item[data-page]");
+    const pages = document.querySelectorAll(".page");
 
-    const navLinks = document.querySelectorAll(".nav-link");
-    const sections = document.querySelectorAll(".main-content section");
-
-    navLinks.forEach((link) => {
-      link.addEventListener("click", (e) => {
-        e.preventDefault();
-
-        // Sidebar active state
-        navLinks.forEach((l) => l.classList.remove("active"));
-        link.classList.add("active");
-
-        // Section switching
-        const target = link.dataset.section;
-
-        sections.forEach((sec) => {
-          sec.classList.remove("active-section");
-          if (sec.id === target) {
-            sec.classList.add("active-section");
-          }
-        });
-      });
-    });
-
-    // DEFAULT SECTION
-    document.getElementById("dashboard").classList.add("active-section");
-
-    const adminProfile = document.getElementById("adminProfile");
-    const adminDropdown = document.getElementById("adminDropdown");
-    const dropdownIcon = document.getElementById("dropdownIcon");
-
-    // Toggle dropdown on admin profile click
-    adminProfile.addEventListener("click", function (e) {
-      e.stopPropagation();
-      adminDropdown.classList.toggle("active");
-      dropdownIcon.classList.toggle("open");
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener("click", function (e) {
-      if (!adminProfile.contains(e.target)) {
-        adminDropdown.classList.remove("active");
-        dropdownIcon.classList.remove("open");
-      }
-    });
-
-    // Logout functionality
-
-    // Sample admin data - you would typically fetch this from your backend
-    const adminData = {
-      name: "Admin User",
-      email: "admin@shribrand.com",
-      role: "Administrator",
-      activeSessions: 1,
-      lastLogin: "Today, 10:30 AM",
-      deviceCount: 2,
-      initials: "AJ",
-    };
-
-    // Initialize admin data
-    document.addEventListener("DOMContentLoaded", function () {
-      // Set admin data
-      document.getElementById("adminName").textContent = adminData.name;
-      document.getElementById("adminAvatar").textContent = adminData.initials;
-
-      // Update dropdown header avatar
-      const dropdownAvatar = document.querySelector(
-        ".admin-dropdown-header .admin-avatar",
+    function navigate(pageId) {
+      navItems.forEach((b) =>
+        b.classList.toggle("active", b.dataset.page === pageId),
       );
-      if (dropdownAvatar) {
-        dropdownAvatar.textContent = adminData.initials;
-      }
+      pages.forEach((p) =>
+        p.classList.toggle("active", p.id === "page-" + pageId),
+      );
+      closeSidebar();
+      if (pageId === "messages" && typeof msgInit === "function") msgInit();
+    }
 
-      // Update dropdown header name and email
-      const dropdownName = document.querySelector(
-        ".admin-dropdown-header .admin-name",
-      );
-      const dropdownEmail = document.querySelector(
-        ".admin-dropdown-header .admin-email",
-      );
-      if (dropdownName) dropdownName.textContent = adminData.name;
-      if (dropdownEmail) dropdownEmail.textContent = adminData.email;
-    });
+    navItems.forEach((btn) =>
+      btn.addEventListener("click", () => navigate(btn.dataset.page)),
+    );
+
+    const sidebar = document.getElementById("sidebar");
+    const hamburger = document.getElementById("hamburger");
+    const overlay = document.getElementById("overlay");
+
+    function openSidebar() {
+      sidebar.classList.add("open");
+      overlay.classList.add("open");
+    }
+    function closeSidebar() {
+      sidebar.classList.remove("open");
+      overlay.classList.remove("open");
+    }
+
+    hamburger.addEventListener("click", () =>
+      sidebar.classList.contains("open") ? closeSidebar() : openSidebar(),
+    );
+    overlay.addEventListener("click", closeSidebar);
   </script>
 </body>
 

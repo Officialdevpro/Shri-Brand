@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shri Brand — Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <style>
+    /* ═══════════════════════════════════════════════
+       ROOT — mirrors product.css exactly
+       ═══════════════════════════════════════════════ */
+    :root {
+      --crimson:      #7f0403;
+      --crimson-mid:  #a01e1d;
+      --crimson-deep: #580202;
+      --gold:         #b8860b;
+      --gold-light:   #d4a520;
+      --gold-pale:    rgba(184, 134, 11, 0.11);
+      --gold-border:  rgba(184, 134, 11, 0.25);
+      --parchment:    #f7f3ed;
+      --parchment-2:  #f0ebe3;
+      --surface:      #ffffff;
+      --ink:          #1c1410;
+      --ink-mid:      #4a3c30;
+      --ink-muted:    #7a6a58;
+      --ink-faint:    #aa9988;
+      --border:       rgba(184, 134, 11, 0.18);
+      --green:        #3a7a56;
+      --green-pale:   rgba(58, 122, 86, 0.1);
+      --shadow-warm:  0 4px 28px rgba(127, 4, 3, 0.07);
+      --shadow-deep:  0 16px 56px rgba(127, 4, 3, 0.13);
+      --ease:         cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Jost", sans-serif;
+      background: var(--parchment);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(184,134,11,0.04) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(184,134,11,0.03) 40px);
+    }
+
+    button { cursor: pointer; font-family: "Jost", sans-serif; }
+
+    /* ═══════════════════════════════════════════════
+       SIDEBAR
+       ═══════════════════════════════════════════════ */
+    .sidebar {
+      width: 232px;
+      min-height: 100vh;
+      background: var(--crimson-deep);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      z-index: 100;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(184,134,11,0.05) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(184,134,11,0.03) 40px);
+    }
+
+    .sidebar-logo {
+      padding: 28px 22px 22px;
+      border-bottom: 1px solid rgba(184,134,11,0.22);
+      position: relative;
+    }
+
+    .sidebar-logo::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 22px;
+      width: 60px; height: 1px;
+      background: var(--gold);
+    }
+
+    .logo-eyebrow {
+      font-size: 8.5px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(184,134,11,0.7);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .logo-brand {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.05em;
+      line-height: 1;
+    }
+
+    .logo-brand span { color: var(--gold-light); }
+
+    .logo-sub {
+      font-size: 9.5px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-top: 5px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 18px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      overflow-y: auto;
+    }
+
+    .nav-section {
+      font-size: 8.5px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: rgba(184,134,11,0.5);
+      font-weight: 600;
+      padding: 14px 10px 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 12px;
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      font-weight: 400;
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      position: relative;
+      transition: color 0.18s, background 0.18s;
+      border-radius: 2px;
+    }
+
+    .nav-item:hover { color: rgba(255,255,255,0.85); background: rgba(184,134,11,0.1); }
+
+    .nav-item.active {
+      color: #fff;
+      background: rgba(184,134,11,0.15);
+      font-weight: 500;
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 25%; bottom: 25%;
+      width: 2.5px;
+      background: var(--gold);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .nav-item i {
+      width: 18px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--gold);
+      opacity: 0.7;
+    }
+
+    .nav-item.active i { opacity: 1; }
+
+    .sidebar-footer {
+      padding: 16px 22px;
+      border-top: 1px solid rgba(184,134,11,0.15);
+      font-size: 10.5px;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.08em;
+    }
+
+    /* ═══════════════════════════════════════════════
+       MAIN SHELL
+       ═══════════════════════════════════════════════ */
+    .main {
+      margin-left: 232px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* ─── TOP BAR ──────────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 30px 36px 22px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      flex-wrap: wrap;
+      background: var(--parchment);
+      position: sticky; top: 0;
+      z-index: 50;
+    }
+
+    .topbar::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 36px;
+      width: 100px; height: 2px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+    }
+
+    .page-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+
+    .page-eyebrow::before {
+      content: '';
+      display: block;
+      width: 20px; height: 1px;
+      background: var(--gold);
+    }
+
+    .page-title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(26px, 3vw, 38px);
+      font-weight: 700;
+      color: var(--crimson);
+      letter-spacing: 0.02em;
+      line-height: 1;
+    }
+
+    .page-subtitle {
+      font-size: 11.5px;
+      font-weight: 300;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-top: 5px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .period-selector {
+      display: flex;
+      border: 1px solid var(--gold-border);
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .period-btn {
+      padding: 8px 16px;
+      font-size: 11.5px;
+      font-family: "Jost", sans-serif;
+      background: none;
+      border: none;
+      color: var(--ink-muted);
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      font-weight: 500;
+      transition: background 0.18s, color 0.18s;
+      border-right: 1px solid var(--gold-border);
+    }
+
+    .period-btn:last-child { border-right: none; }
+
+    .period-btn.active {
+      background: var(--crimson);
+      color: #fff;
+    }
+
+    /* ─── PAGE BODY ────────────────────────────────── */
+    .page-body {
+      padding: 32px 36px 64px;
+    }
+
+    /* ─── ORNAMENT DIVIDER ─────────────────────────── */
+    .orn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 26px;
+    }
+
+    .orn-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .orn-diamond {
+      width: 7px; height: 7px;
+      background: var(--gold);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+      opacity: 0.65;
+    }
+
+    /* ─── SECTION HEADING ──────────────────────────── */
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .section-label {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+
+    .section-sub {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      font-weight: 400;
+      font-family: "Jost", sans-serif;
+      margin-left: 8px;
+    }
+
+    .section-link {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color 0.18s;
+    }
+
+    .section-link:hover { color: var(--gold-light); }
+
+    /* ═══════════════════════════════════════════════
+       KPI CARDS
+       ═══════════════════════════════════════════════ */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 22px 22px 18px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.22s, box-shadow 0.22s, transform 0.22s var(--ease);
+      animation: fadeUp 0.4s var(--ease) both;
+    }
+
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), rgba(184,134,11,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.22s;
+    }
+
+    .kpi-card:hover { border-color: var(--gold-border); box-shadow: var(--shadow-warm); transform: translateY(-2px); }
+    .kpi-card:hover::after { opacity: 1; }
+
+    .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+    .kpi-card:nth-child(2) { animation-delay: 0.10s; }
+    .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+    .kpi-card:nth-child(4) { animation-delay: 0.20s; }
+
+    .kpi-icon-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .kpi-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      font-weight: 600;
+    }
+
+    .kpi-icon {
+      width: 34px; height: 34px;
+      background: var(--gold-pale);
+      border: 1px solid var(--gold-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold);
+      font-size: 13px;
+    }
+
+    .kpi-val {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--crimson);
+      line-height: 1;
+      letter-spacing: 0.01em;
+      margin-bottom: 8px;
+    }
+
+    .kpi-val.alert-val { color: #c0392b; }
+
+    .kpi-change {
+      font-size: 11.5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 400;
+    }
+
+    .kpi-change.up   { color: var(--green); }
+    .kpi-change.down { color: #c0392b; }
+
+    .kpi-change i { font-size: 10px; }
+
+    /* ═══════════════════════════════════════════════
+       CARD SURFACE
+       ═══════════════════════════════════════════════ */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      animation: fadeUp 0.4s var(--ease) 0.2s both;
+    }
+
+    .card-head {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .card-head::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0;
+      width: 60px; height: 1.5px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+    }
+
+    .card-title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+
+    .card-sub {
+      font-size: 10.5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-top: 1px;
+    }
+
+    .card-body { padding: 22px; }
+
+    /* ═══════════════════════════════════════════════
+       LAYOUT GRIDS
+       ═══════════════════════════════════════════════ */
+    .row { margin-bottom: 20px; }
+
+    .col-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .col-3-1 {
+      display: grid;
+      grid-template-columns: 1.85fr 1fr;
+      gap: 20px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       CHARTS
+       ═══════════════════════════════════════════════ */
+    .chart-wrap { position: relative; height: 270px; }
+    .chart-wrap-sm { position: relative; height: 190px; }
+
+    /* Revenue summary strip */
+    .rev-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .rev-strip-item {
+      padding: 14px 18px;
+      border-right: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .rev-strip-item:last-child { border-right: none; }
+
+    .rev-strip-val {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--crimson);
+      line-height: 1;
+    }
+
+    .rev-strip-lbl {
+      font-size: 9.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-top: 3px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       TOP PRODUCTS TABLE
+       ═══════════════════════════════════════════════ */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th {
+      text-align: left;
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      font-weight: 600;
+      padding: 0 16px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table th:last-child { text-align: right; }
+
+    .data-table td {
+      padding: 14px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(184,134,11,0.09);
+      vertical-align: middle;
+      color: var(--ink);
+    }
+
+    .data-table tbody tr:last-child td { border-bottom: none; }
+
+    .data-table tbody tr {
+      transition: background 0.15s;
+    }
+
+    .data-table tbody tr:hover { background: var(--gold-pale); }
+
+    /* rank badge */
+    .rank-badge {
+      width: 24px; height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Cormorant Garamond", serif;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .rank-badge.r1 { background: rgba(184,134,11,0.18); color: var(--gold); border: 1px solid var(--gold-border); }
+    .rank-badge.r2 { background: rgba(120,120,140,0.1); color: var(--ink-mid); border: 1px solid rgba(120,120,140,0.2); }
+    .rank-badge.r3 { background: rgba(140,100,60,0.12); color: #a07840; border: 1px solid rgba(140,100,60,0.2); }
+    .rank-badge.rn { background: transparent; color: var(--ink-faint); border: 1px solid var(--border); }
+
+    .product-name { font-size: 13.5px; font-weight: 500; color: var(--ink); }
+    .product-sku  { font-size: 10.5px; color: var(--ink-faint); letter-spacing: 0.06em; margin-top: 1px; }
+
+    /* p-tag reuse from product.css */
+    .p-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+    }
+
+    .p-tag-floral   { background: rgba(180,60,100,0.1);  color: #b43c64; }
+    .p-tag-woody    { background: rgba(140,90,30,0.12);  color: #8c5a1e; }
+    .p-tag-resin    { background: rgba(100,60,160,0.1);  color: #6444a0; }
+    .p-tag-heritage { background: rgba(20,120,140,0.1);  color: #14788c; }
+    .p-tag-mixed    { background: rgba(58,122,86,0.12);  color: var(--green); }
+
+    /* sold bar */
+    .sold-wrap { display: flex; align-items: center; gap: 10px; }
+
+    .sold-track {
+      flex: 1;
+      height: 4px;
+      background: var(--parchment-2);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .sold-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      transition: width 1.1s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+
+    .sold-num {
+      font-size: 12px;
+      color: var(--ink-muted);
+      width: 36px;
+      text-align: right;
+      font-weight: 500;
+    }
+
+    .revenue-td {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--crimson);
+      text-align: right;
+    }
+
+    /* ═══════════════════════════════════════════════
+       STOCK ALERTS
+       ═══════════════════════════════════════════════ */
+    .alert-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .alert-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px;
+      background: var(--parchment);
+      border: 1px solid var(--border);
+      border-left: 3px solid transparent;
+      transition: border-color 0.2s, transform 0.18s, box-shadow 0.18s;
+    }
+
+    .alert-row:hover { transform: translateX(3px); box-shadow: var(--shadow-warm); }
+
+    .alert-row.critical { border-left-color: #c0392b; }
+    .alert-row.low      { border-left-color: var(--gold); }
+
+    .alert-left { display: flex; align-items: center; gap: 12px; }
+
+    .alert-indicator {
+      width: 8px; height: 8px;
+      flex-shrink: 0;
+      transform: rotate(45deg);
+    }
+
+    .alert-indicator.critical { background: #c0392b; box-shadow: 0 0 6px rgba(192,57,43,0.5); }
+    .alert-indicator.low      { background: var(--gold); box-shadow: 0 0 6px rgba(184,134,11,0.5); }
+
+    .alert-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+    .alert-sku  { font-size: 10.5px; color: var(--ink-faint); letter-spacing: 0.05em; margin-top: 1px; }
+
+    .alert-right { display: flex; align-items: center; gap: 14px; }
+
+    .stock-count {
+      text-align: right;
+    }
+
+    .stock-count .num {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .stock-count .lbl {
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    .stock-count.critical .num { color: #c0392b; }
+    .stock-count.low .num      { color: var(--gold); }
+
+    .restock-btn {
+      padding: 7px 15px;
+      background: none;
+      border: 1px solid var(--gold-border);
+      color: var(--gold);
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: background 0.18s, color 0.18s, border-color 0.18s;
+    }
+
+    .restock-btn:hover {
+      background: var(--crimson);
+      border-color: var(--crimson);
+      color: #fff;
+    }
+
+    /* ═══════════════════════════════════════════════
+       CATEGORY PIE LAYOUT
+       ═══════════════════════════════════════════════ */
+    .pie-shell {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 6px 0;
+    }
+
+    .pie-canvas-wrap {
+      width: 150px;
+      height: 150px;
+      flex-shrink: 0;
+    }
+
+    .pie-legend { flex: 1; display: flex; flex-direction: column; gap: 9px; }
+
+    .pie-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 12.5px;
+    }
+
+    .pie-swatch {
+      width: 9px; height: 9px;
+      flex-shrink: 0;
+      transform: rotate(45deg);
+    }
+
+    .pie-name { flex: 1; color: var(--ink-mid); }
+
+    .pie-pct {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--crimson);
+      min-width: 36px;
+      text-align: right;
+    }
+
+    /* ═══════════════════════════════════════════════
+       ANIMATIONS
+       ═══════════════════════════════════════════════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════════════════════════════════════════════
+       SCROLLBAR
+       ═══════════════════════════════════════════════ */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--parchment-2); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-border); border-radius: 3px; }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════════ */
+    @media (max-width: 1200px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .col-3-1  { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { width: 0; overflow: hidden; }
+      .main    { margin-left: 0; }
+      .page-body, .topbar { padding-left: 20px; padding-right: 20px; }
+      .topbar::after { left: 20px; }
+      .col-2   { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 540px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+      .rev-strip { grid-template-columns: 1fr; }
+      .rev-strip-item { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     SIDEBAR
+     ═══════════════════════════════════════════════ -->
+
+
+<!-- ═══════════════════════════════════════════════
+     MAIN
+     ═══════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <div class="page-eyebrow">Admin Panel</div>
+      <div class="page-title">Dashboard</div>
+      <div class="page-subtitle" id="today-date">Loading…</div>
+    </div>
+    <div class="topbar-right">
+      <div class="period-selector">
+        <button class="period-btn" onclick="setPeriod(this,'7d')">7 Days</button>
+        <button class="period-btn active" onclick="setPeriod(this,'30d')">30 Days</button>
+        <button class="period-btn" onclick="setPeriod(this,'90d')">Quarter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE BODY -->
+  <div class="page-body">
+
+    <!-- ── KPI ROW ──────────────────────────────── -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon-row">
+          <div class="kpi-label">Total Revenue</div>
+          <div class="kpi-icon"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+        </div>
+        <div class="kpi-val">₹1,04,280</div>
+        <div class="kpi-change up"><i class="fa-solid fa-arrow-trend-up"></i> 28.4% vs last month</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-row">
+          <div class="kpi-label">Orders This Month</div>
+          <div class="kpi-icon"><i class="fa-solid fa-box-open"></i></div>
+        </div>
+        <div class="kpi-val">312</div>
+        <div class="kpi-change up"><i class="fa-solid fa-arrow-trend-up"></i> 12.1% vs last month</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-row">
+          <div class="kpi-label">Avg. Order Value</div>
+          <div class="kpi-icon"><i class="fa-solid fa-chart-simple"></i></div>
+        </div>
+        <div class="kpi-val">₹334</div>
+        <div class="kpi-change up"><i class="fa-solid fa-arrow-trend-up"></i> 5.2% vs last month</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-row">
+          <div class="kpi-label">Low Stock Items</div>
+          <div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        </div>
+        <div class="kpi-val alert-val">4</div>
+        <div class="kpi-change down"><i class="fa-solid fa-arrow-trend-up"></i> 2 more than last week</div>
+      </div>
+    </div>
+
+    <!-- ── ORNAMENT ──────────────────────────────── -->
+    <div class="orn"><div class="orn-line"></div><div class="orn-diamond"></div><div class="orn-line"></div></div>
+
+    <!-- ── ROW 1 : Revenue Chart + Category Pie ─── -->
+    <div class="col-3-1 row">
+
+      <!-- Revenue Area Chart -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Revenue &amp; Orders</div>
+            <div class="card-sub">7-month performance overview</div>
+          </div>
+        </div>
+        <div class="card-body" style="padding-bottom:0;">
+          <div class="chart-wrap">
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+        <div class="rev-strip">
+          <div class="rev-strip-item">
+            <div class="rev-strip-val">₹5.05L</div>
+            <div class="rev-strip-lbl">Total Revenue</div>
+          </div>
+          <div class="rev-strip-item">
+            <div class="rev-strip-val">1,534</div>
+            <div class="rev-strip-lbl">Total Orders</div>
+          </div>
+          <div class="rev-strip-item">
+            <div class="rev-strip-val">₹329</div>
+            <div class="rev-strip-lbl">Avg. Order Value</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Donut -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">By Category</div>
+            <div class="card-sub">Sales distribution</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="pie-shell">
+            <div class="pie-canvas-wrap">
+              <canvas id="categoryChart"></canvas>
+            </div>
+            <div class="pie-legend" id="pie-legend"></div>
+          </div>
+
+          <div style="margin-top: 22px;">
+            <div class="chart-wrap-sm">
+              <canvas id="paymentChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── ORNAMENT ──────────────────────────────── -->
+    <div class="orn"><div class="orn-line"></div><div class="orn-diamond"></div><div class="orn-line"></div></div>
+
+    <!-- ── ROW 2 : Top Products Table ───────────── -->
+    <div class="row card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Top Selling Products</div>
+          <div class="card-sub">Ranked by units sold · this month</div>
+        </div>
+        <a class="section-link" href="#">View all <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div style="padding: 8px 0 0;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:42px; padding-left:22px;">#</th>
+              <th>Product</th>
+              <th>Category</th>
+              <th>Units Sold</th>
+              <th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody id="products-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── ORNAMENT ──────────────────────────────── -->
+    <div class="orn"><div class="orn-line"></div><div class="orn-diamond"></div><div class="orn-line"></div></div>
+
+    <!-- ── ROW 3 : Stock Alerts + Daily Orders ─── -->
+    <div class="col-2 row">
+
+      <!-- Stock Alerts -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Stock Alerts</div>
+            <div class="card-sub">Products needing attention</div>
+          </div>
+          <a class="section-link" href="#">Inventory <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="card-body">
+          <div class="alert-list" id="alert-list"></div>
+        </div>
+      </div>
+
+      <!-- Daily Orders Bar -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Daily Orders</div>
+            <div class="card-sub">This month · day by day</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap">
+            <canvas id="ordersChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /page-body -->
+</main>
+
+<!-- ═══════════════════════════════════════════════
+     SCRIPT
+     ═══════════════════════════════════════════════ -->
+<script>
+/* ───────────────────────────────────────────────────
+   MOCK DATA — mirrors your MongoDB schemas exactly.
+   Replace with real fetch('/api/admin/dashboard') calls.
+   ─────────────────────────────────────────────────── */
+
+const REVENUE_DATA = [
+  { month: "Aug", revenue: 42000, orders: 134 },
+  { month: "Sep", revenue: 58000, orders: 178 },
+  { month: "Oct", revenue: 51000, orders: 156 },
+  { month: "Nov", revenue: 73000, orders: 221 },
+  { month: "Dec", revenue: 96000, orders: 289 },
+  { month: "Jan", revenue: 81000, orders: 244 },
+  { month: "Feb", revenue: 104000, orders: 312 },
+];
+
+// Matches productModel.fragranceCategory enum values
+const CATEGORY_DATA = [
+  { label: "Floral",   pct: 38, color: "#b43c64" },
+  { label: "Woody",    pct: 24, color: "#8c5a1e" },
+  { label: "Resin",    pct: 18, color: "#6444a0" },
+  { label: "Heritage", pct: 12, color: "#14788c" },
+  { label: "Mixed",    pct: 8,  color: "#3a7a56" },
+];
+
+// Matches orderModel payment.method enum
+const PAYMENT_DATA = [
+  { label: "Razorpay", value: 1724, color: "#7f0403" },
+  { label: "COD",      value: 285,  color: "rgba(184,134,11,0.5)" },
+];
+
+// Matches productModel: name, sku, totalSold, fragranceCategory
+const TOP_PRODUCTS = [
+  { name: "Mogra Premium Incense",       sku: "MOG-001",    sold: 892, revenue: 267600, cat: "floral"   },
+  { name: "Sandalwood Heritage Sticks",  sku: "SAN-HRT-02", sold: 734, revenue: 330300, cat: "woody"    },
+  { name: "Rose Garden Combo Pack",      sku: "RSE-CMB-01", sold: 621, revenue: 217350, cat: "floral"   },
+  { name: "Loban Resin Collection",      sku: "LBN-RES-03", sold: 489, revenue: 195600, cat: "resin"    },
+  { name: "Temple Ritual Gift Box",      sku: "TMP-GFT-01", sold: 376, revenue: 263200, cat: "mixed"    },
+];
+
+// Matches productModel isLowStock virtual (stock <= lowStockThreshold)
+const LOW_STOCK = [
+  { name: "Sandalwood Heritage Sticks", sku: "SAN-HRT-02", stock: 3,  threshold: 10, level: "critical" },
+  { name: "Temple Ritual Gift Box",     sku: "TMP-GFT-01", stock: 3,  threshold: 10, level: "critical" },
+  { name: "Chandan Dhoop Cones",        sku: "CHN-DHP-04", stock: 7,  threshold: 10, level: "low"      },
+  { name: "Rose Garden Combo Pack",     sku: "RSE-CMB-01", stock: 9,  threshold: 10, level: "low"      },
+];
+
+// Daily orders this month
+const DAILY_ORDERS = Array.from({ length: 30 }, (_, i) => ({
+  day: i + 1,
+  val: Math.floor(5 + Math.random() * 20),
+}));
+
+/* ─── UTILS ──────────────────────────────────────── */
+const fmt = n => "₹" + Number(n).toLocaleString("en-IN");
+
+document.getElementById("today-date").textContent = new Date().toLocaleDateString("en-IN", {
+  weekday: "long", year: "numeric", month: "long", day: "numeric"
+});
+
+function setPeriod(btn, period) {
+  document.querySelectorAll(".period-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  // TODO: re-fetch data for period and update all charts
+}
+
+/* ─── CHART.JS DEFAULTS ──────────────────────────── */
+Chart.defaults.color           = "#7a6a58";
+Chart.defaults.font.family     = "'Jost', sans-serif";
+Chart.defaults.font.size       = 11;
+Chart.defaults.plugins.tooltip = {
+  ...Chart.defaults.plugins.tooltip,
+  backgroundColor: "#fff",
+  borderColor:     "rgba(184,134,11,0.25)",
+  borderWidth:     1,
+  titleColor:      "#1c1410",
+  bodyColor:       "#7a6a58",
+  padding:         12,
+  cornerRadius:    0,
+};
+
+const GRID = "rgba(184,134,11,0.08)";
+const CRIMSON = "#7f0403";
+const GOLD    = "#b8860b";
+
+/* ─── 1. REVENUE + ORDERS CHART ──────────────────── */
+new Chart(document.getElementById("revenueChart"), {
+  type: "line",
+  data: {
+    labels: REVENUE_DATA.map(d => d.month),
+    datasets: [
+      {
+        label: "Revenue (₹)",
+        data: REVENUE_DATA.map(d => d.revenue),
+        yAxisID: "yRev",
+        borderColor: CRIMSON,
+        backgroundColor: "rgba(127,4,3,0.07)",
+        borderWidth: 2.5,
+        pointBackgroundColor: CRIMSON,
+        pointBorderColor: "#fff",
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        fill: true,
+        tension: 0.42,
+      },
+      {
+        label: "Orders",
+        data: REVENUE_DATA.map(d => d.orders),
+        yAxisID: "yOrd",
+        borderColor: GOLD,
+        backgroundColor: "rgba(184,134,11,0.06)",
+        borderWidth: 2,
+        pointBackgroundColor: GOLD,
+        pointBorderColor: "#fff",
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        fill: true,
+        tension: 0.42,
+        borderDash: [6, 3],
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: "index", intersect: false },
+    plugins: {
+      legend: {
+        position: "top", align: "end",
+        labels: { boxWidth: 10, padding: 18, usePointStyle: true, pointStyleWidth: 8 },
+      },
+      tooltip: {
+        callbacks: {
+          label: ctx => ctx.dataset.yAxisID === "yRev"
+            ? `  Revenue: ${fmt(ctx.raw)}`
+            : `  Orders: ${ctx.raw}`,
+        },
+      },
+    },
+    scales: {
+      x: { grid: { color: GRID } },
+      yRev: {
+        type: "linear", position: "left",
+        grid: { color: GRID },
+        ticks: { callback: v => "₹" + (v / 1000) + "k" },
+      },
+      yOrd: {
+        type: "linear", position: "right",
+        grid: { drawOnChartArea: false },
+      },
+    },
+  },
+});
+
+/* ─── 2. CATEGORY DONUT ───────────────────────────── */
+new Chart(document.getElementById("categoryChart"), {
+  type: "doughnut",
+  data: {
+    labels: CATEGORY_DATA.map(d => d.label),
+    datasets: [{
+      data: CATEGORY_DATA.map(d => d.pct),
+      backgroundColor: CATEGORY_DATA.map(d => d.color),
+      borderColor: "#fff",
+      borderWidth: 3,
+      hoverOffset: 5,
+    }],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: "66%",
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: { label: ctx => `  ${ctx.label}: ${ctx.raw}%` },
+      },
+    },
+  },
+});
+
+// Custom legend
+const pieLegend = document.getElementById("pie-legend");
+CATEGORY_DATA.forEach(d => {
+  pieLegend.innerHTML += `
+    <div class="pie-row">
+      <div class="pie-swatch" style="background:${d.color}"></div>
+      <span class="pie-name">${d.label}</span>
+      <span class="pie-pct">${d.pct}%</span>
+    </div>`;
+});
+
+/* ─── 3. PAYMENT METHOD BAR ───────────────────────── */
+new Chart(document.getElementById("paymentChart"), {
+  type: "bar",
+  data: {
+    labels: PAYMENT_DATA.map(d => d.label),
+    datasets: [{
+      label: "Orders",
+      data: PAYMENT_DATA.map(d => d.value),
+      backgroundColor: PAYMENT_DATA.map(d => d.color),
+      borderRadius: 0,
+      borderSkipped: false,
+    }],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => `  Orders: ${ctx.raw}` } },
+      title: {
+        display: true,
+        text: "Payment Method Split",
+        color: "#7a6a58",
+        font: { size: 10.5, family: "'Jost', sans-serif", weight: "600" },
+        align: "start",
+        padding: { bottom: 10 },
+        letterSpacing: "0.12em",
+      },
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: GRID }, beginAtZero: true },
+    },
+  },
+});
+
+/* ─── 4. TOP PRODUCTS TABLE ───────────────────────── */
+const maxSold   = Math.max(...TOP_PRODUCTS.map(p => p.sold));
+const rankClass = ["r1", "r2", "r3", "rn", "rn"];
+
+TOP_PRODUCTS.forEach((p, i) => {
+  const pct = Math.round((p.sold / maxSold) * 100);
+  document.getElementById("products-tbody").innerHTML += `
+    <tr>
+      <td style="padding-left:22px;">
+        <div class="rank-badge ${rankClass[i]}">${i + 1}</div>
+      </td>
+      <td>
+        <div class="product-name">${p.name}</div>
+        <div class="product-sku">${p.sku}</div>
+      </td>
+      <td>
+        <span class="p-tag p-tag-${p.cat}">${p.cat}</span>
+      </td>
+      <td>
+        <div class="sold-wrap">
+          <div class="sold-track">
+            <div class="sold-fill" style="width:0%" data-pct="${pct}"></div>
+          </div>
+          <span class="sold-num">${p.sold}</span>
+        </div>
+      </td>
+      <td class="revenue-td">${fmt(p.revenue)}</td>
+    </tr>`;
+});
+
+// Animate progress bars
+setTimeout(() => {
+  document.querySelectorAll(".sold-fill").forEach(el => {
+    el.style.width = el.dataset.pct + "%";
+  });
+}, 400);
+
+/* ─── 5. STOCK ALERTS ─────────────────────────────── */
+LOW_STOCK.forEach(item => {
+  document.getElementById("alert-list").innerHTML += `
+    <div class="alert-row ${item.level}">
+      <div class="alert-left">
+        <div class="alert-indicator ${item.level}"></div>
+        <div>
+          <div class="alert-name">${item.name}</div>
+          <div class="alert-sku">${item.sku} &nbsp;·&nbsp; threshold: ${item.threshold} units</div>
+        </div>
+      </div>
+      <div class="alert-right">
+        <div class="stock-count ${item.level}">
+          <div class="num">${item.stock}</div>
+          <div class="lbl">units left</div>
+        </div>
+        <button class="restock-btn" onclick="alert('Restock: ${item.sku}')">Restock</button>
+      </div>
+    </div>`;
+});
+
+/* ─── 6. DAILY ORDERS CHART ───────────────────────── */
+new Chart(document.getElementById("ordersChart"), {
+  type: "bar",
+  data: {
+    labels: DAILY_ORDERS.map(d => d.day),
+    datasets: [{
+      label: "Orders",
+      data: DAILY_ORDERS.map(d => d.val),
+      backgroundColor: DAILY_ORDERS.map(d =>
+        d.val >= 20 ? CRIMSON : d.val >= 14 ? "rgba(127,4,3,0.45)" : "rgba(184,134,11,0.25)"
+      ),
+      borderRadius: 0,
+      borderSkipped: false,
+    }],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          title: ctx => `Day ${ctx[0].label}`,
+          label: ctx => `  Orders: ${ctx.raw}`,
+        },
+      },
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
+      y: { grid: { color: GRID }, beginAtZero: true },
+    },
+  },
+});
+</script>
+</body>
+</html>

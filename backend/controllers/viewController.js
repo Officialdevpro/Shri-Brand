@@ -1,28 +1,33 @@
-const Product = require("../models/product");
+const Product = require("../models/productModel");
+const Category = require("../models/categoryModel");
 const catchAsync = require("../utils/catchAsync");
 
-// Render Home Page with SSR products
+// Render Home Page with SSR products grouped by dynamic categories
 exports.renderHomePage = catchAsync(async (req, res, next) => {
-    // Fetch products grouped by type in parallel
-    const [products, comboPacks, giftPacks] = await Promise.all([
-        Product.find({ productType: "single", isActive: true })
-            .sort("-createdAt")
-            .limit(12)
-            .select("name slug mainImage shortDescription price originalPrice discountPercentage stock productType _id"),
-        Product.find({ productType: "combo", isActive: true })
-            .sort("-createdAt")
-            .limit(6)
-            .select("name slug mainImage shortDescription price originalPrice discountPercentage stock productType _id"),
-        Product.find({ productType: "gift", isActive: true })
-            .sort("-createdAt")
-            .limit(6)
-            .select("name slug mainImage shortDescription price originalPrice discountPercentage stock productType _id"),
-    ]);
+    // Fetch all active categories sorted by display order
+    const categories = await Category.find({ isActive: true }).sort("order name");
+
+    // For each category, fetch matching products
+    const categoryData = await Promise.all(
+        categories.map(async (cat) => {
+            const products = await Product.find({
+                productType: cat.name,
+                isActive: true,
+            })
+                .sort("-createdAt")
+                .limit(12)
+                .select("name slug mainImage shortDescription packs productType _id");
+
+            return {
+                name: cat.name,
+                label: cat.label,
+                products,
+            };
+        })
+    );
 
     res.status(200).render("index", {
-        products,
-        comboPacks,
-        giftPacks,
+        categories: categoryData,
     });
 });
 

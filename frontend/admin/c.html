@@ -1,1826 +1,1185 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ERP Orders System</title>
-
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    />
-
-    <style>
-      :root {
-        --erp-bg: #050812;
-        --erp-glass: rgba(255, 255, 255, 0.06);
-        --erp-border: #1f2937;
-        --erp-text: #e5e7eb;
-        --erp-muted: #9ca3af;
-        --erp-accent: #8b5cf6;
-        --erp-accent2: #22d3ee;
-        --erp-card-bg: linear-gradient(180deg, #0b1220, #020617);
-        --erp-hover-glow: 0 0 20px rgba(139, 92, 246, 0.3);
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Inter", sans-serif;
-      }
-
-      .erp-body {
-        background:
-          radial-gradient(
-            900px 500px at 10% 10%,
-            rgba(139, 92, 246, 0.18),
-            transparent 40%
-          ),
-          radial-gradient(
-            900px 500px at 90% 90%,
-            rgba(34, 211, 238, 0.18),
-            transparent 40%
-          ),
-          var(--erp-bg);
-        color: var(--erp-text);
-        min-height: 100vh;
-        padding: 20px;
-        position: relative;
-        overflow-x: hidden;
-      }
-
-      /* Animated Background Elements */
-      .erp-body::before {
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background:
-          radial-gradient(
-            circle at 20% 30%,
-            rgba(139, 92, 246, 0.05) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 80% 70%,
-            rgba(34, 211, 238, 0.05) 0%,
-            transparent 50%
-          );
-        pointer-events: none;
-        z-index: -1;
-      }
-
-      /* HEADER */
-      .erp-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-        flex-wrap: wrap;
-        gap: 20px;
-        padding: 10px 0;
-      }
-
-      .erp-header h1 {
-        font-size: clamp(28px, 5vw, 36px);
-        font-weight: 800;
-        background: linear-gradient(
-          90deg,
-          var(--erp-accent),
-          var(--erp-accent2)
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        position: relative;
-        padding-left: 10px;
-      }
-
-      .erp-header h1::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 70%;
-        background: linear-gradient(
-          to bottom,
-          var(--erp-accent),
-          var(--erp-accent2)
-        );
-        border-radius: 2px;
-      }
-
-      .erp-actions {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      /* BUTTON */
-      .erp-btn {
-        padding: 12px 20px;
-        border-radius: 14px;
-        border: 1px solid var(--erp-border);
-        background: linear-gradient(135deg, #0b1220, #020617);
-        color: var(--erp-muted);
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        font-weight: 500;
-        font-size: 14px;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        white-space: nowrap;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .erp-btn::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
-        transform: translate(-50%, -50%);
-        transition:
-          width 0.6s,
-          height 0.6s;
-      }
-
-      .erp-btn:hover::after {
-        width: 300px;
-        height: 300px;
-      }
-
-      .erp-btn:hover {
-        color: #fff;
-        border-color: var(--erp-accent);
-        box-shadow: var(--erp-hover-glow);
-        transform: translateY(-2px);
-      }
-
-      .erp-primary {
-        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-        border: none;
-        color: #fff;
-      }
-
-      .erp-primary:hover {
-        background: linear-gradient(135deg, #7c3aed, #6d28d9);
-        box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
-      }
-
-      /* CONTROLS */
-      .erp-controls {
-        background: var(--erp-glass);
-        border: 1px solid var(--erp-border);
-        border-radius: 18px;
-        padding: 24px;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 16px;
-        margin-bottom: 30px;
-        backdrop-filter: blur(10px);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .erp-controls::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          var(--erp-accent),
-          transparent
-        );
-      }
-
-      .erp-filter-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .erp-filter-label {
-        font-size: 13px;
-        color: var(--erp-muted);
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .erp-controls input,
-      .erp-controls select {
-        background: rgba(2, 6, 23, 0.8);
-        border: 1px solid var(--erp-border);
-        color: #fff;
-        padding: 14px 16px;
-        border-radius: 12px;
-        width: 100%;
-        font-size: 14px;
-        transition: all 0.3s ease;
-        cursor: pointer;
-      }
-
-      .erp-controls input:focus,
-      .erp-controls select:focus {
-        outline: none;
-        border-color: var(--erp-accent);
-        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-      }
-
-      .erp-controls input::placeholder {
-        color: var(--erp-muted);
-      }
-
-      .erp-search-wrapper {
-        position: relative;
-        grid-column: 1 / -1;
-      }
-
-      .erp-search-wrapper i {
-        position: absolute;
-        left: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--erp-muted);
-      }
-
-      .erp-search-wrapper input {
-        padding-left: 46px;
-      }
-
-      /* Date Input Icon */
-      .erp-date-wrapper {
-        position: relative;
-      }
-
-      .erp-date-wrapper i {
-        position: absolute;
-        right: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--erp-muted);
-        pointer-events: none;
-      }
-
-      .erp-date-wrapper input {
-        padding-right: 46px;
-      }
-
-      /* Custom Calendar */
-      .erp-calendar-container {
-        position: relative;
-      }
-
-      .erp-calendar-popup {
-        position: absolute;
-        background: var(--erp-card-bg);
-        border: 1px solid var(--erp-border);
-        border-radius: 18px;
-        padding: 20px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(20px);
-        z-index: 1000;
-        min-width: 320px;
-        transform: translateY(0px);
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      }
-
-      .erp-calendar-popup.show {
-        transform: translateY(0);
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .erp-calendar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-      }
-
-      .erp-calendar-nav {
-        display: flex;
-        gap: 10px;
-      }
-
-      .erp-calendar-nav button {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: rgba(139, 92, 246, 0.1);
-        border: 1px solid rgba(139, 92, 246, 0.3);
-        color: var(--erp-accent);
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .erp-calendar-nav button:hover {
-        background: rgba(139, 92, 246, 0.2);
-        transform: scale(1.1);
-      }
-
-      .erp-calendar-title {
-        font-weight: 600;
-        font-size: 16px;
-        background: linear-gradient(
-          90deg,
-          var(--erp-accent),
-          var(--erp-accent2)
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      .erp-calendar-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 8px;
-        margin-bottom: 15px;
-      }
-
-      .erp-calendar-day {
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 13px;
-        color: var(--erp-muted);
-        font-weight: 500;
-      }
-
-      .erp-calendar-date {
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        background: transparent;
-        border: none;
-        color: var(--erp-text);
-      }
-
-      .erp-calendar-date:hover {
-        background: rgba(139, 92, 246, 0.1);
-      }
-
-      .erp-calendar-date.today {
-        background: rgba(34, 211, 238, 0.1);
-        color: var(--erp-accent2);
-        font-weight: 600;
-      }
-
-      .erp-calendar-date.selected {
-        background: linear-gradient(
-          135deg,
-          var(--erp-accent),
-          var(--erp-accent2)
-        );
-        color: white;
-        font-weight: 600;
-      }
-
-      .erp-calendar-date.other-month {
-        color: rgba(156, 163, 175, 0.4);
-      }
-
-      .erp-calendar-actions {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-        margin-top: 20px;
-      }
-
-      .erp-calendar-actions button {
-        flex: 1;
-        padding: 10px;
-        border-radius: 10px;
-        border: none;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.3s ease;
-      }
-
-      .erp-calendar-actions .apply-btn {
-        background: linear-gradient(
-          135deg,
-          var(--erp-accent),
-          var(--erp-accent2)
-        );
-        color: white;
-      }
-
-      .erp-calendar-actions .apply-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
-      }
-
-      .erp-calendar-actions .cancel-btn {
-        background: rgba(255, 255, 255, 0.05);
-        color: var(--erp-text);
-        border: 1px solid var(--erp-border);
-      }
-
-      .erp-calendar-actions .cancel-btn:hover {
-        background: rgba(255, 255, 255, 0.1);
-      }
-
-      /* TABLE CARD */
-      .erp-card-order {
-        background: var(--erp-card-bg);
-        border: 1px solid var(--erp-border);
-        border-radius: 24px;
-        overflow: hidden;
-        position: relative;
-        margin-bottom: 30px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-      }
-
-      .erp-card-order::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          var(--erp-accent),
-          transparent
-        );
-      }
-
-      /* TABLE */
-      .erp-table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 100%;
-      }
-
-      .erp-th,
-      .erp-td {
-        padding: 18px 22px;
-        text-align: left;
-      }
-
-      .erp-th {
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--erp-muted);
-        background: rgba(255, 255, 255, 0.03);
-        font-weight: 600;
-        border-bottom: 1px solid var(--erp-border);
-        position: sticky;
-        top: 0;
-        backdrop-filter: blur(10px);
-      }
-
-      .erp-tbody tr {
-        transition: all 0.3s ease;
-        position: relative;
-      }
-
-      .erp-tbody tr::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(139, 92, 246, 0.2),
-          transparent
-        );
-      }
-
-      .erp-tbody tr:hover {
-        background: rgba(255, 255, 255, 0.04);
-        transform: scale(1.01);
-      }
-
-      /* Customer Cell */
-      .erp-customer-cell {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .erp-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 16px;
-        color: white;
-      }
-
-      /* Different background colors for avatars */
-      .erp-avatar-color-1 {
-        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-      }
-      .erp-avatar-color-2 {
-        background: linear-gradient(135deg, #22d3ee, #06b6d4);
-      }
-      .erp-avatar-color-3 {
-        background: linear-gradient(135deg, #10b981, #059669);
-      }
-      .erp-avatar-color-4 {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-      }
-      .erp-avatar-color-5 {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-      }
-      .erp-avatar-color-6 {
-        background: linear-gradient(135deg, #6366f1, #4f46e5);
-      }
-      .erp-avatar-color-7 {
-        background: linear-gradient(135deg, #ec4899, #db2777);
-      }
-      .erp-avatar-color-8 {
-        background: linear-gradient(135deg, #8b5cf6, #22d3ee);
-      }
-      .erp-avatar-color-9 {
-        background: linear-gradient(135deg, #f59e0b, #10b981);
-      }
-      .erp-avatar-color-10 {
-        background: linear-gradient(135deg, #6366f1, #ef4444);
-      }
-
-      .erp-customer-info h4 {
-        font-weight: 500;
-        margin-bottom: 4px;
-      }
-
-      .erp-customer-info p {
-        font-size: 13px;
-        color: var(--erp-muted);
-      }
-
-      /* BADGES */
-      .erp-badge {
-        padding: 8px 16px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        border: 1px solid transparent;
-      }
-
-      .erp-upi {
-        background: #facc1522;
-        color: #fde047;
-        border-color: rgba(250, 204, 21, 0.3);
-      }
-
-      .erp-cash {
-        background: #34d39922;
-        color: #34d399;
-        border-color: rgba(52, 211, 153, 0.3);
-      }
-
-      /* PAGINATION */
-      .erp-pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        padding: 24px;
-        border-top: 1px solid var(--erp-border);
-        background: rgba(255, 255, 255, 0.02);
-        flex-wrap: wrap;
-      }
-
-      .erp-pagination button {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: rgba(2, 6, 23, 0.8);
-        border: 1px solid var(--erp-border);
-        color: var(--erp-muted);
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .erp-pagination button:hover:not(.active) {
-        border-color: var(--erp-accent);
-        color: #fff;
-        transform: translateY(-2px);
-      }
-
-      .erp-pagination button.active {
-        background: linear-gradient(
-          135deg,
-          var(--erp-accent),
-          var(--erp-accent2)
-        );
-        color: #fff;
-        font-weight: 700;
-        border: none;
-        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-      }
-
-      .erp-pagination-info {
-        font-size: 14px;
-        color: var(--erp-muted);
-        margin: 0 16px;
-        white-space: nowrap;
-      }
-
-      /* Empty State */
-      .erp-empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        display: none;
-      }
-
-      .erp-empty-icon {
-        width: 80px;
-        height: 80px;
-        background: rgba(139, 92, 246, 0.1);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 24px;
-        font-size: 32px;
-        color: var(--erp-accent);
-      }
-
-      .erp-empty-state h3 {
-        font-size: 20px;
-        margin-bottom: 12px;
-        color: var(--erp-text);
-      }
-
-      .erp-empty-state p {
-        color: var(--erp-muted);
-        max-width: 400px;
-        margin: 0 auto 24px;
-      }
-
-      /* Toast Notification */
-      .erp-toast {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: linear-gradient(135deg, #0b1220, #020617);
-        border: 1px solid var(--erp-border);
-        border-left: 4px solid var(--erp-accent);
-        border-radius: 12px;
-        padding: 16px 24px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        transform: translateX(120%);
-        transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        z-index: 1000;
-        max-width: 350px;
-        box-shadow: var(--erp-hover-glow);
-      }
-
-      .erp-toast.show {
-        transform: translateX(0);
-      }
-
-      .erp-toast-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: rgba(139, 92, 246, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--erp-accent);
-      }
-
-      /* RESPONSIVE */
-      @media (max-width: 768px) {
-        .erp-body {
-          padding: 16px;
-        }
-
-        .erp-header {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 16px;
-        }
-
-        .erp-actions {
-          width: 100%;
-          justify-content: flex-start;
-        }
-
-        .erp-btn {
-          flex: 1;
-          min-width: 140px;
-          justify-content: center;
-        }
-
-        .erp-controls {
-          grid-template-columns: 1fr;
-          padding: 20px;
-        }
-
-        .erp-search-wrapper {
-          grid-column: 1;
-        }
-
-        .erp-card-order {
-          border-radius: 20px;
-        }
-
-        .erp-table {
-          display: block;
-          overflow-x: auto;
-          -webkit-overflow-scrolling: touch;
-        }
-
-        .erp-th,
-        .erp-td {
-          padding: 16px 18px;
-          min-width: 140px;
-        }
-
-        .erp-pagination {
-          padding: 20px;
-        }
-
-        .erp-pagination-info {
-          order: -1;
-          width: 100%;
-          text-align: center;
-          margin-bottom: 12px;
-        }
-
-        .erp-calendar-popup {
-          position: fixed;
-          transform: translate(-50%, -50%) scale(0.9);
-          min-width: 300px;
-          width: 90%;
-          max-width: 320px;
-        }
-
-        .erp-calendar-popup.show {
-          transform: translate(0%, -80%) scale(1);
-        }
-      }
-
-      @media (max-width: 480px) {
-        .erp-header h1 {
-          font-size: 24px;
-        }
-
-        .erp-btn {
-          min-width: 100%;
-        }
-
-        .erp-pagination button {
-          width: 40px;
-          height: 40px;
-        }
-      }
-
-      /* Animation for table rows */
-      @keyframes erp-fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .erp-tbody tr {
-        animation: erp-fadeIn 0.5s ease forwards;
-      }
-
-      /* Scrollbar Styling */
-      .erp-scrollbar::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-
-      .erp-scrollbar::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 4px;
-      }
-
-      .erp-scrollbar::-webkit-scrollbar-thumb {
-        background: linear-gradient(
-          135deg,
-          var(--erp-accent),
-          var(--erp-accent2)
-        );
-        border-radius: 4px;
-      }
-
-      .erp-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(
-          135deg,
-          var(--erp-accent2),
-          var(--erp-accent)
-        );
-      }
-
-      .erp-sort-indicator {
-        display: inline-block;
-        margin-left: 8px;
-        opacity: 0.5;
-        transition: transform 0.3s ease;
-      }
-
-      .erp-sort-indicator.active {
-        opacity: 1;
-        color: var(--erp-accent);
-      }
-
-      .erp-sort-indicator.asc {
-        transform: rotate(180deg);
-      }
-
-      .erp-loading {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top-color: var(--erp-accent);
-        animation: erp-spin 1s ease-in-out infinite;
-      }
-
-      @keyframes erp-spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-    </style>
-  </head>
-
-  <body class="erp-body">
-    <div class="erp-toast" id="erpToast">
-      <div class="erp-toast-icon">
-        <i class="fas fa-check"></i>
-      </div>
-      <div>
-        <div class="erp-toast-message" id="erpToastMessage">
-          Filters cleared successfully
-        </div>
-        <div class="erp-toast-time" id="erpToastTime">Just now</div>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Users — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --crimson: #7f0403; --crimson-mid: #a01e1d; --crimson-deep: #580202;
+      --gold: #b8860b; --gold-light: #d4a520;
+      --gold-pale: rgba(184,134,11,0.11); --gold-border: rgba(184,134,11,0.25);
+      --parchment: #f7f3ed; --parchment-2: #f0ebe3; --surface: #ffffff;
+      --ink: #1c1410; --ink-mid: #4a3c30; --ink-muted: #7a6a58; --ink-faint: #aa9988;
+      --border: rgba(184,134,11,0.18);
+      --green: #3a7a56; --green-pale: rgba(58,122,86,0.1);
+      --shadow-warm: 0 4px 28px rgba(127,4,3,0.07);
+      --shadow-deep: 0 16px 56px rgba(127,4,3,0.13);
+      --ease: cubic-bezier(0.4,0,0.2,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{
+      font-family:"Jost",sans-serif;background:var(--parchment);color:var(--ink);
+      font-size:14px;line-height:1.6;min-height:100vh;
+      background-image:
+        repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(184,134,11,0.04) 40px),
+        repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(184,134,11,0.03) 40px);
+    }
+    button{cursor:pointer;font-family:"Jost",sans-serif;}
+    input,select,textarea{font-family:"Jost",sans-serif;}
+
+    /* PAGE SHELL */
+    .page-shell{max-width:1360px;margin:0 auto;padding:36px 32px 80px;}
+    @media(max-width:600px){.page-shell{padding:18px 14px 60px;}}
+
+    .page-top{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:20px;
+      padding-bottom:22px;margin-bottom:28px;border-bottom:1px solid var(--border);
+      position:relative;flex-wrap:wrap;
+    }
+    .page-top::after{content:"";position:absolute;bottom:-1px;left:0;width:100px;height:2px;background:linear-gradient(90deg,var(--gold),transparent);}
+    .page-eyebrow{display:flex;align-items:center;gap:10px;font-size:10px;font-weight:600;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+    .page-eyebrow::before{content:"";display:block;width:20px;height:1px;background:var(--gold);}
+    .page-title{font-family:"Cormorant Garamond",serif;font-size:clamp(26px,4vw,44px);font-weight:700;color:var(--crimson);letter-spacing:.02em;line-height:1;}
+    .page-subtitle{font-size:12px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-muted);margin-top:6px;}
+    .page-top-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+    .count-pill{display:flex;align-items:center;gap:8px;padding:8px 18px;border:1px solid var(--gold-border);background:var(--gold-pale);}
+    .count-pill-num{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:700;color:var(--crimson);line-height:1;}
+    .count-pill-label{font-size:11px;font-weight:400;letter-spacing:.1em;color:var(--ink-muted);}
+    .btn-add{
+      display:inline-flex;align-items:center;gap:9px;padding:12px 24px;
+      background:var(--crimson);color:#fff;border:none;font-size:12px;font-weight:500;
+      letter-spacing:.08em;text-transform:uppercase;position:relative;overflow:hidden;
+      transition:background .22s var(--ease);white-space:nowrap;
+    }
+    .btn-add::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.07),transparent);}
+    .btn-add::after{content:"";position:absolute;bottom:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,var(--gold-light),var(--gold),var(--gold-light));}
+    .btn-add:hover{background:var(--crimson-mid);}
+
+    /* TOOLBAR */
+    .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+    .search-wrap{position:relative;flex:1;min-width:180px;}
+    .search-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--gold);font-size:12px;pointer-events:none;}
+    .search-wrap input{width:100%;padding:10px 12px 10px 36px;background:var(--surface);border:1px solid var(--border);color:var(--ink);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;}
+    .search-wrap input::placeholder{color:var(--ink-faint);font-size:12px;}
+    .search-wrap input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-pale);}
+    .filter-sel{
+      padding:10px 34px 10px 13px;background:var(--surface);border:1px solid var(--border);
+      color:var(--ink-mid);font-size:12.5px;outline:none;cursor:pointer;appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23b8860b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right 11px center;transition:border-color .2s;
+    }
+    .filter-sel:focus{border-color:var(--gold);}
+
+    /* ORNAMENT */
+    .orn{display:flex;align-items:center;gap:10px;margin:0 0 16px;}
+    .orn-line{flex:1;height:1px;background:var(--border);}
+    .orn-diamond{width:7px;height:7px;background:var(--gold);transform:rotate(45deg);flex-shrink:0;opacity:.65;}
+
+    /* TABLE */
+    .table-outer{
+      background:var(--surface);border:1px solid var(--border);
+      box-shadow:var(--shadow-warm),0 1px 0 rgba(184,134,11,.08);
+      overflow:hidden;position:relative;
+    }
+    
+    .scroll-hint{
+      display:none;align-items:center;justify-content:center;gap:6px;
+      padding:6px 16px;font-size:10.5px;letter-spacing:.08em;color:var(--ink-faint);
+      border-bottom:1px solid var(--border);background:rgba(184,134,11,.04);
+    }
+    .scroll-hint i{color:var(--gold);font-size:10px;animation:swipeHint 1.4s ease-in-out infinite;}
+    @keyframes swipeHint{0%,100%{transform:translateX(0);}50%{transform:translateX(5px);}}
+    @media(max-width:720px){.scroll-hint{display:flex;}}
+
+    .table-scroll{
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:thin;
+      scrollbar-color:var(--gold-border) transparent;
+    }
+    .table-scroll::-webkit-scrollbar{height:5px;}
+    .table-scroll::-webkit-scrollbar-track{background:var(--parchment-2);}
+    .table-scroll::-webkit-scrollbar-thumb{background:var(--gold-border);border-radius:3px;}
+
+    .users-table{width:100%;border-collapse:collapse;min-width:620px;}
+    .users-table thead tr{
+      border-bottom:2px solid var(--border);
+      background:linear-gradient(to right,rgba(184,134,11,.06),transparent);
+    }
+    .users-table th{
+      padding:13px 16px;text-align:left;font-size:9px;font-weight:600;
+      letter-spacing:.2em;text-transform:uppercase;color:var(--gold);white-space:nowrap;
+    }
+    .users-table th.th-r{text-align:right;}
+    .users-table tbody tr{
+      border-bottom:1px solid var(--border);
+      transition:background .15s var(--ease),box-shadow .15s;
+      animation:fadeUp .3s var(--ease) both;
+      cursor:pointer;
+    }
+    .users-table tbody tr:last-child{border-bottom:none;}
+    .users-table tbody tr:hover{background:var(--gold-pale);box-shadow:inset 3px 0 0 var(--gold);}
+    .users-table td{padding:14px 16px;font-size:13px;color:var(--ink-mid);vertical-align:middle;white-space:nowrap;transition:color .15s;}
+
+    .user-cell{display:flex;align-items:center;gap:13px;}
+    .avatar{
+      width:40px;height:40px;flex-shrink:0;
+      background:linear-gradient(145deg,var(--crimson-deep) 0%,var(--crimson) 100%);
+      display:flex;align-items:center;justify-content:center;
+      font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:700;color:#fff;
+      letter-spacing:.02em;
+      transition:opacity .18s;
+    }
+    .avatar.av-inactive{opacity:.45;filter:grayscale(.6);}
+    .u-name{font-weight:600;color:var(--ink);font-size:13.5px;line-height:1.2;transition:color .15s;}
+    .u-meta{display:flex;align-items:center;gap:6px;margin-top:3px;}
+    .u-id{font-size:10px;color:var(--ink-faint);}
+    .u-inactive-tag{
+      font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+      padding:1px 7px;background:rgba(180,50,50,.09);color:#b03030;
+      border:1px solid rgba(180,50,50,.18);
+    }
+    .role-badge{display:inline-flex;align-items:center;padding:3px 10px;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+    .role-admin{background:var(--crimson);color:#fff;}
+    .role-reseller{background:transparent;color:var(--gold);border:1px solid var(--gold-border);}
+    .role-customer{background:transparent;color:var(--ink-muted);border:1px solid rgba(122,106,88,.3);}
+    .orders-num{font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:700;color:var(--crimson);}
+    .orders-wrap{display:flex;align-items:baseline;gap:4px;}
+    .orders-sub{font-size:10px;color:var(--ink-faint);}
+    .users-table tbody tr:hover .u-name{color:var(--crimson);}
+    .act-cell{display:flex;align-items:center;justify-content:flex-end;gap:5px;}
+    .act-btn{
+      width:32px;height:32px;border:1px solid var(--border);background:var(--surface);
+      display:inline-flex;align-items:center;justify-content:center;
+      font-size:12px;color:var(--ink-muted);transition:all .18s var(--ease);
+    }
+    .act-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-pale);}
+    .act-btn.danger:hover{border-color:var(--crimson);color:var(--crimson);background:rgba(127,4,3,.06);}
+    .table-footer-hint{
+      display:flex;align-items:center;gap:6px;
+      padding:8px 16px;border-top:1px solid var(--border);
+      font-size:10.5px;color:var(--ink-faint);letter-spacing:.06em;
+      background:linear-gradient(to right,rgba(184,134,11,.03),transparent);
+    }
+    .table-footer-hint i{color:var(--gold);font-size:10px;}
+    .empty-state i{font-size:2.5rem;color:rgba(184,134,11,.25);margin-bottom:14px;display:block;}
+    .empty-state h3{font-family:"Cormorant Garamond",serif;font-size:20px;color:var(--ink-muted);margin-bottom:5px;}
+    .empty-state p{font-size:12.5px;color:var(--ink-faint);}
+
+    /* PAGINATION */
+    .pagination{display:flex;align-items:center;justify-content:space-between;margin-top:18px;flex-wrap:wrap;gap:10px;}
+    .pg-info{font-size:12px;color:var(--ink-faint);letter-spacing:.06em;}
+    .pg-btns{display:flex;gap:4px;}
+    .pg-btn{
+      min-width:34px;height:34px;padding:0 8px;border:1px solid var(--border);background:var(--surface);
+      display:inline-flex;align-items:center;justify-content:center;
+      font-size:12px;color:var(--ink-muted);transition:all .18s var(--ease);
+    }
+    .pg-btn:hover,.pg-btn.active{border-color:var(--gold);color:var(--crimson);background:var(--gold-pale);}
+    .pg-btn:disabled{opacity:.35;pointer-events:none;}
+
+    /* OVERLAY + DRAWERS */
+    .overlay{
+      position:fixed;inset:0;background:rgba(28,20,16,.52);z-index:800;
+      opacity:0;pointer-events:none;transition:opacity .28s var(--ease);backdrop-filter:blur(3px);
+    }
+    .overlay.open{opacity:1;pointer-events:all;}
+    .drawer{
+      position:fixed;top:0;right:0;bottom:0;width:480px;max-width:100vw;
+      background:var(--surface);z-index:900;display:flex;flex-direction:column;
+      transform:translateX(110%);transition:transform .32s var(--ease);
+      box-shadow:-8px 0 40px rgba(127,4,3,.14);
+    }
+    .drawer.open{transform:translateX(0);}
+    .drawer.wide{width:640px;}
+    .drawer-head{
+      padding:22px 26px 18px;border-bottom:1px solid var(--border);
+      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+      background:linear-gradient(to right,rgba(184,134,11,.05),transparent);
+      position:relative;flex-shrink:0;
+    }
+    .drawer-head::before{content:"";position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--crimson),var(--gold),transparent);}
+    .d-eyebrow{font-size:9px;font-weight:600;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+    .d-title{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:700;color:var(--crimson);}
+    .d-close{
+      width:32px;height:32px;border:1px solid var(--border);background:transparent;
+      display:flex;align-items:center;justify-content:center;color:var(--ink-muted);
+      font-size:13px;transition:all .18s;flex-shrink:0;
+    }
+    .d-close:hover{border-color:var(--crimson);color:var(--crimson);}
+    .drawer-body{
+      flex:1;overflow-y:auto;padding:20px 26px;
+      display:flex;flex-direction:column;gap:16px;
+      scrollbar-width:thin;scrollbar-color:var(--gold-border) transparent;
+    }
+    .drawer-body::-webkit-scrollbar{width:4px;}
+    .drawer-body::-webkit-scrollbar-thumb{background:var(--gold-border);}
+    .drawer-foot{padding:14px 26px 20px;border-top:1px solid var(--border);display:flex;gap:10px;background:var(--parchment);flex-shrink:0;}
+    .btn-save{
+      flex:1;padding:12px;background:var(--crimson);color:#fff;border:none;
+      font-size:12.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+      position:relative;overflow:hidden;transition:background .22s;
+    }
+    .btn-save::after{content:"";position:absolute;bottom:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,var(--gold-light),var(--gold),var(--gold-light));}
+    .btn-save:hover{background:var(--crimson-mid);}
+    .btn-cancel{padding:12px 22px;background:transparent;color:var(--ink-muted);border:1px solid var(--border);font-size:12.5px;letter-spacing:.06em;transition:all .18s;}
+    .btn-cancel:hover{border-color:var(--gold);color:var(--ink);}
+
+    /* FORM */
+    .form-sec{border:1px solid var(--border);padding:18px 20px 14px;}
+    .form-sec-title{
+      font-size:9.5px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+      color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px;
+    }
+    .form-sec-title::after{content:"";flex:1;height:1px;background:var(--border);}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;}
+    @media(max-width:520px){.field-row{grid-template-columns:1fr;}}
+    .field{margin-bottom:12px;}
+    .field label{display:block;font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:5px;}
+    .field input,.field select{
+      width:100%;padding:10px 12px;background:var(--parchment);border:1px solid var(--border);
+      color:var(--ink);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;appearance:none;
+    }
+    .field select{
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23b8860b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right 11px center;padding-right:32px;background-color:var(--parchment);
+    }
+    .field input:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-pale);background:var(--surface);}
+    .field input::placeholder{color:var(--ink-faint);font-size:12px;}
+
+    /* VIEW DRAWER — profile hero */
+    .profile-hero{
+      background:linear-gradient(135deg,var(--crimson-deep),var(--crimson) 60%,var(--crimson-mid));
+      padding:22px 26px;display:flex;align-items:center;gap:16px;
+      position:relative;overflow:hidden;flex-shrink:0;
+    }
+    .profile-hero::after{
+      content:"";position:absolute;right:-24px;top:-24px;
+      width:130px;height:130px;border:1px solid rgba(184,134,11,.2);transform:rotate(15deg);pointer-events:none;
+    }
+    .ph-avatar{
+      width:72px;height:72px;flex-shrink:0;
+      background:rgba(255,255,255,.16);
+      border:1.5px solid rgba(184,134,11,.35);
+      display:flex;align-items:center;justify-content:center;
+      font-family:"Cormorant Garamond",serif;font-size:28px;font-weight:700;color:#fff;
+    }
+    .ph-avatar.av-inactive{opacity:.55;filter:grayscale(.5);}
+    .ph-info{flex:1;min-width:0;}
+    .ph-name{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:700;color:#fff;line-height:1.2;word-break:break-word;}
+    .ph-email{font-size:11.5px;color:rgba(255,255,255,.62);margin-top:3px;word-break:break-all;}
+    .ph-status-line{display:flex;align-items:center;gap:8px;margin-top:12px;}
+    .ph-role-tag{
+      font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+      padding:4px 12px;background:var(--gold);color:#fff;
+    }
+    .ph-status-tag{
+      font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+      padding:4px 12px;color:#fff;border:1px solid rgba(255,255,255,.25);
+      background:rgba(255,255,255,.1);
+    }
+    .ph-status-tag.st-active{color:#a8ffca;border-color:rgba(80,220,130,.3);background:rgba(58,122,86,.25);}
+    .ph-status-tag.st-inactive{color:#ffb0b0;border-color:rgba(220,80,80,.3);background:rgba(160,40,40,.25);}
+    .ph-order-count{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-left:auto;}
+
+    /* Tab nav */
+    .tab-nav{
+      display:flex;border-bottom:2px solid var(--border);flex-shrink:0;
+      overflow-x:auto;scrollbar-width:none;
+    }
+    .tab-nav::-webkit-scrollbar{display:none;}
+    .tab-btn{
+      padding:11px 18px;font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+      border:none;background:transparent;color:var(--ink-muted);cursor:pointer;
+      border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;
+      transition:all .18s;
+    }
+    .tab-btn:hover{color:var(--gold);}
+    .tab-btn.active{color:var(--crimson);border-bottom-color:var(--crimson);}
+
+    /* Scrollable tab content */
+    .tab-content{
+      flex:1;overflow-y:auto;padding:20px 26px;display:flex;flex-direction:column;gap:16px;
+      scrollbar-width:thin;scrollbar-color:var(--gold-border) transparent;
+    }
+    .tab-content::-webkit-scrollbar{width:4px;}
+    .tab-content::-webkit-scrollbar-thumb{background:var(--gold-border);}
+
+    /* Section header */
+    .sec-hd{
+      font-size:9.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+      color:var(--gold);display:flex;align-items:center;gap:8px;margin-bottom:10px;
+    }
+    .sec-hd::after{content:"";flex:1;height:1px;background:var(--border);}
+
+    /* Detail list */
+    .detail-list{border:1px solid var(--border);}
+    .d-row{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;}
+    .d-row:last-child{border-bottom:none;}
+    .d-row i{color:var(--gold);width:14px;text-align:center;font-size:11px;flex-shrink:0;margin-top:2px;}
+    .d-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);width:74px;flex-shrink:0;margin-top:2px;}
+    .d-val{color:var(--ink-mid);font-size:12.5px;word-break:break-word;flex:1;}
+    .d-val.nil{color:var(--ink-faint);font-style:italic;font-size:12px;}
+
+    /* ════════════════════════════════
+       NEW PROFILE TAB COMPONENTS
+       ════════════════════════════════ */
+
+    /* Metrics strip */
+    .prof-metrics{
+      display:flex;align-items:stretch;
+      border:1px solid var(--gold-border);
+      background:linear-gradient(135deg,var(--parchment),var(--parchment-2));
+      overflow:hidden;
+      position:relative;
+    }
+    .prof-metrics::before{
+      content:"";position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,var(--gold),var(--crimson),var(--gold));
+    }
+    .prof-metric{
+      flex:1;display:flex;align-items:center;gap:12px;
+      padding:16px 14px;
+    }
+    .prof-metric-div{width:1px;background:var(--gold-border);align-self:stretch;margin:10px 0;}
+    .pm-icon{
+      width:36px;height:36px;flex-shrink:0;
+      background:linear-gradient(135deg,var(--crimson-deep),var(--crimson));
+      display:flex;align-items:center;justify-content:center;
+      font-size:12px;color:rgba(255,255,255,.85);
+    }
+    .pm-content{}
+    .pm-num{
+      font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:700;
+      color:var(--crimson);line-height:1;
+    }
+    .pm-lbl{
+      font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--ink-faint);margin-top:2px;
+    }
+
+    /* Two-column info cards */
+    .prof-cards-grid{
+      display:grid;grid-template-columns:1fr 1fr;gap:12px;
+    }
+    @media(max-width:520px){.prof-cards-grid{grid-template-columns:1fr;}}
+    .prof-card{
+      border:1px solid var(--border);background:var(--surface);
+      overflow:hidden;
+    }
+    .prof-card-head{
+      display:flex;align-items:center;gap:8px;
+      padding:10px 14px;
+      background:linear-gradient(to right,rgba(184,134,11,.07),transparent);
+      border-bottom:1px solid var(--border);
+      font-size:9.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);
+    }
+    .prof-card-head i{font-size:11px;}
+    .prof-card-body{padding:4px 0;}
+    .pc-row{
+      display:flex;align-items:center;gap:12px;
+      padding:11px 14px;border-bottom:1px solid var(--border);
+    }
+    .pc-row:last-child{border-bottom:none;}
+    .pc-icon{
+      width:30px;height:30px;flex-shrink:0;
+      border:1px solid var(--gold-border);background:var(--gold-pale);
+      display:flex;align-items:center;justify-content:center;
+      font-size:11px;color:var(--gold);
+    }
+    .pc-label{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);line-height:1;}
+    .pc-value{font-size:13px;color:var(--ink-mid);font-weight:500;margin-top:3px;line-height:1.2;}
+    .pc-value.nil{color:var(--ink-faint);font-style:italic;font-size:12px;}
+
+    /* Address cards */
+    .addr-card{border:1px solid var(--border);padding:13px 15px;background:var(--parchment);position:relative;}
+    .addr-card.dflt{border-color:var(--gold-border);background:var(--gold-pale);}
+    .addr-dflt-tag{position:absolute;top:10px;right:10px;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;background:var(--gold);color:#fff;}
+    .addr-line{font-size:12.5px;color:var(--ink-mid);line-height:1.75;}
+    .addr-ph{font-size:11.5px;color:var(--ink-muted);margin-top:5px;display:flex;align-items:center;gap:5px;}
+    .addr-ph i{color:var(--gold);font-size:10px;}
+
+    /* Order cards */
+    .order-card{border:1px solid var(--border);background:var(--surface);}
+    .order-head{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
+      padding:12px 14px;background:var(--parchment);border-bottom:1px solid var(--border);flex-wrap:wrap;
+    }
+    .o-num{font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:700;color:var(--crimson);}
+    .o-date{font-size:11px;color:var(--ink-faint);margin-top:2px;}
+    .o-badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+    .o-status{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;}
+    .os-placed{background:rgba(184,134,11,.15);color:var(--gold);}
+    .os-processing{background:rgba(58,90,180,.1);color:#3a5ab4;}
+    .os-shipped{background:rgba(100,60,160,.1);color:#6428aa;}
+    .os-delivered{background:var(--green-pale);color:var(--green);}
+    .os-cancelled{background:rgba(127,4,3,.08);color:var(--crimson);}
+    .pay-badge{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;}
+    .pp-paid{background:var(--green-pale);color:var(--green);}
+    .pp-pending{background:rgba(184,134,11,.12);color:var(--gold);}
+    .pp-failed{background:rgba(127,4,3,.08);color:var(--crimson);}
+    .pp-refunded{background:rgba(100,100,100,.1);color:var(--ink-muted);}
+    .order-items{padding:10px 14px;display:flex;flex-direction:column;gap:7px;}
+    .o-item{display:flex;align-items:center;gap:10px;font-size:12.5px;}
+    .o-img-ph{width:38px;height:38px;background:var(--parchment-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;color:rgba(184,134,11,.3);flex-shrink:0;}
+    .o-iname{flex:1;color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .o-isku{font-size:10.5px;color:var(--ink-faint);}
+    .o-iqty{font-size:11px;color:var(--ink-faint);flex-shrink:0;}
+    .o-iprice{font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:700;color:var(--crimson);flex-shrink:0;}
+    .ship-row{
+      padding:10px 14px;border-top:1px solid var(--border);background:rgba(184,134,11,.03);
+      font-size:11.5px;color:var(--ink-muted);display:flex;align-items:flex-start;gap:8px;
+    }
+    .ship-row i{color:var(--gold);font-size:11px;margin-top:2px;flex-shrink:0;}
+    .order-foot{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 14px;border-top:1px solid var(--border);background:var(--parchment);flex-wrap:wrap;gap:6px;
+    }
+    .o-pricing-detail{font-size:11px;color:var(--ink-faint);}
+    .o-total-val{font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:700;color:var(--crimson);}
+
+    /* stats-row (orders tab) */
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    .stat-box{border:1px solid var(--border);background:var(--parchment);padding:14px 10px;text-align:center;}
+    .stat-num{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:700;color:var(--crimson);line-height:1;}
+    .stat-lbl{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-top:4px;}
+
+    /* No data */
+    .no-data{text-align:center;padding:28px 20px;border:1px solid var(--border);background:var(--parchment);}
+    .no-data i{font-size:2rem;color:rgba(184,134,11,.2);margin-bottom:10px;display:block;}
+    .no-data p{font-size:12.5px;color:var(--ink-faint);line-height:1.7;}
+
+    /* DELETE MODAL */
+    .modal-overlay{
+      position:fixed;inset:0;background:rgba(28,20,16,.55);z-index:1000;
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity .22s var(--ease);backdrop-filter:blur(4px);
+    }
+    .modal-overlay.open{opacity:1;pointer-events:all;}
+    .modal{
+      background:var(--surface);width:340px;max-width:90vw;position:relative;
+      transform:scale(.92) translateY(16px);transition:transform .24s var(--ease);
+      box-shadow:var(--shadow-deep);
+    }
+    .modal-overlay.open .modal{transform:scale(1) translateY(0);}
+    .modal::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--crimson),var(--crimson-mid),transparent);}
+    .modal-body{padding:28px 24px 20px;text-align:center;}
+    .modal-ico{width:52px;height:52px;border:1px solid rgba(127,4,3,.2);background:rgba(127,4,3,.06);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:1.1rem;color:var(--crimson);}
+    .modal-body h3{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+    .modal-body p{font-size:12.5px;color:var(--ink-muted);line-height:1.6;}
+    .modal-foot{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);}
+    .modal-foot button{padding:13px;border:none;font-size:12.5px;font-weight:500;letter-spacing:.06em;cursor:pointer;transition:background .18s;}
+    .m-cancel{background:var(--parchment);color:var(--ink-muted);border-right:1px solid var(--border)!important;}
+    .m-cancel:hover{background:var(--parchment-2);}
+    .m-del{background:var(--crimson);color:#fff;}
+    .m-del:hover{background:var(--crimson-mid);}
+
+    /* TOAST */
+    .toast-wrap{position:fixed;bottom:24px;right:20px;z-index:2000;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+    .toast{
+      display:flex;align-items:center;gap:10px;padding:12px 16px;
+      background:var(--ink);color:#fff;font-size:12.5px;letter-spacing:.04em;
+      min-width:220px;max-width:320px;pointer-events:all;
+      transform:translateX(120%);animation:toastIn .3s var(--ease) forwards;position:relative;overflow:hidden;
+    }
+    .toast::after{content:"";position:absolute;bottom:0;left:0;right:0;height:2px;}
+    .toast.success::after{background:var(--green);}
+    .toast.error::after{background:var(--crimson);}
+    .toast i{font-size:13px;flex-shrink:0;}
+    .toast.success i{color:#4ec27a;}
+    .toast.error i{color:#ff7070;}
+    @keyframes toastIn{to{transform:translateX(0);}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  </style>
+</head>
+<body>
+
+<div class="page-shell">
+  <div class="page-top">
+    <div>
+      <div class="page-eyebrow">Admin Panel</div>
+      <h1 class="page-title">Users</h1>
+      <p class="page-subtitle">Manage accounts, roles &amp; permissions</p>
     </div>
-
-    <!-- Calendar Popup -->
-    <div class="erp-calendar-popup" id="erpCalendarPopup">
-      <div class="erp-calendar-header">
-        <div class="erp-calendar-nav">
-          <button id="erpPrevMonth"><i class="fas fa-chevron-left"></i></button>
-          <button id="erpNextMonth">
-            <i class="fas fa-chevron-right"></i>
-          </button>
-        </div>
-        <div class="erp-calendar-title" id="erpCalendarTitle">April 2024</div>
+    <div class="page-top-right">
+      <div class="count-pill">
+        <span class="count-pill-num" id="totalCount">0</span>
+        <span class="count-pill-label">Total<br>Members</span>
       </div>
-      <div class="erp-calendar-grid" id="erpCalendarDays">
-        <!-- Day headers -->
-        <div class="erp-calendar-day">Sun</div>
-        <div class="erp-calendar-day">Mon</div>
-        <div class="erp-calendar-day">Tue</div>
-        <div class="erp-calendar-day">Wed</div>
-        <div class="erp-calendar-day">Thu</div>
-        <div class="erp-calendar-day">Fri</div>
-        <div class="erp-calendar-day">Sat</div>
-      </div>
-      <div class="erp-calendar-grid" id="erpCalendarDates">
-        <!-- Dates will be populated by JavaScript -->
-      </div>
-      <div class="erp-calendar-actions">
-        <button class="cancel-btn" id="erpCancelDate">Cancel</button>
-        <button class="apply-btn" id="erpApplyDate">Apply Date</button>
-      </div>
+      <button class="btn-add" onclick="openAddDrawer()">
+        <i class="fa-solid fa-plus"></i> Add User
+      </button>
     </div>
+  </div>
 
-    <div class="erp-header">
-      <h1><i class="fas fa-cube"></i> ERP Orders</h1>
-      <div class="erp-actions">
-        <button class="erp-btn" id="erpClearBtn">
-          <i class="fas fa-broom"></i> Clear Filters
-        </button>
-        <button class="erp-btn erp-primary" id="erpExportBtn">
-          <i class="fas fa-download"></i> Export
-        </button>
-        <button class="erp-btn" id="erpRefreshBtn">
-          <i class="fas fa-sync-alt"></i> Refresh
-        </button>
-      </div>
+  <div class="toolbar">
+    <div class="search-wrap">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="searchInput" placeholder="Search by name or email…" oninput="applyFilters()" />
     </div>
+    <select class="filter-sel" id="roleFilter" onchange="applyFilters()">
+      <option value="">All Roles</option>
+      <option value="admin">Admin</option>
+      <option value="reseller">Reseller</option>
+      <option value="customer">Customer</option>
+    </select>
+    <select class="filter-sel" id="sortFilter" onchange="applyFilters()">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="name">Name A–Z</option>
+      <option value="orders">Most Orders</option>
+    </select>
+  </div>
 
-    <div class="erp-controls">
-      <div class="erp-search-wrapper">
-        <i class="fas fa-search"></i>
-        <input
-          id="erpSearch"
-          placeholder="Search by Order ID, customer name, items..."
-        />
-      </div>
+  <div class="orn"><div class="orn-line"></div><div class="orn-diamond"></div><div class="orn-line"></div></div>
 
-      <div class="erp-filter-group">
-        <label class="erp-filter-label">Payment Method</label>
-        <select id="erpPayment">
-          <option value="">All Payments</option>
-          <option value="upi">UPI</option>
-          <option value="cash">Cash</option>
-        </select>
-      </div>
-
-      <div class="erp-filter-group erp-calendar-container">
-        <label class="erp-filter-label">Start Date</label>
-        <div class="erp-date-wrapper">
-          <i class="fas fa-calendar-alt"></i>
-          <input
-            type="text"
-            id="erpStartDate"
-            readonly
-            placeholder="Select start date"
-          />
-        </div>
-      </div>
-
-      <div class="erp-filter-group erp-calendar-container">
-        <label class="erp-filter-label">End Date</label>
-        <div class="erp-date-wrapper">
-          <i class="fas fa-calendar-alt"></i>
-          <input
-            type="text"
-            id="erpEndDate"
-            readonly
-            placeholder="Select end date"
-          />
-        </div>
-      </div>
-
-      <div class="erp-filter-group">
-        <label class="erp-filter-label">Min Amount</label>
-        <input type="number" id="erpMin" placeholder="₹ Minimum" min="0" />
-      </div>
-
-      <div class="erp-filter-group">
-        <label class="erp-filter-label">Max Amount</label>
-        <input type="number" id="erpMax" placeholder="₹ Maximum" min="0" />
-      </div>
-    </div>
-
-    <div class="erp-card">
-      <table class="erp-table">
+  <div class="table-outer">
+    <div class="scroll-hint"><i class="fa-solid fa-arrow-right"></i>&nbsp; Swipe to see all columns</div>
+    <div class="table-scroll">
+      <table class="users-table">
         <thead>
           <tr>
-            <th data-erp-sort="id">Order ID</th>
-            <th data-erp-sort="n">Customer</th>
-            <th data-erp-sort="i">Items</th>
-            <th data-erp-sort="t">Total</th>
-            <th data-erp-sort="p">Payment</th>
-            <th data-erp-sort="timestamp">Date</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Phone</th>
+            <th>Orders</th>
+            <th>Joined</th>
+            <th class="th-r">Actions</th>
           </tr>
         </thead>
-        <tbody id="erpTbody" class="erp-tbody">
-          <!-- Orders will be loaded here -->
-        </tbody>
+        <tbody id="usersBody"></tbody>
       </table>
-
-      <!-- Empty State -->
-      <div class="erp-empty-state" id="erpEmptyState">
-        <div class="erp-empty-icon">
-          <i class="fas fa-inbox"></i>
-        </div>
-        <h3>No Orders Found</h3>
-        <p>
-          Try adjusting your filters or search terms to find what you're looking
-          for.
-        </p>
-        <button class="erp-btn" id="erpClearAllBtn">
-          <i class="fas fa-times"></i> Clear All Filters
-        </button>
-      </div>
-
-      <div class="erp-pagination" id="erpPages">
-        <div class="erp-pagination-info" id="erpPageInfo">
-          Loading orders...
-        </div>
+      <div class="empty-state" id="emptyState">
+        <i class="fa-solid fa-users-slash"></i>
+        <h3>No users found</h3>
+        <p>Try adjusting your search or filters</p>
       </div>
     </div>
+    <div class="table-footer-hint">
+      <i class="fa-regular fa-hand-pointer"></i> Click any row to view full profile
+    </div>
+  </div>
 
-    <script>
-      // Enhanced sample data with MongoDB-like IDs and timestamps
-      const erpSampleData = [
-        {
-          id: "6973111a1da6214ab5575bcb",
-          n: "Rakesh Sharma",
-          email: "rakesh@example.com",
-          i: "Sony Headset ×1, HP Mouse ×2",
-          t: 2520,
-          p: "upi",
-          d: "2024-04-07T19:15:00",
-          timestamp: 1712484900000,
-        },
-        {
-          id: "6973111a1da6214ab5575bcc",
-          n: "Ragu Patil",
-          email: "ragu@example.com",
-          i: "HP Mouse ×3",
-          t: 5045,
-          p: "cash",
-          d: "2024-04-07T11:13:00",
-          timestamp: 1712484780000,
-        },
-        {
-          id: "6973111a1da6214ab5575bcd",
-          n: "Priya Verma",
-          email: "priya@example.com",
-          i: "Keyboard ×1",
-          t: 3820,
-          p: "upi",
-          d: "2024-04-06T15:45:00",
-          timestamp: 1712403900000,
-        },
-        {
-          id: "6973111a1da6214ab5575bce",
-          n: "Amit Singh",
-          email: "amit@example.com",
-          i: "USB Cable ×3",
-          t: 1750,
-          p: "cash",
-          d: "2024-04-06T10:20:00",
-          timestamp: 1712377200000,
-        },
-        {
-          id: "6973111a1da6214ab5575bcf",
-          n: "Sanjay Kumar",
-          email: "sanjay@example.com",
-          i: "Gaming Mouse ×2",
-          t: 8990,
-          p: "upi",
-          d: "2024-04-05T17:30:00",
-          timestamp: 1712313000000,
-        },
-        {
-          id: "6973111a1da6214ab5575bd0",
-          n: "Kavita Reddy",
-          email: "kavita@example.com",
-          i: "Bluetooth Speaker ×1",
-          t: 4230,
-          p: "cash",
-          d: "2024-04-05T13:15:00",
-          timestamp: 1712299500000,
-        },
-        {
-          id: "6973111a1da6214ab5575bd1",
-          n: "Vikram Joshi",
-          email: "vikram@example.com",
-          i: "Monitor ×1, Keyboard ×1",
-          t: 18500,
-          p: "upi",
-          d: "2024-04-04T09:45:00",
-          timestamp: 1712213100000,
-        },
-        {
-          id: "6973111a1da6214ab5575bd2",
-          n: "Neha Gupta",
-          email: "neha@example.com",
-          i: "Mousepad ×2, USB Hub ×1",
-          t: 1250,
-          p: "cash",
-          d: "2024-04-04T14:20:00",
-          timestamp: 1712200800000,
-        },
-        {
-          id: "6973111a1da6214ab5575bd3",
-          n: "Rajesh Nair",
-          email: "rajesh@example.com",
-          i: "Laptop Stand ×1",
-          t: 3200,
-          p: "upi",
-          d: "2024-04-03T16:10:00",
-          timestamp: 1712139000000,
-        },
-        {
-          id: "6973111a1da6214ab5575bd4",
-          n: "Sneha Desai",
-          email: "sneha@example.com",
-          i: "Wireless Charger ×3",
-          t: 5400,
-          p: "cash",
-          d: "2024-04-03T11:30:00",
-          timestamp: 1712125800000,
-        },
-        {
-          id: "6973111a1da6214ab5575bd5",
-          n: "Manoj Tiwari",
-          email: "manoj@example.com",
-          i: "External SSD ×1",
-          t: 7500,
-          p: "upi",
-          d: "2024-04-02T13:15:00",
-          timestamp: 1712049300000,
-        },
-        {
-          id: "6973111a1da6214ab5575bd6",
-          n: "Anjali Kapoor",
-          email: "anjali@example.com",
-          i: "Webcam ×1, Mic ×1",
-          t: 6800,
-          p: "cash",
-          d: "2024-04-01T10:05:00",
-          timestamp: 1711962300000,
-        },
-        {
-          id: "6973111a1da6214ab5575bd7",
-          n: "Pradeep Mehta",
-          email: "pradeep@example.com",
-          i: "Tablet ×1",
-          t: 24500,
-          p: "upi",
-          d: "2024-03-31T14:30:00",
-          timestamp: 1711873800000,
-        },
-        {
-          id: "6973111a1da6214ab5575bd8",
-          n: "Swati Choudhary",
-          email: "swati@example.com",
-          i: "Smart Watch ×2",
-          t: 15900,
-          p: "cash",
-          d: "2024-03-30T16:45:00",
-          timestamp: 1711795500000,
-        },
-        {
-          id: "6973111a1da6214ab5575bd9",
-          n: "Deepak Yadav",
-          email: "deepak@example.com",
-          i: "Laptop Bag ×1",
-          t: 2800,
-          p: "upi",
-          d: "2024-03-29T09:20:00",
-          timestamp: 1711696800000,
-        },
-      ];
+  <div class="pagination">
+    <div class="pg-info" id="pgInfo"></div>
+    <div class="pg-btns" id="pgBtns"></div>
+  </div>
+</div>
 
-      // Global variables
-      let erpCurrentPage = 1;
-      const erpItemsPerPage = 8;
-      let erpCurrentData = [...erpSampleData];
-      let erpSortConfig = { key: null, direction: "asc" };
-      let erpCalendarActiveInput = null;
-      let erpCurrentMonth = new Date().getMonth();
-      let erpCurrentYear = new Date().getFullYear();
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
 
-      // DOM Elements
-      const erpTbody = document.getElementById("erpTbody");
-      const erpEmptyState = document.getElementById("erpEmptyState");
-      const erpPages = document.getElementById("erpPages");
-      const erpPageInfo = document.getElementById("erpPageInfo");
-      const erpToast = document.getElementById("erpToast");
-      const erpToastMessage = document.getElementById("erpToastMessage");
-      const erpToastTime = document.getElementById("erpToastTime");
-      const erpCalendarPopup = document.getElementById("erpCalendarPopup");
-      const erpCalendarDates = document.getElementById("erpCalendarDates");
-      const erpCalendarTitle = document.getElementById("erpCalendarTitle");
-      const erpPrevMonthBtn = document.getElementById("erpPrevMonth");
-      const erpNextMonthBtn = document.getElementById("erpNextMonth");
-      const erpApplyDateBtn = document.getElementById("erpApplyDate");
-      const erpCancelDateBtn = document.getElementById("erpCancelDate");
+<!-- ADD/EDIT DRAWER -->
+<div class="drawer" id="editDrawer">
+  <div class="drawer-head">
+    <div>
+      <div class="d-eyebrow" id="editEyebrow">New Record</div>
+      <div class="d-title" id="editTitle">Add User</div>
+    </div>
+    <button class="d-close" onclick="closeAll()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="drawer-body">
+    <div class="form-sec">
+      <div class="form-sec-title">Personal Info</div>
+      <div class="field-row">
+        <div class="field"><label>First Name *</label><input id="f_first" placeholder="e.g. John" /></div>
+        <div class="field"><label>Last Name</label><input id="f_last" placeholder="e.g. Doe" /></div>
+      </div>
+      <div class="field"><label>Email Address *</label><input type="email" id="f_email" placeholder="user@example.com" /></div>
+      <div class="field">
+        <label>Phone <em style="font-size:9px;color:var(--ink-faint);text-transform:none;letter-spacing:0;font-style:normal;">(10 digits — optional)</em></label>
+        <input type="tel" id="f_phone" placeholder="9876543210" maxlength="10" />
+      </div>
+    </div>
+    <div class="form-sec">
+      <div class="form-sec-title">Account Settings</div>
+      <div class="field-row">
+        <div class="field">
+          <label>Role</label>
+          <select id="f_role">
+            <option value="customer">Customer</option>
+            <option value="reseller">Reseller</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="f_status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" id="passWrap">
+        <label>Password *</label>
+        <input type="password" id="f_pass" placeholder="Min 8 characters" />
+      </div>
+    </div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn-cancel" onclick="closeAll()">Cancel</button>
+    <button class="btn-save" onclick="saveUser()"><i class="fa-solid fa-check" style="margin-right:6px;font-size:11px;"></i>Save User</button>
+  </div>
+</div>
 
-      // Filter elements
-      const erpSearchInput = document.getElementById("erpSearch");
-      const erpPaymentSelect = document.getElementById("erpPayment");
-      const erpStartDateInput = document.getElementById("erpStartDate");
-      const erpEndDateInput = document.getElementById("erpEndDate");
-      const erpMinAmountInput = document.getElementById("erpMin");
-      const erpMaxAmountInput = document.getElementById("erpMax");
+<!-- VIEW DRAWER (tabbed) -->
+<div class="drawer wide" id="viewDrawer">
+  <div class="drawer-head">
+    <div>
+      <div class="d-eyebrow">Member Profile</div>
+      <div class="d-title" id="vd_name">User</div>
+    </div>
+    <button class="d-close" onclick="closeAll()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div id="vd_hero"></div>
+  <div class="tab-nav" id="vd_tabs">
+    <button class="tab-btn active" onclick="switchTab('profile',this)">Profile</button>
+    <button class="tab-btn" onclick="switchTab('address',this)">Addresses</button>
+    <button class="tab-btn" onclick="switchTab('orders',this)">Order History</button>
+  </div>
+  <div class="tab-content" id="vd_body"></div>
+  <div class="drawer-foot">
+    <button class="btn-cancel" onclick="closeAll()">Close</button>
+    <button class="btn-save" onclick="editFromView()"><i class="fa-solid fa-pen" style="margin-right:6px;font-size:11px;"></i>Edit User</button>
+  </div>
+</div>
 
-      // Button elements
-      const erpClearBtn = document.getElementById("erpClearBtn");
-      const erpExportBtn = document.getElementById("erpExportBtn");
-      const erpRefreshBtn = document.getElementById("erpRefreshBtn");
-      const erpClearAllBtn = document.getElementById("erpClearAllBtn");
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="delModal">
+  <div class="modal">
+    <div class="modal-body">
+      <div class="modal-ico"><i class="fa-solid fa-trash-can"></i></div>
+      <h3>Remove User?</h3>
+      <p>This is permanent. <strong id="delName"></strong> will be deleted along with all their data.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="m-cancel" onclick="closeDel()">Cancel</button>
+      <button class="m-del" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
 
-      // Initialize
-      document.addEventListener("DOMContentLoaded", () => {
-        erpRenderTable();
-        erpSetupEventListeners();
-        erpUpdatePagination();
-        erpGenerateCalendar();
-      });
+<div class="toast-wrap" id="toastWrap"></div>
 
-      // Event Listeners Setup
-      function erpSetupEventListeners() {
-        // Search and filter inputs
-        erpSearchInput.addEventListener("input", () => {
-          erpCurrentPage = 1;
-          erpApplyFilters();
-        });
+<script>
+/* MOCK DATA */
+let users = [
+  {
+    _id:"u1", name:"Admin User", email:"admin@example.com", phone:"9876500001",
+    role:"admin", isVerified:true, active:true, joined:"2026-01-29",
+    loginAttempts:0,
+    addresses:[
+      {addressLine1:"12 Palace Road",addressLine2:"Near Central Park",city:"Chennai",state:"Tamil Nadu",pincode:"600001",phone:"9876500001",isDefault:true}
+    ]
+  },
+  {
+    _id:"u2", name:"gfdfd", email:"h@gmail.com", phone:"",
+    role:"reseller", isVerified:false, active:true, joined:"2026-01-29",
+    loginAttempts:0, addresses:[]
+  },
+  {
+    _id:"u3", name:"g4tg", email:"rtrthe@gmail.com", phone:"",
+    role:"customer", isVerified:false, active:true, joined:"2026-01-30",
+    loginAttempts:0, addresses:[]
+  },
+  {
+    _id:"u4", name:"MOHAMMED RIFATH M", email:"m.rifath1711@gmail.com", phone:"9988776655",
+    role:"customer", isVerified:true, active:true, joined:"2026-01-30",
+    loginAttempts:0,
+    addresses:[
+      {addressLine1:"45 Gandhi Street",addressLine2:"",city:"Madurai",state:"Tamil Nadu",pincode:"625001",phone:"9988776655",isDefault:true},
+      {addressLine1:"Old House, 3rd Cross",addressLine2:"Bypass Road",city:"Coimbatore",state:"Tamil Nadu",pincode:"641001",phone:"9900112233",isDefault:false}
+    ]
+  },
+  {
+    _id:"u5", name:"pooja", email:"poojaavaisshanv@gmail.com", phone:"9123456789",
+    role:"customer", isVerified:true, active:true, joined:"2026-01-31",
+    loginAttempts:0,
+    addresses:[
+      {addressLine1:"22 Rose Avenue",addressLine2:"",city:"Bangalore",state:"Karnataka",pincode:"560001",phone:"9123456789",isDefault:true}
+    ]
+  },
+  {
+    _id:"u6", name:"Nandhu", email:"naveenv7574@gmail.com", phone:"9876512345",
+    role:"customer", isVerified:true, active:true, joined:"2026-02-04",
+    loginAttempts:0,
+    addresses:[
+      {addressLine1:"7/B Nehru Colony",addressLine2:"2nd Floor",city:"Trichy",state:"Tamil Nadu",pincode:"620001",phone:"9876512345",isDefault:true}
+    ]
+  },
+  {
+    _id:"u7", name:"pavithra", email:"cpavithraaa.2007@gmail.com", phone:"",
+    role:"customer", isVerified:false, active:false, joined:"2026-02-07",
+    loginAttempts:3, addresses:[]
+  },
+  {
+    _id:"u8", name:"Naveen", email:"nandhuv1390@gmail.com", phone:"9001122334",
+    role:"admin", isVerified:true, active:true, joined:"2026-02-04",
+    loginAttempts:0,
+    addresses:[
+      {addressLine1:"Plot 9, Tech Park",addressLine2:"Phase 2",city:"Hyderabad",state:"Telangana",pincode:"500081",phone:"9001122334",isDefault:true}
+    ]
+  },
+];
 
-        erpPaymentSelect.addEventListener("change", () => {
-          erpCurrentPage = 1;
-          erpApplyFilters();
-        });
+const ordersByUser = {
+  "u5": [
+    {
+      orderNumber:"SB-20260131-A3F9", createdAt:"2026-01-31",
+      orderStatus:"delivered",
+      payment:{method:"razorpay",status:"paid",razorpayOrderId:"order_abc123",paidAt:"2026-01-31"},
+      pricing:{subtotal:2799,totalDiscount:300,shippingCost:0,total:2499},
+      shippingAddress:{fullName:"pooja",email:"poojaavaisshanv@gmail.com",phone:"9123456789",address:"22 Rose Avenue",city:"Bangalore",state:"Karnataka",pincode:"560001"},
+      items:[{name:"Silk Pattu Saree",sku:"SAR-001",price:2499,originalPrice:2799,discountPercentage:11,quantity:1,itemTotal:2499}]
+    },
+    {
+      orderNumber:"SB-20260215-B7D2", createdAt:"2026-02-15",
+      orderStatus:"shipped",
+      payment:{method:"razorpay",status:"paid",razorpayOrderId:"order_def456",paidAt:"2026-02-15"},
+      pricing:{subtotal:1598,totalDiscount:200,shippingCost:0,total:1398},
+      shippingAddress:{fullName:"pooja",email:"poojaavaisshanv@gmail.com",phone:"9123456789",address:"22 Rose Avenue",city:"Bangalore",state:"Karnataka",pincode:"560001"},
+      items:[{name:"Cotton Kurta Set",sku:"KRT-022",price:699,originalPrice:799,discountPercentage:13,quantity:2,itemTotal:1398}]
+    }
+  ],
+  "u6": [
+    {
+      orderNumber:"SB-20260210-C1E8", createdAt:"2026-02-10",
+      orderStatus:"processing",
+      payment:{method:"cod",status:"pending",razorpayOrderId:null,paidAt:null},
+      pricing:{subtotal:3200,totalDiscount:0,shippingCost:60,total:3260},
+      shippingAddress:{fullName:"Nandhu",email:"naveenv7574@gmail.com",phone:"9876512345",address:"7/B Nehru Colony, 2nd Floor",city:"Trichy",state:"Tamil Nadu",pincode:"620001"},
+      items:[{name:"Bridal Lehenga",sku:"LHG-008",price:3200,originalPrice:3200,discountPercentage:0,quantity:1,itemTotal:3200}]
+    },
+    {
+      orderNumber:"SB-20260218-D4G3", createdAt:"2026-02-18",
+      orderStatus:"placed",
+      payment:{method:"razorpay",status:"paid",razorpayOrderId:"order_ghi789",paidAt:"2026-02-18"},
+      pricing:{subtotal:1200,totalDiscount:150,shippingCost:0,total:1050},
+      shippingAddress:{fullName:"Nandhu",email:"naveenv7574@gmail.com",phone:"9876512345",address:"7/B Nehru Colony",city:"Trichy",state:"Tamil Nadu",pincode:"620001"},
+      items:[{name:"Anarkali Suit",sku:"ANK-015",price:1050,originalPrice:1200,discountPercentage:13,quantity:1,itemTotal:1050}]
+    }
+  ],
+  "u8": [
+    {
+      orderNumber:"SB-20260204-E9K1", createdAt:"2026-02-04",
+      orderStatus:"delivered",
+      payment:{method:"razorpay",status:"paid",razorpayOrderId:"order_jkl012",paidAt:"2026-02-04"},
+      pricing:{subtotal:4500,totalDiscount:500,shippingCost:0,total:4000},
+      shippingAddress:{fullName:"Naveen",email:"nandhuv1390@gmail.com",phone:"9001122334",address:"Plot 9, Tech Park, Phase 2",city:"Hyderabad",state:"Telangana",pincode:"500081"},
+      items:[
+        {name:"Banarasi Silk Dupatta",sku:"DUP-031",price:2000,originalPrice:2250,discountPercentage:11,quantity:1,itemTotal:2000},
+        {name:"Zari Border Saree",sku:"SAR-077",price:2000,originalPrice:2250,discountPercentage:11,quantity:1,itemTotal:2000}
+      ]
+    }
+  ]
+};
 
-        erpStartDateInput.addEventListener("click", (e) => {
-          erpCalendarActiveInput = "startDate";
-          erpShowCalendar(e.target);
-        });
+/* STATE */
+let filtered = [];
+let currentPage = 1;
+const PER = 10;
+let editingId = null;
+let deleteTarget = null;
+let viewingId = null;
+let activeTab = "profile";
 
-        erpEndDateInput.addEventListener("click", (e) => {
-          erpCalendarActiveInput = "endDate";
-          erpShowCalendar(e.target);
-        });
+/* HELPERS */
+const initials = n => n.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase();
+const fmtDate  = d => new Date(d).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"});
+const fmtCur   = n => "₹"+Number(n).toLocaleString("en-IN");
+const oCount   = id => (ordersByUser[id]||[]).length;
+const oSpend   = id => (ordersByUser[id]||[]).reduce((s,o)=>s+o.pricing.total,0);
+const roleBadge = r => `<span class="role-badge role-${r}">${r}</span>`;
 
-        erpMinAmountInput.addEventListener("input", () => {
-          erpCurrentPage = 1;
-          erpApplyFilters();
-        });
+/* TABLE RENDER */
+function render(){
+  const tbody = document.getElementById("usersBody");
+  const empty = document.getElementById("emptyState");
+  const page  = filtered.slice((currentPage-1)*PER, currentPage*PER);
 
-        erpMaxAmountInput.addEventListener("input", () => {
-          erpCurrentPage = 1;
-          erpApplyFilters();
-        });
+  document.getElementById("totalCount").textContent = users.length;
 
-        // Calendar controls
-        erpPrevMonthBtn.addEventListener("click", () => {
-          erpCurrentMonth--;
-          if (erpCurrentMonth < 0) {
-            erpCurrentMonth = 11;
-            erpCurrentYear--;
-          }
-          erpGenerateCalendar();
-        });
-
-        erpNextMonthBtn.addEventListener("click", () => {
-          erpCurrentMonth++;
-          if (erpCurrentMonth > 11) {
-            erpCurrentMonth = 0;
-            erpCurrentYear++;
-          }
-          erpGenerateCalendar();
-        });
-
-        erpApplyDateBtn.addEventListener("click", () => {
-          erpApplySelectedDate();
-        });
-
-        erpCancelDateBtn.addEventListener("click", () => {
-          erpHideCalendar();
-        });
-
-        // Close calendar when clicking outside
-        document.addEventListener("click", (e) => {
-          if (
-            !erpCalendarPopup.contains(e.target) &&
-            !erpStartDateInput.contains(e.target) &&
-            !erpEndDateInput.contains(e.target)
-          ) {
-            erpHideCalendar();
-          }
-        });
-
-        // Action buttons
-        erpClearBtn.addEventListener("click", erpClearFilters);
-        erpExportBtn.addEventListener("click", erpExportData);
-        erpRefreshBtn.addEventListener("click", erpRefreshData);
-        erpClearAllBtn.addEventListener("click", erpClearFilters);
-
-        // Table header sorting
-        document.querySelectorAll("[data-erp-sort]").forEach((th) => {
-          th.addEventListener("click", () => {
-            const sortKey = th.getAttribute("data-erp-sort");
-            erpSortData(sortKey);
-          });
-        });
-      }
-
-      // Filter Functions
-      function erpApplyFilters() {
-        let filtered = [...erpSampleData];
-
-        // Search filter
-        const searchTerm = erpSearchInput.value.toLowerCase();
-        if (searchTerm) {
-          filtered = filtered.filter(
-            (item) =>
-              item.id.toLowerCase().includes(searchTerm) ||
-              item.n.toLowerCase().includes(searchTerm) ||
-              item.i.toLowerCase().includes(searchTerm) ||
-              item.email.toLowerCase().includes(searchTerm),
-          );
-        }
-
-        // Payment filter
-        const paymentValue = erpPaymentSelect.value;
-        if (paymentValue) {
-          filtered = filtered.filter((item) => item.p === paymentValue);
-        }
-
-        // Date range filter
-        const startDate = erpStartDateInput.value;
-        const endDate = erpEndDateInput.value;
-        if (startDate) {
-          const start = new Date(startDate).getTime();
-          filtered = filtered.filter((item) => item.timestamp >= start);
-        }
-        if (endDate) {
-          const end = new Date(endDate + "T23:59:59").getTime();
-          filtered = filtered.filter((item) => item.timestamp <= end);
-        }
-
-        // Amount range filter
-        const minAmount = parseFloat(erpMinAmountInput.value) || 0;
-        const maxAmount = parseFloat(erpMaxAmountInput.value) || Infinity;
-        filtered = filtered.filter(
-          (item) => item.t >= minAmount && item.t <= maxAmount,
-        );
-
-        erpCurrentData = filtered;
-        erpRenderTable();
-        erpUpdatePagination();
-      }
-
-      function erpClearFilters() {
-        erpSearchInput.value = "";
-        erpPaymentSelect.value = "";
-        erpStartDateInput.value = "";
-        erpEndDateInput.value = "";
-        erpMinAmountInput.value = "";
-        erpMaxAmountInput.value = "";
-
-        erpCurrentPage = 1;
-        erpCurrentData = [...erpSampleData];
-        erpSortConfig = { key: null, direction: "asc" };
-
-        erpRenderTable();
-        erpUpdatePagination();
-        erpShowToast("All filters cleared successfully");
-      }
-
-      // Sorting Functions
-      function erpSortData(key) {
-        if (erpSortConfig.key === key) {
-          erpSortConfig.direction =
-            erpSortConfig.direction === "asc" ? "desc" : "asc";
-        } else {
-          erpSortConfig.key = key;
-          erpSortConfig.direction = "asc";
-        }
-
-        erpCurrentData.sort((a, b) => {
-          let aVal = a[key];
-          let bVal = b[key];
-
-          // Special handling for different data types
-          if (key === "t") {
-            aVal = parseFloat(aVal);
-            bVal = parseFloat(bVal);
-          } else if (key === "timestamp") {
-            aVal = new Date(aVal).getTime();
-            bVal = new Date(bVal).getTime();
-          }
-
-          if (aVal < bVal) return erpSortConfig.direction === "asc" ? -1 : 1;
-          if (aVal > bVal) return erpSortConfig.direction === "asc" ? 1 : -1;
-          return 0;
-        });
-
-        // Update sort indicators
-        document.querySelectorAll("[data-erp-sort]").forEach((th) => {
-          const indicator =
-            th.querySelector(".erp-sort-indicator") ||
-            erpCreateSortIndicator(th);
-          indicator.className = "erp-sort-indicator";
-          if (th.getAttribute("data-erp-sort") === erpSortConfig.key) {
-            indicator.classList.add("active", erpSortConfig.direction);
-            indicator.innerHTML = erpSortConfig.direction === "asc" ? "↑" : "↓";
-          } else {
-            indicator.innerHTML = "↕";
-          }
-        });
-
-        erpRenderTable();
-      }
-
-      function erpCreateSortIndicator(th) {
-        const indicator = document.createElement("span");
-        indicator.className = "erp-sort-indicator";
-        indicator.innerHTML = "↕";
-        th.appendChild(indicator);
-        return indicator;
-      }
-
-      // Calendar Functions
-      function erpShowCalendar(target) {
-        const rect = target.getBoundingClientRect();
-        erpCalendarPopup.style.top = `${rect.bottom + window.scrollY + 10}px`;
-        erpCalendarPopup.style.left = `${rect.left + window.scrollX}px`;
-        erpCalendarPopup.classList.add("show");
-      }
-
-      function erpHideCalendar() {
-        erpCalendarPopup.classList.remove("show");
-      }
-
-      function erpGenerateCalendar() {
-        // Update calendar title
-        const monthNames = [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "November",
-          "December",
-        ];
-        erpCalendarTitle.textContent = `${monthNames[erpCurrentMonth]} ${erpCurrentYear}`;
-
-        // Clear previous dates
-        erpCalendarDates.innerHTML = "";
-
-        // Get first day of month and total days
-        const firstDay = new Date(erpCurrentYear, erpCurrentMonth, 1);
-        const lastDay = new Date(erpCurrentYear, erpCurrentMonth + 1, 0);
-        const daysInMonth = lastDay.getDate();
-        const startingDay = firstDay.getDay();
-
-        // Add empty cells for days before the first day of the month
-        for (let i = 0; i < startingDay; i++) {
-          const emptyCell = document.createElement("button");
-          emptyCell.className = "erp-calendar-date other-month";
-          emptyCell.textContent = new Date(
-            erpCurrentYear,
-            erpCurrentMonth,
-            -startingDay + i + 1,
-          ).getDate();
-          erpCalendarDates.appendChild(emptyCell);
-        }
-
-        // Add days of the month
-        const today = new Date();
-        const isToday = (day) => {
-          return (
-            day === today.getDate() &&
-            erpCurrentMonth === today.getMonth() &&
-            erpCurrentYear === today.getFullYear()
-          );
-        };
-
-        const selectedDate =
-          erpCalendarActiveInput === "startDate"
-            ? erpStartDateInput.value
-            : erpEndDateInput.value;
-        const selectedDay = selectedDate
-          ? new Date(selectedDate).getDate()
-          : null;
-        const selectedMonth = selectedDate
-          ? new Date(selectedDate).getMonth()
-          : null;
-        const selectedYear = selectedDate
-          ? new Date(selectedDate).getFullYear()
-          : null;
-
-        for (let day = 1; day <= daysInMonth; day++) {
-          const dateBtn = document.createElement("button");
-          dateBtn.className = "erp-calendar-date";
-          dateBtn.textContent = day;
-
-          if (isToday(day)) {
-            dateBtn.classList.add("today");
-          }
-
-          if (
-            day === selectedDay &&
-            erpCurrentMonth === selectedMonth &&
-            erpCurrentYear === selectedYear
-          ) {
-            dateBtn.classList.add("selected");
-          }
-
-          dateBtn.addEventListener("click", () => {
-            document
-              .querySelectorAll(".erp-calendar-date.selected")
-              .forEach((el) => {
-                el.classList.remove("selected");
-              });
-            dateBtn.classList.add("selected");
-          });
-
-          erpCalendarDates.appendChild(dateBtn);
-        }
-
-        // Add empty cells for remaining days
-        const totalCells = 42; // 6 rows * 7 days
-        const remainingCells = totalCells - (startingDay + daysInMonth);
-        for (let i = 1; i <= remainingCells; i++) {
-          const emptyCell = document.createElement("button");
-          emptyCell.className = "erp-calendar-date other-month";
-          emptyCell.textContent = i;
-          erpCalendarDates.appendChild(emptyCell);
-        }
-      }
-
-      function erpApplySelectedDate() {
-        const selectedDate = document.querySelector(
-          ".erp-calendar-date.selected",
-        );
-        if (selectedDate && erpCalendarActiveInput) {
-          const day = selectedDate.textContent;
-
-          // Create date in local timezone
-          const date = new Date(erpCurrentYear, erpCurrentMonth, day);
-
-          // Format date as YYYY-MM-DD (local date, not UTC)
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, "0");
-          const dayFormatted = String(date.getDate()).padStart(2, "0");
-          const formattedDate = `${year}-${month}-${dayFormatted}`;
-
-          if (erpCalendarActiveInput === "startDate") {
-            erpStartDateInput.value = formattedDate;
-          } else {
-            erpEndDateInput.value = formattedDate;
-          }
-
-          erpCurrentPage = 1;
-          erpApplyFilters();
-          erpHideCalendar();
-        }
-      }
-
-      // Render Functions
-      function erpRenderTable() {
-        // Calculate pagination
-        const startIndex = (erpCurrentPage - 1) * erpItemsPerPage;
-        const endIndex = startIndex + erpItemsPerPage;
-        const pageData = erpCurrentData.slice(startIndex, endIndex);
-
-        // Clear table
-        erpTbody.innerHTML = "";
-
-        if (pageData.length === 0) {
-          erpEmptyState.style.display = "block";
-          return;
-        }
-
-        erpEmptyState.style.display = "none";
-
-        // Render rows
-        pageData.forEach((item, index) => {
-          const row = document.createElement("tr");
-          row.style.animationDelay = `${index * 0.05}s`;
-
-          // Format date
-          const date = new Date(item.d);
-          const formattedDate = date.toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          });
-          const formattedTime = date.toLocaleTimeString("en-IN", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-
-          // Avatar color based on index
-          const avatarColor = `erp-avatar-color-${(index % 10) + 1}`;
-          const initials = item.n
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase();
-
-          row.innerHTML = `
-        <td class="erp-td"><strong>${item.id.slice(-6)}</strong></td>
-        <td class="erp-td">
-          <div class="erp-customer-cell">
-            <div class="erp-avatar ${avatarColor}">${initials}</div>
-            <div class="erp-customer-info">
-              <h4>${item.n}</h4>
-              <p>${item.email}</p>
+  if(!filtered.length){ tbody.innerHTML=""; empty.style.display="block"; }
+  else {
+    empty.style.display="none";
+    tbody.innerHTML = page.map((u,i)=>`
+      <tr style="animation-delay:${i*.04}s" onclick="openView('${u._id}')">
+        <td>
+          <div class="user-cell">
+            <div class="avatar ${u.active?"":"av-inactive"}">${initials(u.name)}</div>
+            <div>
+              <div class="u-name">${u.name}</div>
+              <div class="u-meta">
+                <span class="u-id">#${u._id.replace("u","").padStart(4,"0")}</span>
+                ${!u.active?'<span class="u-inactive-tag">Inactive</span>':""}
+              </div>
             </div>
           </div>
         </td>
-        <td class="erp-td">${item.i}</td>
-        <td class="erp-td"><strong>₹${item.t.toLocaleString("en-IN")}</strong></td>
-        <td class="erp-td">
-          <span class="erp-badge ${item.p === "upi" ? "erp-upi" : "erp-cash"}">
-            <i class="fas ${item.p === "upi" ? "fa-mobile-alt" : "fa-money-bill"}"></i>
-            ${item.p === "upi" ? "UPI" : "Cash"}
-          </span>
+        <td style="font-size:12.5px;color:var(--ink-muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;">${u.email}</td>
+        <td>${roleBadge(u.role)}</td>
+        <td style="font-size:12.5px;color:var(--ink-muted);">${u.phone||'<span style="color:var(--ink-faint);font-style:italic;font-size:11.5px;">—</span>'}</td>
+        <td>
+          <div class="orders-wrap">
+            <span class="orders-num">${oCount(u._id)}</span>
+            ${oCount(u._id)>0?`<span class="orders-sub">orders</span>`:"—"}
+          </div>
         </td>
-        <td class="erp-td">
-          <div>${formattedDate}</div>
-          <small style="color: var(--erp-muted);">${formattedTime}</small>
+        <td style="font-size:12px;color:var(--ink-muted);">${fmtDate(u.joined)}</td>
+        <td onclick="event.stopPropagation()">
+          <div class="act-cell">
+            <button class="act-btn" title="Edit user" onclick="openEdit('${u._id}')"><i class="fa-regular fa-pen-to-square"></i></button>
+            <button class="act-btn danger" title="Delete user" onclick="openDel('${u._id}')"><i class="fa-regular fa-trash-can"></i></button>
+          </div>
         </td>
-      `;
+      </tr>`).join("");
+  }
+  renderPg();
+}
 
-          erpTbody.appendChild(row);
-        });
-      }
+function renderPg(){
+  const total = filtered.length, pages = Math.ceil(total/PER);
+  const s = Math.min((currentPage-1)*PER+1, total||0);
+  const e = Math.min(currentPage*PER, total);
+  document.getElementById("pgInfo").textContent = total?`Showing ${s}–${e} of ${total} users`:"";
+  let h = `<button class="pg-btn" ${currentPage===1?"disabled":""} onclick="goP(${currentPage-1})"><i class="fa-solid fa-chevron-left" style="font-size:9px;"></i></button>`;
+  for(let p=1;p<=pages;p++) h+=`<button class="pg-btn ${p===currentPage?"active":""}" onclick="goP(${p})">${p}</button>`;
+  h+=`<button class="pg-btn" ${currentPage>=pages||!pages?"disabled":""} onclick="goP(${currentPage+1})"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></button>`;
+  document.getElementById("pgBtns").innerHTML=h;
+}
+function goP(p){ currentPage=p; render(); }
 
-      function erpUpdatePagination() {
-        const totalPages = Math.ceil(erpCurrentData.length / erpItemsPerPage);
-        erpPages.innerHTML = "";
+/* FILTERS */
+function applyFilters(){
+  const q    = document.getElementById("searchInput").value.toLowerCase();
+  const role = document.getElementById("roleFilter").value;
+  const sort = document.getElementById("sortFilter").value;
 
-        // Page info
-        erpPageInfo.textContent =
-          erpCurrentData.length === 0
-            ? "No orders found"
-            : `Showing ${Math.min((erpCurrentPage - 1) * erpItemsPerPage + 1, erpCurrentData.length)}-${Math.min(erpCurrentPage * erpItemsPerPage, erpCurrentData.length)} of ${erpCurrentData.length} orders`;
+  filtered = users.filter(u=>{
+    return (!q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q))
+        && (!role || u.role===role);
+  });
 
-        erpPages.appendChild(erpPageInfo);
+  if(sort==="name")   filtered.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sort==="oldest") filtered.sort((a,b)=>new Date(a.joined)-new Date(b.joined));
+  else if(sort==="orders") filtered.sort((a,b)=>oCount(b._id)-oCount(a._id));
+  else                filtered.sort((a,b)=>new Date(b.joined)-new Date(a.joined));
 
-        // Previous button
-        const prevBtn = document.createElement("button");
-        prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-        prevBtn.disabled = erpCurrentPage === 1;
-        prevBtn.addEventListener("click", () => {
-          if (erpCurrentPage > 1) {
-            erpCurrentPage--;
-            erpRenderTable();
-            erpUpdatePagination();
-          }
-        });
-        erpPages.appendChild(prevBtn);
+  currentPage=1; render();
+}
 
-        // Page buttons
-        const maxVisiblePages = 5;
-        let startPage = Math.max(
-          1,
-          erpCurrentPage - Math.floor(maxVisiblePages / 2),
-        );
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+/* ADD / EDIT DRAWER */
+function openAddDrawer(){
+  editingId=null;
+  document.getElementById("editEyebrow").textContent="New Record";
+  document.getElementById("editTitle").textContent="Add User";
+  document.getElementById("passWrap").style.display="";
+  ["f_first","f_last","f_email","f_phone","f_pass"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("f_role").value="customer";
+  document.getElementById("f_status").value="active";
+  openDrawer("editDrawer");
+}
 
-        if (endPage - startPage + 1 < maxVisiblePages) {
-          startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
+function openEdit(id){
+  editingId=id;
+  const u=users.find(x=>x._id===id);
+  document.getElementById("editEyebrow").textContent="Edit Record";
+  document.getElementById("editTitle").textContent="Edit User";
+  document.getElementById("passWrap").style.display="none";
+  const parts=u.name.split(" ");
+  document.getElementById("f_first").value=parts[0]||"";
+  document.getElementById("f_last").value=parts.slice(1).join(" ")||"";
+  document.getElementById("f_email").value=u.email;
+  document.getElementById("f_phone").value=u.phone||"";
+  document.getElementById("f_role").value=u.role;
+  document.getElementById("f_status").value=u.active?"active":"inactive";
+  openDrawer("editDrawer");
+}
 
-        if (startPage > 1) {
-          const firstBtn = document.createElement("button");
-          firstBtn.textContent = "1";
-          firstBtn.addEventListener("click", () => {
-            erpCurrentPage = 1;
-            erpRenderTable();
-            erpUpdatePagination();
-          });
-          erpPages.appendChild(firstBtn);
+function saveUser(){
+  const first=document.getElementById("f_first").value.trim();
+  const email=document.getElementById("f_email").value.trim();
+  const phone=document.getElementById("f_phone").value.trim();
+  if(!first||!email){ toast("Name and Email are required","error"); return; }
+  if(phone && !/^[0-9]{10}$/.test(phone)){ toast("Phone must be exactly 10 digits","error"); return; }
+  if(!editingId && document.getElementById("f_pass").value.length<8){ toast("Password must be at least 8 characters","error"); return; }
 
-          if (startPage > 2) {
-            const ellipsis = document.createElement("button");
-            ellipsis.innerHTML = "...";
-            ellipsis.disabled = true;
-            erpPages.appendChild(ellipsis);
-          }
-        }
+  if(editingId){
+    const u=users.find(x=>x._id===editingId);
+    u.name=(first+" "+document.getElementById("f_last").value.trim()).trim();
+    u.email=email; u.phone=phone;
+    u.role=document.getElementById("f_role").value;
+    u.active=document.getElementById("f_status").value==="active";
+    toast("User updated successfully","success");
+  } else {
+    users.unshift({
+      _id:"u"+Date.now(),
+      name:(first+" "+document.getElementById("f_last").value.trim()).trim(),
+      email, phone,
+      role:document.getElementById("f_role").value,
+      active:document.getElementById("f_status").value==="active",
+      joined:new Date().toISOString().split("T")[0],
+      loginAttempts:0, addresses:[]
+    });
+    toast("User added","success");
+  }
+  closeAll(); applyFilters();
+}
 
-        for (let i = startPage; i <= endPage; i++) {
-          const pageBtn = document.createElement("button");
-          pageBtn.textContent = i;
-          if (i === erpCurrentPage) {
-            pageBtn.classList.add("active");
-          }
-          pageBtn.addEventListener("click", () => {
-            erpCurrentPage = i;
-            erpRenderTable();
-            erpUpdatePagination();
-          });
-          erpPages.appendChild(pageBtn);
-        }
+/* VIEW DRAWER */
+function openView(id){
+  viewingId=id; activeTab="profile";
+  const u=users.find(x=>x._id===id);
+  document.getElementById("vd_name").textContent=u.name;
+  buildHero(u);
+  buildTab(u, "profile");
+  document.querySelectorAll(".tab-btn").forEach((b,i)=>b.classList.toggle("active",i===0));
+  openDrawer("viewDrawer");
+}
 
-        if (endPage < totalPages) {
-          if (endPage < totalPages - 1) {
-            const ellipsis = document.createElement("button");
-            ellipsis.innerHTML = "...";
-            ellipsis.disabled = true;
-            erpPages.appendChild(ellipsis);
-          }
+function buildHero(u){
+  const oc=oCount(u._id), sp=oSpend(u._id);
+  document.getElementById("vd_hero").innerHTML=`
+    <div class="profile-hero">
+      <div class="ph-avatar ${u.active?"":"av-inactive"}">${initials(u.name)}</div>
+      <div class="ph-info">
+        <div class="ph-name">${u.name}</div>
+        <div class="ph-email">${u.email}</div>
+        <div class="ph-status-line">
+          <span class="ph-role-tag">${u.role}</span>
+          <span class="ph-status-tag ${u.active?"st-active":"st-inactive"}">${u.active?"Active":"Inactive"}</span>
+          ${oc?`<span class="ph-order-count">${oc} order${oc>1?"s":""} · ${fmtCur(sp)}</span>`:""}
+        </div>
+      </div>
+    </div>`;
+}
 
-          const lastBtn = document.createElement("button");
-          lastBtn.textContent = totalPages;
-          lastBtn.addEventListener("click", () => {
-            erpCurrentPage = totalPages;
-            erpRenderTable();
-            erpUpdatePagination();
-          });
-          erpPages.appendChild(lastBtn);
-        }
+function switchTab(tab, el){
+  activeTab=tab;
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");
+  const u=users.find(x=>x._id===viewingId);
+  if(u) buildTab(u, tab);
+}
 
-        // Next button
-        const nextBtn = document.createElement("button");
-        nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-        nextBtn.disabled = erpCurrentPage === totalPages;
-        nextBtn.addEventListener("click", () => {
-          if (erpCurrentPage < totalPages) {
-            erpCurrentPage++;
-            erpRenderTable();
-            erpUpdatePagination();
-          }
-        });
-        erpPages.appendChild(nextBtn);
-      }
+function buildTab(u, tab){
+  const body=document.getElementById("vd_body");
+  if(tab==="profile")  body.innerHTML=profileTab(u);
+  else if(tab==="address") body.innerHTML=addressTab(u);
+  else body.innerHTML=ordersTab(u);
+}
 
-      // Utility Functions
-      function erpShowToast(message) {
-        erpToastMessage.textContent = message;
-        erpToastTime.textContent = "Just now";
-        erpToast.classList.add("show");
+/* PROFILE TAB — redesigned, no Most Recent Order */
+function profileTab(u){
+  const oc=oCount(u._id), sp=oSpend(u._id);
+  const orders=ordersByUser[u._id]||[];
+  const delivered=orders.filter(o=>o.orderStatus==="delivered").length;
 
-        setTimeout(() => {
-          erpToast.classList.remove("show");
-        }, 3000);
-      }
+  
+  return `
+    <div class="prof-cards-grid">
+      <div class="prof-card">
+        <div class="prof-card-head"><i class="fa-solid fa-address-card"></i> Contact Details</div>
+        <div class="prof-card-body">
+          <div class="pc-row">
+            <span class="pc-icon"><i class="fa-solid fa-user"></i></span>
+            <div class="pc-text">
+              <div class="pc-label">Full Name</div>
+              <div class="pc-value">${u.name}</div>
+            </div>
+          </div>
+          <div class="pc-row">
+            <span class="pc-icon"><i class="fa-solid fa-envelope"></i></span>
+            <div class="pc-text">
+              <div class="pc-label">Email Address</div>
+              <div class="pc-value" style="font-size:12px;word-break:break-all;">${u.email}</div>
+            </div>
+          </div>
+          <div class="pc-row">
+            <span class="pc-icon"><i class="fa-solid fa-phone"></i></span>
+            <div class="pc-text">
+              <div class="pc-label">Phone</div>
+              <div class="pc-value ${u.phone?"":"nil"}">${u.phone||"Not provided"}</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      function erpExportData() {
-        // Create CSV content
-        let csv = "Order ID,Customer Name,Email,Items,Total,Payment,Date\n";
+      <div class="prof-card">
+        <div class="prof-card-head"><i class="fa-solid fa-shield-halved"></i> Account Details</div>
+        <div class="prof-card-body">
+          <div class="pc-row">
+            <span class="pc-icon"><i class="fa-solid fa-crown"></i></span>
+            <div class="pc-text">
+              <div class="pc-label">Role</div>
+              <div class="pc-value" style="text-transform:capitalize;">${u.role}</div>
+            </div>
+          </div>
+          <div class="pc-row">
+            <span class="pc-icon"><i class="fa-solid fa-id-card"></i></span>
+            <div class="pc-text">
+              <div class="pc-label">User ID</div>
+              <div class="pc-value" style="font-family:'Cormorant Garamond',serif;font-size:16px;">#${u._id.replace("u","").padStart(4,"0")}</div>
+            </div>
+          </div>
+          <div class="pc-row">
+            <span class="pc-icon"><i class="fa-solid fa-calendar-plus"></i></span>
+            <div class="pc-text">
+              <div class="pc-label">Member Since</div>
+              <div class="pc-value">${fmtDate(u.joined)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
 
-        erpCurrentData.forEach((item) => {
-          const date = new Date(item.d);
-          const formattedDate = date.toLocaleDateString("en-IN");
+/* ADDRESS TAB */
+function addressTab(u){
+  if(!u.addresses.length) return `
+    <div class="no-data">
+      <i class="fa-solid fa-location-dot"></i>
+      <p>No saved addresses.<br><span style="font-size:11px;color:var(--ink-faint)">Addresses are captured when the user places an order and fills in their shipping details.</span></p>
+    </div>`;
+  return `
+    <div>
+      <div class="sec-hd">${u.addresses.length} Saved Address${u.addresses.length>1?"es":""}</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${u.addresses.map(a=>`
+          <div class="addr-card ${a.isDefault?"dflt":""}">
+            ${a.isDefault?'<span class="addr-dflt-tag">Default</span>':""}
+            <div class="addr-line">
+              <strong>${a.addressLine1}</strong>${a.addressLine2?", "+a.addressLine2:""}<br>
+              ${a.city}, ${a.state} — ${a.pincode}
+            </div>
+            <div class="addr-ph"><i class="fa-solid fa-phone"></i>${a.phone}</div>
+          </div>`).join("")}
+      </div>
+    </div>`;
+}
 
-          csv += `"${item.id}","${item.n}","${item.email}","${item.i}",₹${item.t},"${item.p}","${formattedDate}"\n`;
-        });
+/* ORDERS TAB */
+function ordersTab(u){
+  const orders=ordersByUser[u._id]||[];
+  if(!orders.length) return `
+    <div class="no-data">
+      <i class="fa-solid fa-box-open"></i>
+      <p>No orders placed yet.<br><span style="font-size:11px;color:var(--ink-faint)">When this user places an order, the full cart snapshot, payment details, and shipping info will appear here.</span></p>
+    </div>`;
+  const sp=oSpend(u._id);
+  const delivered=orders.filter(o=>o.orderStatus==="delivered").length;
+  return `
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num">${orders.length}</div><div class="stat-lbl">Total Orders</div></div>
+      <div class="stat-box"><div class="stat-num">${delivered}</div><div class="stat-lbl">Delivered</div></div>
+      <div class="stat-box"><div class="stat-num">${fmtCur(sp)}</div><div class="stat-lbl">Total Spent</div></div>
+    </div>
+    <div>
+      <div class="sec-hd">All Orders (${orders.length})</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        ${orders.map(o=>orderCard(o)).join("")}
+      </div>
+    </div>`;
+}
 
-        // Create download link
-        const blob = new Blob([csv], { type: "text/csv" });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `ERP_Orders_${new Date().toISOString().split("T")[0]}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+/* ORDER CARD */
+function orderCard(o){
+  const osMap={"placed":"os-placed","processing":"os-processing","shipped":"os-shipped","delivered":"os-delivered","cancelled":"os-cancelled"};
+  const pyMap={"paid":"pp-paid","pending":"pp-pending","failed":"pp-failed","refunded":"pp-refunded"};
+  const osCls=osMap[o.orderStatus]||"os-placed";
+  const pyCls=pyMap[o.payment.status]||"pp-pending";
+  const pricingNote=[];
+  if(o.pricing.totalDiscount) pricingNote.push(`saved ${fmtCur(o.pricing.totalDiscount)}`);
+  if(o.pricing.shippingCost)  pricingNote.push(`shipping ${fmtCur(o.pricing.shippingCost)}`);
+  return `
+    <div class="order-card">
+      <div class="order-head">
+        <div>
+          <div class="o-num">${o.orderNumber}</div>
+          <div class="o-date">${fmtDate(o.createdAt)} &nbsp;·&nbsp; ${o.payment.method==="cod"?"Cash on Delivery":"Razorpay"}</div>
+        </div>
+        <div class="o-badges">
+          <span class="o-status ${osCls}">${o.orderStatus}</span>
+          <span class="pay-badge ${pyCls}">${o.payment.status}</span>
+        </div>
+      </div>
+      <div class="order-items">
+        ${o.items.map(it=>`
+          <div class="o-item">
+            <div class="o-img-ph"><i class="fa-solid fa-shirt"></i></div>
+            <div style="flex:1;min-width:0;">
+              <div class="o-iname">${it.name}</div>
+              <div class="o-isku">${it.sku}${it.discountPercentage?` · ${it.discountPercentage}% off`:""}</div>
+            </div>
+            <div class="o-iqty">×${it.quantity}</div>
+            <div class="o-iprice">${fmtCur(it.itemTotal)}</div>
+          </div>`).join("")}
+      </div>
+      <div class="ship-row">
+        <i class="fa-solid fa-location-dot"></i>
+        <span>${o.shippingAddress.fullName} &nbsp;·&nbsp; ${o.shippingAddress.phone}<br>
+        ${o.shippingAddress.address}, ${o.shippingAddress.city}, ${o.shippingAddress.state} — ${o.shippingAddress.pincode}</span>
+      </div>
+      <div class="order-foot">
+        <div class="o-pricing-detail">
+          Subtotal ${fmtCur(o.pricing.subtotal)}${pricingNote.length?" · "+pricingNote.join(" · "):""}
+        </div>
+        <div>
+          <span style="font-size:11px;color:var(--ink-faint);margin-right:6px;">Order Total</span>
+          <span class="o-total-val">${fmtCur(o.pricing.total)}</span>
+        </div>
+      </div>
+    </div>`;
+}
 
-        erpShowToast(`Exported ${erpCurrentData.length} orders successfully`);
-      }
+function editFromView(){ closeAll(); setTimeout(()=>openEdit(viewingId),90); }
 
-      function erpRefreshData() {
-        // In a real application, this would fetch fresh data from the server
-        // For now, just reset to original data
-        erpCurrentData = [...erpSampleData];
-        erpCurrentPage = 1;
-        erpRenderTable();
-        erpUpdatePagination();
-        erpShowToast("Data refreshed successfully");
-      }
+/* DELETE */
+function openDel(id){
+  deleteTarget=id;
+  document.getElementById("delName").textContent=users.find(x=>x._id===id).name;
+  document.getElementById("delModal").classList.add("open");
+  document.body.style.overflow = "hidden"; /* ← lock background scroll */
+}
+function closeDel(){
+  document.getElementById("delModal").classList.remove("open");
+  deleteTarget=null;
+  document.body.style.overflow = ""; /* ← restore scroll */
+}
+function confirmDelete(){ users=users.filter(x=>x._id!==deleteTarget); closeDel(); applyFilters(); toast("User removed","error"); }
 
-      // Initialize sort indicators
-      document.querySelectorAll("[data-erp-sort]").forEach((th) => {
-        erpCreateSortIndicator(th);
-      });
-    </script>
-  </body>
+/* DRAWER HELPERS */
+function openDrawer(id){
+  document.getElementById("overlay").classList.add("open");
+  document.getElementById(id).classList.add("open");
+  document.body.style.overflow = "hidden"; /* ← lock background scroll */
+}
+function closeAll(){
+  document.getElementById("overlay").classList.remove("open");
+  ["editDrawer","viewDrawer"].forEach(id=>document.getElementById(id).classList.remove("open"));
+  document.body.style.overflow = ""; /* ← restore scroll */
+}
+
+/* TOAST */
+function toast(msg,type="success"){
+  const w=document.getElementById("toastWrap");
+  const el=document.createElement("div");
+  el.className=`toast ${type}`;
+  el.innerHTML=`<i class="fa-solid ${type==="success"?"fa-circle-check":"fa-circle-xmark"}"></i>${msg}`;
+  w.appendChild(el);
+  setTimeout(()=>{ el.style.transition="opacity .3s"; el.style.opacity="0"; setTimeout(()=>el.remove(),300); },2800);
+}
+
+/* Init */
+applyFilters();
+</script>
+</body>
 </html>

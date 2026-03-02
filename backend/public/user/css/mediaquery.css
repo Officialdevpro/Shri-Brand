@@ -178,10 +178,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    padding: 8px;
   }
 
   .sidebar-logo {
@@ -235,8 +231,11 @@
   }
 
   .sidebar-bottom-decoration {
-    bottom: 0;
+    bottom: -24px;
+    width: 202px;
+    left: 150px !important;
     align-items: flex-end;
+    transform: rotate(-22deg);
   }
 
   /* Specific Image Adjustments */
@@ -421,8 +420,8 @@
     margin: 0 0 1rem !important;
     font-size: 1.65rem !important;
   }
-  .showcard h3{
-     font-size: 1.65rem !important;
+  .showcard h3 {
+    font-size: 1.65rem !important;
   }
 
   .split-left .content {
@@ -600,7 +599,6 @@
 }
 
 @media (min-width: 768px) and (max-width: 893px) {
-  
   .nav-link {
     padding: 6px 10px;
     border-radius: 999px;

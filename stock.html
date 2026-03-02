@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incense Production Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0f0e0c;
+  --surface:  #1a1916;
+  --surface2: #222018;
+  --surface3: #2a271f;
+  --border:   #2e2b22;
+  --border2:  #3d3a2e;
+  --text:     #f2ede4;
+  --text2:    #a09880;
+  --text3:    #5a5548;
+  --gold:     #e8a020;
+  --gold2:    #f0c060;
+  --gold-dim: #6a4a10;
+  --gold-bg:  rgba(232,160,32,0.08);
+  --green:    #22c55e;
+  --green-dim:#0f3320;
+  --green-bg: rgba(34,197,94,0.08);
+  --red:      #ef4444;
+  --red-bg:   rgba(239,68,68,0.08);
+  --r:        14px;
+  --r-sm:     9px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  font-family: 'Sora', sans-serif;
+  color: var(--text);
+  font-size: 13px;
+  min-height: 100vh;
+  overscroll-behavior: none;
+}
+
+/* ═══════════════════════════
+   APP SHELL
+═══════════════════════════ */
+.shell {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ═══════════════════════════
+   HEADER
+═══════════════════════════ */
+.hdr {
+  padding: 20px 20px 0;
+  background: var(--bg);
+  position: relative;
+  z-index: 10;
+}
+
+.hdr-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-mark {
+  width: 38px; height: 38px;
+  background: linear-gradient(145deg, var(--gold), #c07010);
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 4px 16px rgba(232,160,32,0.3);
+}
+
+.brand-text { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+.brand-sub  { font-size: 10px; color: var(--text3); font-weight: 400; margin-top: 1px; }
+
+.hdr-pill {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text2);
+  letter-spacing: 0.3px;
+}
+
+/* ═══════════════════════════
+   STEP PROGRESS
+═══════════════════════════ */
+.progress-wrap {
+  padding: 0 20px 20px;
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--border);
+}
+
+.progress-track {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.progress-line-bg {
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  left: 16px; right: 16px;
+  height: 2px;
+  background: var(--border2);
+  z-index: 0;
+}
+
+.progress-line-fill {
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  left: 16px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+  z-index: 1;
+  width: 0%;
+  transition: width .4s cubic-bezier(.4,0,.2,1);
+}
+
+.pstep {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.ps-dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  transition: all .25s;
+}
+
+.ps-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text3);
+  transition: color .25s;
+  white-space: nowrap;
+}
+
+.pstep.active .ps-dot {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #000;
+  box-shadow: 0 0 0 4px rgba(232,160,32,0.15);
+}
+.pstep.active .ps-label { color: var(--gold); }
+
+.pstep.done .ps-dot {
+  background: var(--green-dim);
+  border-color: var(--green);
+  color: var(--green);
+}
+.pstep.done .ps-label { color: var(--text2); }
+
+/* ═══════════════════════════
+   CONTENT
+═══════════════════════════ */
+.content {
+  flex: 1;
+  padding: 24px 16px 48px;
+  overflow: hidden;
+}
+
+/* PAGE */
+.page { display: none; }
+.page.active { display: block; animation: pgIn .28s ease; }
+@keyframes pgIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════
+   SECTION TITLE
+═══════════════════════════ */
+.sec-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin: 24px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sec-title:first-child { margin-top: 0; }
+.sec-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ═══════════════════════════
+   INVENTORY CARD
+═══════════════════════════ */
+.inv-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.inv-card-hd {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.inv-icon {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.inv-icon.g { background: var(--green-bg); }
+.inv-icon.a { background: var(--gold-bg); }
+
+.inv-hd-text { font-size: 12px; font-weight: 700; }
+.inv-hd-sub  { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+.inv-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+}
+
+.inv-f {
+  background: var(--surface);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.inv-f label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+/* GREEN UNDERLINE */
+.gin {
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--green);
+  color: var(--text);
+  font-family: 'Sora', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  padding: 4px 0 3px;
+  width: 100%;
+  outline: none;
+  -moz-appearance: textfield;
+  transition: border-color .15s, color .15s;
+  letter-spacing: -0.5px;
+}
+.gin::-webkit-outer-spin-button,
+.gin::-webkit-inner-spin-button { -webkit-appearance: none; }
+.gin:focus { border-bottom-color: var(--gold); color: var(--gold2); }
+.gin::placeholder { color: var(--text3); font-size: 16px; }
+
+.inv-f-hint { font-size: 10px; color: var(--text3); }
+
+/* ═══════════════════════════
+   CTA BUTTONS
+═══════════════════════════ */
+.btn-primary {
+  width: 100%;
+  padding: 15px;
+  background: var(--gold);
+  color: #000;
+  border: none;
+  border-radius: var(--r);
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  margin-top: 12px;
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px;
+  transition: all .15s;
+  box-shadow: 0 4px 20px rgba(232,160,32,0.25);
+}
+.btn-primary:hover { background: var(--gold2); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(232,160,32,0.35); }
+.btn-primary:active { transform: scale(0.99); }
+
+.btn-ghost {
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  color: var(--text2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all .15s;
+}
+.btn-ghost:hover { border-color: var(--text2); color: var(--text); }
+
+.btn-green {
+  width: 100%;
+  padding: 15px;
+  background: var(--green);
+  color: #000;
+  border: none;
+  border-radius: var(--r);
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px;
+  transition: all .15s;
+  box-shadow: 0 4px 16px rgba(34,197,94,0.2);
+  margin-bottom: 16px;
+}
+.btn-green:hover { filter: brightness(1.1); }
+
+/* ═══════════════════════════
+   FRAGRANCE SELECTOR
+═══════════════════════════ */
+.frag-select-wrap { position: relative; margin-bottom: 12px; }
+.frag-select {
+  width: 100%;
+  appearance: none;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  color: var(--text);
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 14px 44px 14px 16px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.frag-select:focus { border-color: var(--gold); }
+.frag-select option { background: var(--surface); }
+.frag-select-wrap::after {
+  content: '▾';
+  position: absolute;
+  right: 16px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3);
+  pointer-events: none;
+}
+
+/* ═══════════════════════════
+   SIZE CARDS
+═══════════════════════════ */
+.size-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+
+.size-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r);
+  padding: 14px;
+  cursor: pointer;
+  transition: all .18s;
+  position: relative;
+  overflow: hidden;
+}
+
+.size-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity .18s;
+}
+.size-card.s40::before { background: linear-gradient(135deg, rgba(34,197,94,0.06), transparent); }
+.size-card.s80::before { background: linear-gradient(135deg, rgba(232,160,32,0.06), transparent); }
+
+.size-card.sel-40 { border-color: var(--green); }
+.size-card.sel-40::before { opacity: 1; }
+.size-card.sel-80 { border-color: var(--gold); }
+.size-card.sel-80::before { opacity: 1; }
+
+.sc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.sc-gm { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+.size-card.sel-40 .sc-gm { color: var(--green); }
+.size-card.sel-80 .sc-gm { color: var(--gold); }
+
+.sc-check {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+  transition: all .18s;
+}
+.size-card.sel-40 .sc-check { background: var(--green); border-color: var(--green); color: #000; }
+.size-card.sel-80 .sc-check { background: var(--gold); border-color: var(--gold); color: #000; }
+
+.sc-rate { font-size: 11px; color: var(--text2); font-weight: 500; }
+.sc-stock {
+  font-size: 10px;
+  font-weight: 600;
+  margin-top: 4px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  display: inline-block;
+}
+.size-card.sel-40 .sc-stock { background: var(--green-bg); color: var(--green); }
+.size-card.sel-80 .sc-stock { background: var(--gold-bg); color: var(--gold); }
+.size-card:not(.sel-40):not(.sel-80) .sc-stock { background: var(--surface3); color: var(--text3); }
+
+/* ═══════════════════════════
+   BOX INPUT
+═══════════════════════════ */
+.box-field {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  padding: 16px;
+  margin-bottom: 10px;
+}
+.box-field label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text3);
+  display: block;
+  margin-bottom: 8px;
+}
+.box-field .gin { font-size: 32px; letter-spacing: -1px; }
+
+/* ═══════════════════════════
+   PREVIEW ROW
+═══════════════════════════ */
+.prev-row {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.prev-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px;
+  text-align: center;
+}
+
+.prev-chip .pc-label { font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text3); }
+.prev-chip .pc-val { font-size: 14px; font-weight: 800; color: var(--text); margin-top: 3px; line-height: 1; letter-spacing: -0.3px; }
+.prev-chip .pc-val.ok   { color: var(--green); }
+.prev-chip .pc-val.warn { color: var(--red); }
+
+/* ═══════════════════════════
+   PACK LOG ITEMS
+═══════════════════════════ */
+.pack-list { display: flex; flex-direction: column; gap: 8px; }
+
+.pack-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: border-color .15s;
+}
+.pack-item:hover { border-color: var(--border2); }
+
+.pi-head {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pi-left { display: flex; align-items: center; gap: 8px; }
+
+.pi-pill {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.pi-pill.p40 { background: var(--green-bg); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.pi-pill.p80 { background: var(--gold-bg); color: var(--gold); border: 1px solid rgba(232,160,32,0.2); }
+
+.pi-name { font-size: 13px; font-weight: 700; }
+.pi-sub  { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+.pi-right { display: flex; align-items: center; gap: 10px; }
+.pi-mrp-val { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+.pi-mrp-lbl { font-size: 9px; color: var(--text3); font-weight: 500; }
+
+.pi-del {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: none;
+  color: var(--text3);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  transition: all .15s;
+}
+.pi-del:hover { background: var(--red-bg); border-color: var(--red); color: var(--red); }
+
+.pi-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--surface2);
+  border-top: 1px solid var(--border);
+}
+.pi-stat-cell {
+  padding: 8px 12px;
+  border-right: 1px solid var(--border);
+}
+.pi-stat-cell:last-child { border-right: none; }
+.pi-stat-cell .psc-l { font-size: 9px; color: var(--text3); font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; }
+.pi-stat-cell .psc-v { font-size: 12px; font-weight: 700; color: var(--text2); margin-top: 2px; }
+
+/* ═══════════════════════════
+   EMPTY STATE
+═══════════════════════════ */
+.empty-state {
+  text-align: center;
+  padding: 32px 20px;
+  background: var(--surface);
+  border: 1px dashed var(--border2);
+  border-radius: var(--r);
+}
+.empty-state .es-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.5; }
+.empty-state p { font-size: 12px; color: var(--text3); line-height: 1.6; }
+
+/* ═══════════════════════════
+   STEP 3 — STOCK
+═══════════════════════════ */
+.stock-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 16px; }
+
+.stock-tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 12px;
+  text-align: center;
+}
+.stock-tile .st-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text3); }
+.stock-tile .st-val { font-size: 18px; font-weight: 800; color: var(--text); margin-top: 5px; letter-spacing: -0.5px; }
+.stock-tile .st-val.ok   { color: var(--green); }
+.stock-tile .st-val.warn { color: var(--red); }
+
+/* ═══════════════════════════
+   RATE CARD
+═══════════════════════════ */
+.rate-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.rc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.rc-top::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 120px; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(232,160,32,0.04));
+  pointer-events: none;
+}
+
+.rc-left .rc-name { font-size: 16px; font-weight: 800; letter-spacing: -0.3px; }
+.rc-sz-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-left: 6px;
+}
+.rc-sz-40 { background: var(--green-bg); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.rc-sz-80 { background: var(--gold-bg); color: var(--gold); border: 1px solid rgba(232,160,32,0.2); }
+
+.rc-boxes { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+.rc-mrp-block { text-align: right; position: relative; z-index: 1; }
+.rc-mrp-num { font-size: 28px; font-weight: 800; color: var(--gold2); letter-spacing: -1px; line-height: 1; }
+.rc-mrp-lbl { font-size: 9px; color: var(--text3); font-weight: 500; margin-top: 2px; }
+
+/* breakdown grid */
+.rc-breakdown {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+}
+@media(max-width:360px) { .rc-breakdown { grid-template-columns: repeat(2,1fr); } }
+
+.rcb {
+  background: var(--surface2);
+  padding: 12px;
+  text-align: center;
+}
+.rcb.hi { background: #0f2018; }
+.rcb-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text3); }
+.rcb-val { font-size: 15px; font-weight: 800; color: var(--text2); margin-top: 4px; letter-spacing: -0.3px; }
+.rcb.hi .rcb-val { color: var(--green); }
+.rcb-sub { font-size: 9px; color: var(--text3); margin-top: 2px; }
+
+.rc-footer {
+  padding: 9px 16px;
+  background: var(--surface2);
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.rc-footer strong { color: var(--gold); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── HEADER ── -->
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="brand">
+        <div class="brand-mark">🪔</div>
+        <div>
+          <div class="brand-text">ProdCalc</div>
+          <div class="brand-sub">Incense Production</div>
+        </div>
+      </div>
+      <div class="hdr-pill">8 Fragrances</div>
+    </div>
+  </div>
+
+  <!-- ── STEP PROGRESS ── -->
+  <div class="progress-wrap">
+    <div class="progress-track">
+      <div class="progress-line-bg"></div>
+      <div class="progress-line-fill" id="pfill"></div>
+      <div class="pstep active" id="ps1" onclick="goStep(1)">
+        <div class="ps-dot" id="pd1">1</div>
+        <div class="ps-label">Inventory</div>
+      </div>
+      <div class="pstep" id="ps2" onclick="goStep(2)">
+        <div class="ps-dot" id="pd2">2</div>
+        <div class="ps-label">Packing</div>
+      </div>
+      <div class="pstep" id="ps3" onclick="goStep(3)">
+        <div class="ps-dot" id="pd3">3</div>
+        <div class="ps-label">MRP</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONTENT ── -->
+  <div class="content">
+
+    <!-- ══ PAGE 1 ══ -->
+    <div class="page active" id="page1">
+
+      <div class="sec-title">Stick Stock</div>
+      <div class="inv-card">
+        <div class="inv-card-hd">
+          <div class="inv-icon g">🌿</div>
+          <div>
+            <div class="inv-hd-text">Raw Incense Stick</div>
+            <div class="inv-hd-sub">Total available quantity & purchase rate</div>
+          </div>
+        </div>
+        <div class="inv-fields">
+          <div class="inv-f">
+            <label>Quantity (kg)</label>
+            <input class="gin" type="number" id="stickKg" value="500" min="0" step="0.1">
+            <span class="inv-f-hint">Current stock</span>
+          </div>
+          <div class="inv-f">
+            <label>Rate ₹/kg</label>
+            <input class="gin" type="number" id="stickRate" value="120" min="0" step="0.5">
+            <span class="inv-f-hint">Purchase cost</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-title">Box Inventory</div>
+      <div class="inv-card">
+        <div class="inv-card-hd">
+          <div class="inv-icon g">📦</div>
+          <div>
+            <div class="inv-hd-text">40 gm Box</div>
+            <div class="inv-hd-sub">Smaller pack · stock & rate</div>
+          </div>
+        </div>
+        <div class="inv-fields">
+          <div class="inv-f">
+            <label>Stock</label>
+            <input class="gin" type="number" id="box40count" value="3000" min="0">
+            <span class="inv-f-hint">Available boxes</span>
+          </div>
+          <div class="inv-f">
+            <label>Rate ₹/box</label>
+            <input class="gin" type="number" id="box40rate" value="5.5" min="0" step="0.1">
+            <span class="inv-f-hint">Per box</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="inv-card" style="margin-bottom:4px;">
+        <div class="inv-card-hd">
+          <div class="inv-icon a">📦</div>
+          <div>
+            <div class="inv-hd-text">80 gm Box</div>
+            <div class="inv-hd-sub">Larger pack · stock & rate</div>
+          </div>
+        </div>
+        <div class="inv-fields">
+          <div class="inv-f">
+            <label>Stock</label>
+            <input class="gin" type="number" id="box80count" value="2000" min="0">
+            <span class="inv-f-hint">Available boxes</span>
+          </div>
+          <div class="inv-f">
+            <label>Rate ₹/box</label>
+            <input class="gin" type="number" id="box80rate" value="6.5" min="0" step="0.1">
+            <span class="inv-f-hint">Per box</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="goStep(2)">Continue to Packing →</button>
+    </div>
+
+    <!-- ══ PAGE 2 ══ -->
+    <div class="page" id="page2">
+
+      <div class="sec-title">Fragrance</div>
+      <div class="frag-select-wrap">
+        <select class="frag-select" id="fragranceSelect" onchange="updatePreview()">
+          <option value="">— Choose fragrance —</option>
+          <option>Jasmine</option>
+          <option>Champa</option>
+          <option>Lavender</option>
+          <option>Screw Pine</option>
+          <option>Rose</option>
+          <option>Sandal</option>
+          <option>Sacred Resin</option>
+          <option>Javathu</option>
+        </select>
+      </div>
+
+      <div class="sec-title">Pack Size</div>
+      <div class="size-row">
+        <div class="size-card s40" id="sc40" onclick="setSize(40)">
+          <div class="sc-top">
+            <div class="sc-gm">40g</div>
+            <div class="sc-check" id="chk40">✓</div>
+          </div>
+          <div class="sc-rate" id="sz40rate">₹5.5 / box</div>
+          <div class="sc-stock" id="sz40stock">3000 left</div>
+        </div>
+        <div class="size-card s80" id="sc80" onclick="setSize(80)">
+          <div class="sc-top">
+            <div class="sc-gm">80g</div>
+            <div class="sc-check" id="chk80"></div>
+          </div>
+          <div class="sc-rate" id="sz80rate">₹6.5 / box</div>
+          <div class="sc-stock" id="sz80stock">2000 left</div>
+        </div>
+      </div>
+
+      <div class="sec-title">Quantity</div>
+      <div class="box-field">
+        <label>Number of Boxes</label>
+        <input class="gin" type="number" id="packBoxes" min="1" placeholder="0" oninput="updatePreview()">
+      </div>
+
+      <div class="prev-row">
+        <div class="prev-chip">
+          <div class="pc-label">Stick Needed</div>
+          <div class="pc-val" id="pv_need">—</div>
+        </div>
+        <div class="prev-chip">
+          <div class="pc-label">Stick Left</div>
+          <div class="pc-val" id="pv_stick">—</div>
+        </div>
+        <div class="prev-chip">
+          <div class="pc-label">Box Left</div>
+          <div class="pc-val" id="pv_box">—</div>
+        </div>
+      </div>
+
+      <button class="btn-green" onclick="addPack()">＋ Add to Packing List</button>
+
+      <div class="sec-title">Packing List</div>
+      <div class="pack-list" id="packLog"></div>
+
+      <button class="btn-primary" onclick="goStep(3)" style="margin-top:16px;">View Rates & MRP →</button>
+      <button class="btn-ghost" onclick="goStep(1)">← Back to Inventory</button>
+    </div>
+
+    <!-- ══ PAGE 3 ══ -->
+    <div class="page" id="page3">
+
+      <div class="sec-title">Remaining Stock</div>
+      <div class="stock-grid">
+        <div class="stock-tile">
+          <div class="st-lbl">Stick Left</div>
+          <div class="st-val" id="fin_stick">—</div>
+        </div>
+        <div class="stock-tile">
+          <div class="st-lbl">40gm Left</div>
+          <div class="st-val" id="fin_b40">—</div>
+        </div>
+        <div class="stock-tile">
+          <div class="st-lbl">80gm Left</div>
+          <div class="st-val" id="fin_b80">—</div>
+        </div>
+      </div>
+
+      <div class="sec-title">Rate Breakdown & MRP</div>
+      <div id="rateCards"></div>
+
+      <button class="btn-ghost" onclick="goStep(2)" style="margin-top:8px;">← Back to Packing</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let curStep = 1;
+let selSize = 40;
+let packLog = [];
+const PACK_RATE = 1;
+
+/* ── NAVIGATION ── */
+function goStep(n) {
+  if(n === 3) buildRates();
+  document.querySelectorAll('.page').forEach((p,i) => p.classList.toggle('active', i+1===n));
+  curStep = n;
+  updateProgress();
+  refreshSizeCards();
+}
+
+function updateProgress() {
+  const fill = document.getElementById('pfill');
+  fill.style.width = curStep === 1 ? '0%' : curStep === 2 ? '50%' : '100%';
+  for(let i=1;i<=3;i++){
+    const ps = document.getElementById('ps'+i);
+    const pd = document.getElementById('pd'+i);
+    ps.className = 'pstep';
+    if(i < curStep){ ps.classList.add('done'); pd.textContent='✓'; }
+    else if(i===curStep){ ps.classList.add('active'); pd.textContent=i; }
+    else pd.textContent=i;
+  }
+}
+
+/* ── SIZE ── */
+function setSize(s) {
+  selSize = s;
+  refreshSizeCards();
+  updatePreview();
+}
+
+function refreshSizeCards() {
+  const r40 = parseFloat(document.getElementById('box40rate').value)||0;
+  const r80 = parseFloat(document.getElementById('box80rate').value)||0;
+  const {b40, b80} = getBalances();
+  document.getElementById('sz40rate').textContent  = '₹'+r40+' / box';
+  document.getElementById('sz80rate').textContent  = '₹'+r80+' / box';
+  document.getElementById('sz40stock').textContent = b40+' left';
+  document.getElementById('sz80stock').textContent = b80+' left';
+  document.getElementById('sc40').className = 'size-card s40'+(selSize===40?' sel-40':'');
+  document.getElementById('sc80').className = 'size-card s80'+(selSize===80?' sel-80':'');
+  document.getElementById('chk40').textContent = selSize===40?'✓':'';
+  document.getElementById('chk80').textContent = selSize===80?'✓':'';
+}
+
+/* ── BALANCES ── */
+function getBalances() {
+  let stick = parseFloat(document.getElementById('stickKg').value)||0;
+  let b40   = parseInt(document.getElementById('box40count').value)||0;
+  let b80   = parseInt(document.getElementById('box80count').value)||0;
+  packLog.forEach(p => {
+    stick -= (p.boxes * p.size) / 1000;
+    if(p.size===40) b40-=p.boxes; else b80-=p.boxes;
+  });
+  return {stick, b40, b80};
+}
+
+/* ── PREVIEW ── */
+function updatePreview() {
+  const boxes = parseInt(document.getElementById('packBoxes').value)||0;
+  if(!boxes){ clearPrev(); refreshSizeCards(); return; }
+  const {stick, b40, b80} = getBalances();
+  const needed  = (boxes * selSize) / 1000;
+  const aftStick = stick - needed;
+  const aftBox   = (selSize===40 ? b40 : b80) - boxes;
+  setPrev('pv_need',  needed.toFixed(2)+'kg', '');
+  setPrev('pv_stick', aftStick.toFixed(2)+'kg', aftStick<0?'warn':'ok');
+  setPrev('pv_box',   aftBox+' box', aftBox<0?'warn':'ok');
+}
+
+function clearPrev() {
+  ['pv_need','pv_stick','pv_box'].forEach(id => setPrev(id,'—',''));
+}
+
+function setPrev(id, text, cls) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'pc-val'+(cls?' '+cls:'');
+}
+
+/* ── ADD PACK ── */
+function addPack() {
+  const name  = document.getElementById('fragranceSelect').value;
+  const boxes = parseInt(document.getElementById('packBoxes').value)||0;
+  if(!name)       { alert('Please select a fragrance.'); return; }
+  if(boxes < 1)   { alert('Enter number of boxes.'); return; }
+  const {stick, b40, b80} = getBalances();
+  if((boxes*selSize/1000) > stick)            { alert('⚠️ Insufficient stick stock!'); return; }
+  if(boxes > (selSize===40?b40:b80))          { alert('⚠️ Insufficient box stock!'); return; }
+  packLog.push({name, size:selSize, boxes});
+  renderLog();
+  document.getElementById('packBoxes').value = '';
+  clearPrev();
+  refreshSizeCards();
+}
+
+/* ── RENDER LOG ── */
+function renderLog() {
+  const el = document.getElementById('packLog');
+  if(!packLog.length){
+    el.innerHTML=`<div class="empty-state"><div class="es-icon">📋</div><p>No items yet.<br>Add a fragrance above to start.</p></div>`;
+    return;
+  }
+  const sr = parseFloat(document.getElementById('stickRate').value)||0;
+  const r40= parseFloat(document.getElementById('box40rate').value)||0;
+  const r80= parseFloat(document.getElementById('box80rate').value)||0;
+  el.innerHTML = `<div class="pack-list">`+packLog.map((p,i)=>{
+    const br  = p.size===40?r40:r80;
+    const sc  = p.size*(sr/1000);
+    const tot = sc+br+PACK_RATE;
+    const mrp = Math.ceil(tot*2/5)*5;
+    const su  = (p.boxes*p.size/1000).toFixed(2);
+    return `
+    <div class="pack-item">
+      <div class="pi-head">
+        <div class="pi-left">
+          <div class="pi-pill p${p.size}">${p.size}g</div>
+          <div>
+            <div class="pi-name">${p.name}</div>
+            <div class="pi-sub">${p.boxes} boxes · ${su}kg stick</div>
+          </div>
+        </div>
+        <div class="pi-right">
+          <div>
+            <div class="pi-mrp-val">₹${mrp}</div>
+            <div class="pi-mrp-lbl">MRP/box</div>
+          </div>
+          <button class="pi-del" onclick="removePack(${i})">✕</button>
+        </div>
+      </div>
+      <div class="pi-stats">
+        <div class="pi-stat-cell"><div class="psc-l">Cost/Box</div><div class="psc-v">₹${tot.toFixed(2)}</div></div>
+        <div class="pi-stat-cell"><div class="psc-l">Stick Cost</div><div class="psc-v">₹${sc.toFixed(2)}</div></div>
+        <div class="pi-stat-cell"><div class="psc-l">Box Cost</div><div class="psc-v">₹${br.toFixed(2)}</div></div>
+      </div>
+    </div>`;
+  }).join('')+`</div>`;
+}
+
+function removePack(i) {
+  packLog.splice(i,1);
+  renderLog();
+  updatePreview();
+  refreshSizeCards();
+}
+
+/* ── RATES PAGE ── */
+function buildRates() {
+  const sr  = parseFloat(document.getElementById('stickRate').value)||0;
+  const r40 = parseFloat(document.getElementById('box40rate').value)||0;
+  const r80 = parseFloat(document.getElementById('box80rate').value)||0;
+  const {stick,b40,b80} = getBalances();
+
+  const setStock = (id, val, warn) => {
+    const el = document.getElementById(id);
+    el.textContent = val;
+    el.className = 'st-val'+(warn?( val<0||val.toString().startsWith('-')?' warn':' ok'):' ok');
+  };
+  document.getElementById('fin_stick').textContent = stick.toFixed(2)+'kg';
+  document.getElementById('fin_stick').className = 'st-val'+(stick<0?' warn':' ok');
+  document.getElementById('fin_b40').textContent = b40;
+  document.getElementById('fin_b40').className = 'st-val'+(b40<0?' warn':' ok');
+  document.getElementById('fin_b80').textContent = b80;
+  document.getElementById('fin_b80').className = 'st-val'+(b80<0?' warn':' ok');
+
+  const rc = document.getElementById('rateCards');
+  if(!packLog.length){
+    rc.innerHTML=`<div class="empty-state"><div class="es-icon">📊</div><p>No packing entries.<br>Go back to Step 2 to add.</p></div>`;
+    return;
+  }
+  rc.innerHTML = packLog.map(p => {
+    const br   = p.size===40?r40:r80;
+    const sc   = p.size*(sr/1000);
+    const tot  = sc+br+PACK_RATE;
+    const mrp  = Math.ceil(tot*2/5)*5;
+    const total_val = (mrp*p.boxes).toLocaleString('en-IN');
+    return `
+    <div class="rate-card">
+      <div class="rc-top">
+        <div class="rc-left">
+          <div>
+            <span class="rc-name">${p.name}</span>
+            <span class="rc-sz-tag rc-sz-${p.size}">${p.size}g</span>
+          </div>
+          <div class="rc-boxes">${p.boxes} boxes packed</div>
+        </div>
+        <div class="rc-mrp-block">
+          <div class="rc-mrp-num">₹${mrp}</div>
+          <div class="rc-mrp-lbl">MRP per box</div>
+        </div>
+      </div>
+      <div class="rc-breakdown">
+        <div class="rcb">
+          <div class="rcb-lbl">Stick</div>
+          <div class="rcb-val">₹${sc.toFixed(2)}</div>
+          <div class="rcb-sub">${p.size}g × ₹${(sr/1000).toFixed(3)}</div>
+        </div>
+        <div class="rcb">
+          <div class="rcb-lbl">Box</div>
+          <div class="rcb-val">₹${br.toFixed(2)}</div>
+          <div class="rcb-sub">per box</div>
+        </div>
+        <div class="rcb">
+          <div class="rcb-lbl">Packing</div>
+          <div class="rcb-val">₹${PACK_RATE.toFixed(2)}</div>
+          <div class="rcb-sub">labour</div>
+        </div>
+        <div class="rcb hi">
+          <div class="rcb-lbl">Total Cost</div>
+          <div class="rcb-val">₹${tot.toFixed(2)}</div>
+          <div class="rcb-sub">× 2 ↑ ₹5 = ${mrp}</div>
+        </div>
+      </div>
+      <div class="rc-footer">
+        <span>${p.boxes} × ₹${mrp} total</span>
+        <strong>₹${total_val}</strong>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── INIT ── */
+setSize(40);
+renderLog();
+['box40rate','box80rate'].forEach(id =>
+  document.getElementById(id).addEventListener('input', refreshSizeCards));
+['stickKg','stickRate','box40count','box40rate','box80count','box80rate'].forEach(id =>
+  document.getElementById(id).addEventListener('input', ()=>{updatePreview();refreshSizeCards();}));
+</script>
+</body>
+</html>

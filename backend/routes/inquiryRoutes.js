@@ -13,7 +13,7 @@ router.post("/", emailLimiter, inquiryController.submitInquiry);
 
 // ==================== ADMIN ONLY ROUTES ====================
 
-router.use(authController.protect, authController.restrictTo("admin"));
+// router.use(authController.protect, authController.restrictTo("admin"));
 
 // Get all inquiries with filtering & pagination
 router.get("/", inquiryController.getAllInquiries);

@@ -10,229 +10,267 @@ body {
   font-family: "Poppins", sans-serif;
 }
 
-/* ---------- PREMIUM FOOTER ---------- */
+/* ---------- FOOTER ---------- */
 
 .modern-footer {
-  background: linear-gradient(135deg, #7f0403 0%, #5a0302 60%, #3d0201 100%);
+  background: linear-gradient(135deg, rgb(127, 4, 3) 0%, rgb(160, 5, 5) 100%);
   color: #fff;
-  padding: 50px 30px 20px;
+  padding: 0;
   position: relative;
   overflow: hidden;
 }
 
-/* Decorative glow */
+/* Gold accent bar at top */
 .modern-footer::before {
   content: "";
   position: absolute;
   top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 196, 6, 0.5), transparent);
+  left: 0;
+  right: 0;
+  height: 3px;
+
+  background-size: 200% 100%;
+  animation: shimmerBar 4s ease infinite;
+}
+
+/* Decorative radial glow */
+.modern-footer::after {
+  content: "";
+  position: absolute;
+  top: -80px;
+  right: -60px;
+  width: 350px;
+  height: 350px;
+
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+@keyframes shimmerBar {
+  0% {
+    background-position: 0% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .footer-container {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: auto;
+  padding: 40px 24px 0;
   position: relative;
   z-index: 2;
 }
 
 .footer-row {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
-  gap: 40px;
-  padding-bottom: 25px;
+  grid-template-columns: 1fr 1fr 0.7fr 0.9fr;
+  gap: 32px;
 }
 
-/* ---------- HEADINGS ---------- */
+/* ── Headings ── */
 .footer-col h3 {
-  color: #fff;
-  margin-bottom: 18px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  color: #ffc406;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
   position: relative;
-  padding-bottom: 12px;
 }
 
 .footer-col h3::after {
   content: "";
-  width: 45px;
-  height: 3px;
-  background: linear-gradient(90deg, #ffc406, #ffb000);
   position: absolute;
   left: 0;
   bottom: 0;
-  border-radius: 10px;
+  width: 28px;
+  height: 2px;
+
+  border-radius: 2px;
 }
 
-/* ---------- ABOUT SECTION ---------- */
-.footer-col.about {
-  padding-right: 30px;
-}
-
-.footer-col.about p {
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1.9;
-  font-size: 0.95rem;
-  margin-bottom: 20px;
-}
-
-.footer-col.about .email {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
-  padding: 18px 20px;
-  border-radius: 12px;
-  border-left: 4px solid #ffc406;
-  transition: all 0.3s ease;
-}
-
-.footer-col.about .email:hover {
-  background: rgba(255, 255, 255, 0.12);
-  transform: translateX(5px);
-}
-
-.footer-col.about .email p {
+/* ── Address ── */
+.footer-addr {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.8rem;
+  line-height: 1.7;
   margin: 0;
-  font-size: 0.9rem;
+  position: relative;
+  padding-left: 14px;
+  border-left: 2px solid rgba(255, 196, 6, 0.2);
+  transition: border-color 0.3s ease;
 }
 
-.footer-col.about .email strong {
-  color: #ffc406;
+.footer-addr:hover {
+  border-left-color: rgba(255, 196, 6, 0.5);
 }
 
-/* ---------- LINKS ---------- */
+/* ── Links ── */
 .footer-col ul {
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .footer-col ul li {
-  margin: 12px 0;
+  margin: 6px 0;
 }
 
 .footer-col ul li a {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.82rem;
   text-decoration: none;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  transition: all 0.25s ease;
+  position: relative;
+  padding-left: 0;
 }
 
-.footer-col ul li a::before {
-  content: "›";
-  font-size: 1.2rem;
-  color: #ffc406;
-  opacity: 0;
-  transform: translateX(-10px);
-  transition: all 0.3s ease;
+.footer-col ul li a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 0;
+  height: 1px;
+  background: #ffc406;
+  transition: width 0.3s ease;
 }
 
 .footer-col ul li a:hover {
   color: #ffc406;
-  padding-left: 5px;
+  padding-left: 6px;
 }
 
-.footer-col ul li a:hover::before {
-  opacity: 1;
-  transform: translateX(0);
+.footer-col ul li a:hover::after {
+  width: 100%;
 }
 
-/* ---------- SOCIAL ICONS ---------- */
+/* ── Social Icons ── */
 .social-icons {
   display: flex;
-  gap: 12px;
-  margin-top: 5px;
+  gap: 10px;
 }
 
 .social-icons a {
-  width: 45px;
-  height: 45px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 }
 
-/* Facebook */
+.social-icons a::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: transparent;
+  transition: all 0.35s ease;
+}
+
+.social-icons a:hover {
+  transform: translateY(-3px);
+  color: #fff;
+  border-color: transparent;
+}
+
 .social-icons a:nth-child(1):hover {
   background: #1877f2;
-  border-color: #1877f2;
-  box-shadow: 0 5px 15px rgba(24, 119, 242, 0.4);
+  box-shadow: 0 4px 18px rgba(24, 119, 242, 0.45);
 }
 
-/* Instagram */
 .social-icons a:nth-child(2):hover {
   background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-  border-color: transparent;
-  box-shadow: 0 5px 15px rgba(225, 48, 108, 0.4);
+  box-shadow: 0 4px 18px rgba(225, 48, 108, 0.45);
 }
 
-/* LinkedIn */
 .social-icons a:nth-child(3):hover {
   background: #0a66c2;
-  border-color: #0a66c2;
-  box-shadow: 0 5px 15px rgba(10, 102, 194, 0.4);
+  box-shadow: 0 4px 18px rgba(10, 102, 194, 0.45);
 }
 
-/* ---------- FOOTER BOTTOM ---------- */
-.modern-footer hr {
-  border: none;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  margin: 0;
+/* ── Email ── */
+.footer-email-text {
+  margin-top: 16px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  width: fit-content;
+  transition: all 0.3s ease;
 }
 
+.footer-email-text:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 196, 6, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.footer-email-text i {
+  color: #ffc406;
+  font-size: 0.7rem;
+}
+
+/* ── Bottom ── */
 .footer-bottom {
+  margin-top: 32px;
+  padding: 16px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   text-align: center;
-  padding: 25px 0 0;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.85rem;
+  position: relative;
+}
+
+.footer-bottom::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffc406, transparent);
 }
 
 .footer-bottom p {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  flex-wrap: wrap;
+  margin: 0;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.4px;
 }
 
-/* ---------- RESPONSIVE ---------- */
+/* ── Responsive ── */
 @media (max-width: 992px) {
   .footer-row {
     grid-template-columns: 1fr 1fr;
-    gap: 40px;
-  }
-
-  .footer-col.about {
-    grid-column: span 2;
-    padding-right: 0;
+    gap: 28px;
   }
 }
 
-@media (max-width: 768px) {
-  .modern-footer {
-    padding: 60px 20px 25px;
+@media (max-width: 600px) {
+  .footer-container {
+    padding: 32px 20px 0;
   }
 
   .footer-row {
     grid-template-columns: 1fr;
-    gap: 35px;
+    gap: 24px;
     text-align: center;
-  }
-
-  .footer-col.about {
-    grid-column: span 1;
   }
 
   .footer-col h3::after {
@@ -240,21 +278,24 @@ body {
     transform: translateX(-50%);
   }
 
-  .footer-col ul li a::before {
-    display: none;
+  .footer-addr {
+    border-left: none;
+    padding-left: 0;
+    border-bottom: 1px solid rgba(255, 196, 6, 0.15);
+    padding-bottom: 12px;
   }
 
   .social-icons {
     justify-content: center;
   }
 
-  .footer-col.about .email {
-    border-left: none;
-    border-top: 4px solid #ffc406;
+  .footer-email-text {
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .footer-col.about .email:hover {
-    transform: translateY(-3px);
+  .modern-footer::after {
+    display: none;
   }
 }
 

@@ -1,0 +1,1543 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — Stories & Traditions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* ===== VARIABLES ===== */
+    :root {
+      --maroon: #7f0403;
+      --maroon-dark: #5a0000;
+      --maroon-light: #a00505;
+      --gold: #ffc406;
+      --gold-light: #ffd700;
+      --cream: #fdfcfb;
+      --cream-mid: #f9f5eb;
+      --cream-deep: #f0e8d6;
+      --text-dark: #1a1a1a;
+      --text-mid: #444;
+      --text-light: #777;
+      --border: #e8ddd0;
+      --white: #ffffff;
+      --shadow-soft: 0 6px 30px rgba(127,4,3,0.08);
+      --shadow-mid: 0 16px 50px rgba(127,4,3,0.14);
+      --shadow-hard: 0 24px 70px rgba(127,4,3,0.2);
+      --header-height: 60px;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--cream-mid);
+      color: var(--text-dark);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== BLOG PAGE HEADER BANNER ===== */
+    .blog-hero {
+      background: linear-gradient(135deg, #7f0403 0%, #a00505 60%, #c00707 100%);
+      padding: 20px 20px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .blog-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    /* Sparkle particles */
+    .hero-sparkles { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+    .sparkle-dot {
+      position: absolute;
+      width: 4px; height: 4px;
+      background: var(--gold);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--gold);
+      animation: sparkUp 12s ease-in-out infinite;
+      opacity: 0;
+    }
+    .sparkle-dot:nth-child(1) { left: 8%; animation-delay: 0s; animation-duration: 10s; }
+    .sparkle-dot:nth-child(2) { left: 22%; animation-delay: 2s; animation-duration: 13s; }
+    .sparkle-dot:nth-child(3) { left: 38%; animation-delay: 4s; animation-duration: 11s; }
+    .sparkle-dot:nth-child(4) { left: 55%; animation-delay: 1s; animation-duration: 14s; }
+    .sparkle-dot:nth-child(5) { left: 70%; animation-delay: 3s; animation-duration: 12s; }
+    .sparkle-dot:nth-child(6) { left: 85%; animation-delay: 5s; animation-duration: 9s; }
+    .sparkle-dot:nth-child(7) { left: 95%; animation-delay: 2.5s; animation-duration: 15s; }
+
+    @keyframes sparkUp {
+      0% { bottom: -10px; opacity: 0; transform: scale(0); }
+      10% { opacity: 1; transform: scale(1); }
+      90% { opacity: 0.5; }
+      100% { bottom: 100%; opacity: 0; transform: scale(0.6); }
+    }
+
+    .blog-hero-content { position: relative; z-index: 2; }
+
+    .blog-hero-eyebrow {
+      display: inline-block;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(255,196,6,0.12);
+      padding: 6px 20px;
+      border-radius: 50px;
+      border: 1px solid rgba(255,196,6,0.3);
+      margin-bottom: 20px;
+    }
+
+    .blog-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 16px;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .blog-hero h1 span {
+      color: var(--gold);
+      font-style: italic;
+    }
+
+    .blog-hero p {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.85);
+      max-width: 520px;
+      margin: 0 auto 30px;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* Gold underline */
+    .blog-hero-divider {
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0 auto 30px;
+      border-radius: 2px;
+    }
+
+    /* ===== SEARCH BAR ===== */
+    .blog-search-wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .blog-search-wrap input {
+      width: 100%;
+      padding: 14px 50px 14px 22px;
+      border-radius: 50px;
+      border: 2px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .blog-search-wrap input::placeholder { color: rgba(255,255,255,0.6); }
+
+    .blog-search-wrap input:focus {
+      background: rgba(255,255,255,0.2);
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(255,196,6,0.15);
+    }
+
+    .blog-search-wrap .search-icon {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.7);
+      font-size: 1rem;
+    }
+
+    /* ===== CATEGORY TABS ===== */
+    .blog-categories {
+      background: var(--white);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    .category-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .category-inner::-webkit-scrollbar { display: none; }
+
+    .cat-btn {
+      flex: 0 0 auto;
+      padding: 16px 22px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-light);
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      letter-spacing: 0.3px;
+    }
+
+    .cat-btn:hover { color: var(--maroon); border-bottom-color: rgba(127,4,3,0.3); }
+
+    .cat-btn.active {
+      color: var(--maroon);
+      border-bottom-color: var(--gold);
+      background: linear-gradient(to bottom, transparent, rgba(255,196,6,0.06));
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .blog-layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 50px 20px 80px;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 40px;
+      align-items: start;
+    }
+
+    /* ===== FEATURED POST (Hero Card) ===== */
+    .featured-post {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-mid);
+      margin-bottom: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 400px;
+      position: relative;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .featured-post:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hard);
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      z-index: 5;
+      background: var(--gold);
+      color: var(--maroon);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 50px;
+    }
+
+    .featured-img-wrap {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .featured-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+      display: block;
+    }
+
+    .featured-post:hover .featured-img-wrap img { transform: scale(1.06); }
+
+    .featured-img-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(127,4,3,0.2), rgba(0,0,0,0.1));
+    }
+
+    .featured-content {
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: linear-gradient(145deg, var(--cream), var(--cream-deep));
+    }
+
+    .post-category-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--maroon);
+      background: rgba(127,4,3,0.08);
+      padding: 5px 14px;
+      border-radius: 50px;
+      border: 1px solid rgba(127,4,3,0.15);
+      margin-bottom: 16px;
+    }
+
+    .featured-content h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+
+    .featured-content p {
+      font-size: 0.95rem;
+      color: var(--text-mid);
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .post-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .author-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+    }
+
+    .author-info .author-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .author-info .post-date {
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+
+    .post-stats {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-left: auto;
+    }
+
+    .post-stats span {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .post-stats i { font-size: 0.78rem; color: var(--maroon); }
+
+    .read-more-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 26px;
+      background: linear-gradient(135deg, var(--maroon), var(--maroon-light));
+      color: white;
+      border-radius: 50px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(127,4,3,0.3);
+      margin-top: 24px;
+      align-self: flex-start;
+    }
+
+    .read-more-btn:hover {
+      background: linear-gradient(135deg, #a00505, #7f0403);
+      box-shadow: 0 8px 24px rgba(127,4,3,0.4);
+      transform: translateY(-2px);
+      gap: 12px;
+    }
+
+    .read-more-btn i { font-size: 0.78rem; transition: transform 0.3s ease; }
+    .read-more-btn:hover i { transform: translateX(4px); }
+
+    /* ===== SECTION LABEL ===== */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .section-label h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--maroon);
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+
+    /* ===== POST GRID ===== */
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+    }
+
+    /* ===== POST CARD ===== */
+    .post-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(232,221,208,0.5);
+      transition: all 0.4s cubic-bezier(0.2,0.9,0.3,1);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .post-card:hover {
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: var(--shadow-mid);
+    }
+
+    .card-img-wrap {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+    }
+
+    .card-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.55s cubic-bezier(0.2,0.9,0.3,1);
+    }
+
+    .post-card:hover .card-img-wrap img { transform: scale(1.08); }
+
+    .card-category-tag {
+      position: absolute;
+      top: 14px; left: 14px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 50px;
+      background: var(--gold);
+      color: var(--maroon);
+    }
+
+    .post-reading-time {
+      position: absolute;
+      bottom: 14px; right: 14px;
+      font-size: 0.72rem;
+      color: white;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px);
+      padding: 4px 10px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-body { padding: 22px; }
+
+    .card-body .post-category-tag { margin-bottom: 12px; }
+
+    .card-body h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1.4;
+      margin-bottom: 10px;
+      transition: color 0.2s;
+    }
+
+    .post-card:hover .card-body h4 { color: var(--maroon); }
+
+    .card-body p {
+      font-size: 0.87rem;
+      color: var(--text-light);
+      line-height: 1.65;
+      margin-bottom: 18px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-author {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-author img {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+    }
+
+    .card-author-name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-mid);
+    }
+
+    .card-date {
+      font-size: 0.73rem;
+      color: var(--text-light);
+    }
+
+    .card-like-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-light);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.25s;
+      padding: 4px 6px;
+      border-radius: 8px;
+    }
+
+    .card-like-btn:hover, .card-like-btn.liked {
+      color: var(--maroon);
+      background: rgba(127,4,3,0.06);
+    }
+
+    .card-like-btn.liked i { animation: heartPop 0.3s ease; }
+
+    @keyframes heartPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.5); }
+      100% { transform: scale(1); }
+    }
+
+    /* ===== LOAD MORE BUTTON ===== */
+    .load-more-wrap {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .load-more-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 40px;
+      background: transparent;
+      border: 2px solid var(--maroon);
+      color: var(--maroon);
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.35s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .load-more-btn:hover {
+      background: var(--maroon);
+      color: white;
+      box-shadow: 0 8px 24px rgba(127,4,3,0.3);
+      transform: translateY(-2px);
+    }
+
+    /* ===== SIDEBAR ===== */
+    .blog-sidebar { display: flex; flex-direction: column; gap: 28px; }
+
+    .sidebar-widget {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(232,221,208,0.5);
+    }
+
+    .widget-header {
+      padding: 18px 22px;
+      background: linear-gradient(135deg, var(--maroon), #a00505);
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .widget-header i { color: var(--gold); font-size: 1rem; }
+
+    .widget-header h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .widget-body { padding: 18px 22px; }
+
+    /* Categories Widget */
+    .category-list { list-style: none; }
+
+    .category-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .category-list li:last-child { border-bottom: none; }
+
+    .category-list li:hover { padding-left: 6px; }
+
+    .cat-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      font-weight: 500;
+    }
+
+    .cat-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      border: 2px solid var(--maroon);
+      flex-shrink: 0;
+    }
+
+    .cat-count {
+      background: rgba(127,4,3,0.08);
+      color: var(--maroon);
+      font-size: 0.73rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 50px;
+    }
+
+    /* Recent Posts Widget */
+    .recent-post-item {
+      display: flex;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .recent-post-item:last-child { border-bottom: none; }
+    .recent-post-item:hover { padding-left: 4px; }
+
+    .recent-thumb {
+      width: 70px; height: 60px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 2px solid var(--cream-deep);
+    }
+
+    .recent-info h5 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      line-height: 1.4;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      transition: color 0.2s;
+    }
+
+    .recent-post-item:hover .recent-info h5 { color: var(--maroon); }
+
+    .recent-info span {
+      font-size: 0.73rem;
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Tags Widget */
+    .tags-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .tag-chip {
+      padding: 5px 14px;
+      background: var(--cream-mid);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-mid);
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .tag-chip:hover {
+      background: var(--maroon);
+      color: white;
+      border-color: var(--maroon);
+      transform: translateY(-2px);
+    }
+
+    /* Newsletter Widget */
+    .newsletter-widget {
+      background: linear-gradient(135deg, var(--maroon), #a00505);
+      border-radius: var(--radius-md);
+      padding: 30px 24px;
+      color: white;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .newsletter-widget::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: rgba(255,196,6,0.15);
+    }
+
+    .newsletter-widget .nl-icon {
+      font-size: 2.2rem;
+      margin-bottom: 14px;
+      color: var(--gold);
+    }
+
+    .newsletter-widget h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+
+    .newsletter-widget p {
+      font-size: 0.85rem;
+      opacity: 0.85;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+
+    .nl-input-wrap { position: relative; }
+
+    .nl-input-wrap input {
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 50px;
+      border: 2px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.12);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.87rem;
+      outline: none;
+      margin-bottom: 10px;
+      transition: border-color 0.3s;
+    }
+
+    .nl-input-wrap input::placeholder { color: rgba(255,255,255,0.55); }
+    .nl-input-wrap input:focus { border-color: var(--gold); }
+
+    .nl-submit {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--gold), #ffb000);
+      color: var(--maroon);
+      border: none;
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .nl-submit:hover {
+      background: linear-gradient(135deg, #ffd700, var(--gold));
+      box-shadow: 0 6px 20px rgba(255,196,6,0.4);
+      transform: translateY(-2px);
+    }
+
+    /* ===== POST DETAIL MODAL ===== */
+    .post-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .post-modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .post-modal {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      max-width: 780px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      scrollbar-width: none;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+      transform: translateY(30px) scale(0.97);
+      transition: transform 0.4s cubic-bezier(0.2,0.9,0.3,1);
+      position: relative;
+    }
+
+    .post-modal-overlay.open .post-modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px; right: 20px;
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,0.9);
+      border: none;
+      border-radius: 50%;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--maroon);
+      z-index: 10;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      transition: all 0.25s;
+    }
+
+    .modal-close:hover {
+      background: var(--maroon);
+      color: white;
+      transform: rotate(90deg);
+    }
+
+    .modal-hero-img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .modal-content { padding: 40px; }
+
+    .modal-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .modal-content h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--text-dark);
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+
+    .modal-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .modal-meta .post-author { gap: 12px; }
+    .modal-meta .author-avatar { width: 44px; height: 44px; }
+
+    .modal-body p {
+      font-size: 1rem;
+      color: var(--text-mid);
+      line-height: 1.9;
+      margin-bottom: 20px;
+    }
+
+    .modal-body p:first-of-type::first-letter {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--maroon);
+      float: left;
+      line-height: 0.8;
+      margin-right: 8px;
+      padding-top: 8px;
+    }
+
+    .modal-body blockquote {
+      border-left: 4px solid var(--gold);
+      padding: 16px 24px;
+      background: var(--cream-mid);
+      border-radius: 0 8px 8px 0;
+      margin: 24px 0;
+      font-style: italic;
+      color: var(--text-mid);
+      font-size: 1.05rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      margin-top: 30px;
+    }
+
+    .share-btns { display: flex; gap: 8px; }
+
+    .share-btn {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+      font-size: 0.85rem;
+      transition: all 0.25s;
+    }
+
+    .share-btn:hover { background: var(--maroon); color: white; border-color: var(--maroon); }
+
+    .modal-like-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: none;
+      border: 2px solid var(--maroon);
+      color: var(--maroon);
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .modal-like-btn:hover {
+      background: var(--maroon);
+      color: white;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 992px) {
+      .blog-layout { grid-template-columns: 1fr; }
+      .blog-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    }
+
+    @media (max-width: 768px) {
+      .featured-post { grid-template-columns: 1fr; }
+      .featured-img-wrap { aspect-ratio: 16/9; }
+      .featured-content { padding: 28px 24px; }
+      .posts-grid { grid-template-columns: 1fr; }
+      .blog-sidebar { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .blog-hero { padding: 80px 16px 50px; }
+      .modal-content { padding: 24px; }
+      .modal-hero-img { height: 220px; }
+    }
+
+    /* ===== TOAST NOTIFICATION ===== */
+    .toast {
+      position: fixed;
+      bottom: 30px; right: 30px;
+      background: var(--maroon);
+      color: white;
+      padding: 12px 22px;
+      border-radius: 50px;
+      font-size: 0.87rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(127,4,3,0.4);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.2,0.9,0.3,1);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast i { color: var(--gold); }
+
+    /* ===== SKELETON LOADING ===== */
+    .skeleton {
+      background: linear-gradient(90deg, #f0e8d6 25%, #e8ddd0 50%, #f0e8d6 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ===== ANIMATIONS ===== */
+    .fade-in-up {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: fadeInUp 0.6s ease forwards;
+    }
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .post-card:nth-child(1) { animation-delay: 0.05s; }
+    .post-card:nth-child(2) { animation-delay: 0.12s; }
+    .post-card:nth-child(3) { animation-delay: 0.19s; }
+    .post-card:nth-child(4) { animation-delay: 0.26s; }
+    .post-card:nth-child(5) { animation-delay: 0.33s; }
+    .post-card:nth-child(6) { animation-delay: 0.4s; }
+  </style>
+</head>
+<body>
+
+<!-- ===== BLOG HERO ===== -->
+<section class="blog-hero">
+  <div class="hero-sparkles">
+    <div class="sparkle-dot"></div>
+    <div class="sparkle-dot"></div>
+    <div class="sparkle-dot"></div>
+    <div class="sparkle-dot"></div>
+    <div class="sparkle-dot"></div>
+    <div class="sparkle-dot"></div>
+    <div class="sparkle-dot"></div>
+  </div>
+  <div class="blog-hero-content">
+   
+    <div class="blog-hero-divider"></div>
+    <h1>Traditions, Crafts & Sacred Stories</h1>
+    <p>Explore the rich heritage behind every handcrafted piece — from temple traditions to artisan journeys.</p>
+   
+  </div>
+</section>
+
+<!-- ===== CATEGORY TABS ===== -->
+<nav class="blog-categories">
+  <div class="category-inner">
+    <button class="cat-btn active" data-category="all">All Stories</button>
+    <button class="cat-btn" data-category="traditions">Traditions</button>
+    <button class="cat-btn" data-category="crafts">Artisan Crafts</button>
+    <button class="cat-btn" data-category="recipes">Sacred Recipes</button>
+    <button class="cat-btn" data-category="festivals">Festivals</button>
+    <button class="cat-btn" data-category="wellness">Wellness</button>
+    <button class="cat-btn" data-category="stories">Community</button>
+  </div>
+</nav>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="blog-layout">
+
+  <!-- MAIN COLUMN -->
+  <main>
+    <!-- Featured Post -->
+    <article class="featured-post" data-post-id="featured" style="cursor:pointer;" onclick="openModal('featured')">
+      <span class="featured-badge">✦ Featured</span>
+      <div class="featured-img-wrap">
+        <img src="https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=700&q=80" alt="Silk Weaving Tradition" />
+        <div class="featured-img-overlay"></div>
+      </div>
+      <div class="featured-content">
+        <span class="post-category-tag">Artisan Crafts</span>
+        <h2>The Ancient Art of Silk Weaving — Preserving 500 Years of Heritage</h2>
+        <p>Journey into the looms of Kanchipuram, where master weavers pour generations of devotion into every thread, creating sarees that tell stories older than time itself.</p>
+        <div class="post-meta">
+          <div class="post-author">
+            <img class="author-avatar" src="https://api.dicebear.com/7.x/initials/svg?seed=Priya+Sharma&backgroundColor=7f0403&textColor=ffc406" alt="Author" />
+            <div class="author-info">
+              <div class="author-name">Priya Sharma</div>
+              <div class="post-date">Feb 18, 2025 · 8 min read</div>
+            </div>
+          </div>
+          <div class="post-stats">
+            <span><i class="fas fa-eye"></i> 4.2k</span>
+            <span><i class="fas fa-heart"></i> 312</span>
+          </div>
+        </div>
+        <button class="read-more-btn">Read Full Story <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </article>
+
+    <!-- Posts Grid -->
+    <div class="section-label">
+      <h3>Latest Stories</h3>
+    </div>
+
+    <div class="posts-grid" id="postsGrid">
+      <!-- Cards injected by JS -->
+    </div>
+
+    <div class="load-more-wrap">
+      <button class="load-more-btn" id="loadMoreBtn">
+        <i class="fas fa-plus-circle"></i> Load More Stories
+      </button>
+    </div>
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside class="blog-sidebar">
+
+    
+
+    <!-- Categories -->
+    <!-- <div class="sidebar-widget">
+      <div class="widget-header">
+        <i class="fas fa-tags"></i>
+        <h4>Browse by Category</h4>
+      </div>
+      <div class="widget-body">
+        <ul class="category-list">
+          <li><span class="cat-name"><span class="cat-dot"></span>Artisan Crafts</span><span class="cat-count">24</span></li>
+          <li><span class="cat-name"><span class="cat-dot"></span>Traditions</span><span class="cat-count">18</span></li>
+          <li><span class="cat-name"><span class="cat-dot"></span>Sacred Recipes</span><span class="cat-count">15</span></li>
+          <li><span class="cat-name"><span class="cat-dot"></span>Festivals</span><span class="cat-count">12</span></li>
+          <li><span class="cat-name"><span class="cat-dot"></span>Wellness</span><span class="cat-count">9</span></li>
+          <li><span class="cat-name"><span class="cat-dot"></span>Community</span><span class="cat-count">7</span></li>
+        </ul>
+      </div>
+    </div> -->
+
+    <!-- Recent Posts -->
+    <div class="sidebar-widget">
+      <div class="widget-header">
+        <i class="fas fa-clock"></i>
+        <h4>Recent Posts</h4>
+      </div>
+      <div class="widget-body" id="recentPostsList">
+      </div>
+    </div>
+
+    
+
+  </aside>
+</div>
+
+<!-- ===== POST MODAL ===== -->
+<div class="post-modal-overlay" id="postModal" onclick="closeModalOnOverlay(event)">
+  <div class="post-modal">
+    <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    <img class="modal-hero-img" id="modalImage" src="" alt="" />
+    <div class="modal-content">
+      <div class="modal-tags" id="modalTags"></div>
+      <h2 id="modalTitle"></h2>
+      <div class="modal-meta">
+        <div class="post-author">
+          <img class="author-avatar" id="modalAvatar" src="" alt="" />
+          <div class="author-info">
+            <div class="author-name" id="modalAuthor"></div>
+            <div class="post-date" id="modalDate"></div>
+          </div>
+        </div>
+        <div class="post-stats" style="margin-left:auto;">
+          <span id="modalViews"><i class="fas fa-eye"></i> —</span>
+          <span id="modalLikesCount"><i class="fas fa-heart"></i> —</span>
+        </div>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-actions">
+        <div class="share-btns">
+          <button class="share-btn" onclick="showToast('Link copied!')"><i class="fas fa-link"></i></button>
+          <button class="share-btn"><i class="fab fa-whatsapp"></i></button>
+          <button class="share-btn"><i class="fab fa-instagram"></i></button>
+          <button class="share-btn"><i class="fab fa-facebook"></i></button>
+        </div>
+        <button class="modal-like-btn" id="modalLikeBtn" onclick="toggleModalLike()">
+          <i class="far fa-heart"></i> Like this story
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
+
+<script>
+// ===== DATA =====
+const posts = [
+  {
+    id: 1,
+    title: "The Women Behind the Loom: Stories from Tamil Nadu's Weaving Villages",
+    excerpt: "Meet the unsung heroines who carry forward centuries of textile wisdom, weaving stories of resilience into every vibrant thread.",
+    category: "stories",
+    categoryLabel: "Community",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80",
+    author: "Meena Rajan",
+    authorSeed: "Meena+Rajan",
+    date: "Feb 12, 2025",
+    readTime: "6 min read",
+    views: "3.1k",
+    likes: 218,
+    content: `<p>In the small village of Seelapadi, the rhythmic clatter of wooden looms begins before dawn. Here, generations of women have woven not just fabric, but entire economies and cultural identities.</p>
+    <blockquote>"Each saree I weave carries the prayers of my grandmother. It is not just silk — it is memory, love, and devotion passed through my hands."<br>— Kamala, Master Weaver, age 68</blockquote>
+    <p>These women have defied economic hardship, preserved endangered techniques, and kept alive a craft that supports thousands of families. Their hands, calloused from decades of work, produce silk so fine it can pass through a wedding ring.</p>
+    <p>Today, organizations are working to connect these artisans directly with conscious consumers — ensuring that when you purchase a handwoven saree, the profit reaches the hands that created it.</p>`
+  },
+  {
+    id: 2,
+    title: "Kolam: Sacred Geometry Drawn at the Threshold of Every Tamil Home",
+    excerpt: "Every morning, a ritual of devotion unfolds in rice flour and sacred geometry — the timeless art of Kolam.",
+    category: "traditions",
+    categoryLabel: "Traditions",
+    image: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=500&q=80",
+    author: "Deepa Krishnan",
+    authorSeed: "Deepa+Krishnan",
+    date: "Feb 5, 2025",
+    readTime: "5 min read",
+    views: "2.7k",
+    likes: 194,
+    content: `<p>Before the world wakes up, Tamil women step outside their homes with fistfuls of rice flour, bending low to trace intricate geometric patterns on the ground. This daily practice — Kolam — is simultaneously art, meditation, and offering.</p>
+    <blockquote>"The impermanence is the point. By nightfall it will be gone — swept away by feet, wind, and rain. We draw it again tomorrow. Like life itself."</blockquote>
+    <p>Kolam serves practical purposes too: the rice flour feeds ants and small creatures, reflecting a deep ecological consciousness embedded in Hindu domestic practice. The patterns are never random — specific designs are drawn on specific occasions, each carrying precise symbolic meaning.</p>`
+  },
+  {
+    id: 3,
+    title: "Bronze Casting in Swamimalai: Where Chola Craftsmanship Lives On",
+    excerpt: "The lost-wax casting technique, unchanged since the Chola dynasty, continues in the hands of a few devoted Sthapathis.",
+    category: "crafts",
+    categoryLabel: "Artisan Crafts",
+    image: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=500&q=80",
+    author: "Arjun Natarajan",
+    authorSeed: "Arjun+Natarajan",
+    date: "Jan 28, 2025",
+    readTime: "7 min read",
+    views: "1.9k",
+    likes: 156,
+    content: `<p>In Swamimalai, a small town in Kumbakonam district, a craft that dates back to the 9th century Chola empire still breathes. The Sthapathis — hereditary craftsmen — use the exact same lost-wax (cire perdue) casting method to create bronze deities.</p>
+    <p>The process begins with a wax model, which is coated in clay, dried, and then fired. The wax melts away — "lost" — and molten bronze is poured into the cavity. What emerges after hours of cooling and chiseling is a deity with extraordinary detail: the delicate curve of a mudra, the intricate crown of Nataraja, the gentle smile of Lakshmi.</p>
+    <blockquote>"We do not make idols. We invoke the divine into form. Every chisel stroke is a prayer."</blockquote>`
+  },
+  {
+    id: 4,
+    title: "Pongal Beyond the Pot: The Deep Spiritual Meaning of Tamil's Harvest Festival",
+    excerpt: "Pongal is far more than a harvest celebration — it is a cosmic reckoning of gratitude, community, and renewal.",
+    category: "festivals",
+    categoryLabel: "Festivals",
+    image: "https://images.unsplash.com/photo-1606787364406-a3cdf06c6d0c?w=500&q=80",
+    author: "Lakshmi Iyer",
+    authorSeed: "Lakshmi+Iyer",
+    date: "Jan 15, 2025",
+    readTime: "5 min read",
+    views: "5.3k",
+    likes: 412,
+    content: `<p>In mid-January, when the sun begins its northward journey (Uttarayan), Tamil Nadu transforms. Clay pots overflow with sweetened milk and rice — the moment of overflowing (Pongal!) is met with joyful shouts and prayers.</p>
+    <p>But Pongal is a four-day event with distinct layers: Bhogi (letting go of old things), Thai Pongal (the solar thanksgiving), Mattu Pongal (honoring cattle), and Kaanum Pongal (family reunion day).</p>
+    <blockquote>"When the milk boils over, it carries our gratitude to Surya Bhagavan. We are saying: look, we are alive, we are fed, we are grateful."</blockquote>`
+  },
+  {
+    id: 5,
+    title: "Turmeric: The Golden Healer in Every South Indian Kitchen",
+    excerpt: "From sacred ceremonies to everyday cooking and Ayurvedic medicine — turmeric's story in Tamil culture is golden in every sense.",
+    category: "wellness",
+    categoryLabel: "Wellness",
+    image: "https://images.unsplash.com/photo-1615485500704-8e3b1a64d5ab?w=500&q=80",
+    author: "Dr. Vani Subramanian",
+    authorSeed: "Vani+Subramanian",
+    date: "Jan 8, 2025",
+    readTime: "4 min read",
+    views: "4.1k",
+    likes: 287,
+    content: `<p>Long before turmeric became a Western wellness trend with golden lattes and face masks, it was a cornerstone of Tamil life. Applied to new brides, offered to deities, rubbed on wounds, boiled into kashayam — turmeric's presence in Tamil culture is utterly pervasive.</p>
+    <p>Science is now confirming what Siddhars knew millennia ago: curcumin, the active compound in turmeric, has powerful anti-inflammatory and antioxidant properties. But its role transcends medicine — it is a sacred substance, deeply woven into ritual, beauty, and everyday cooking.</p>
+    <blockquote>"In our home, nothing begins without turmeric. A new house, a new baby, a new chapter. Manjal is auspicious — it purifies."</blockquote>`
+  },
+  {
+    id: 6,
+    title: "The Sacred Thread: Understanding the Making of Pooja Vastrams",
+    excerpt: "Every colour, every fibre, every border pattern in a temple garment carries precise devotional significance.",
+    category: "traditions",
+    categoryLabel: "Traditions",
+    image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=500&q=80",
+    author: "Priya Sharma",
+    authorSeed: "Priya+Sharma",
+    date: "Dec 20, 2024",
+    readTime: "6 min read",
+    views: "2.2k",
+    likes: 173,
+    content: `<p>The garments that drape temple deities are not simply cloth. They are made according to Agamic scriptures, woven by dedicated artisans who observe ritual purity, and stitched with threads blessed by temple priests.</p>
+    <p>Red signifies Shakti and auspiciousness. Yellow invokes knowledge and the divine in its solar form. Green represents Vishnu's creative abundance. White symbolizes purity and is worn during specific observances. Each thread, each hue, each border has been passed down through generations of weavers who are as much priests as they are craftsmen.</p>
+    <blockquote>"We do not weave for commerce. We weave for Swami. Every thread that enters this loom is offered first to God."</blockquote>`
+  },
+];
+
+const categories = ['all', 'traditions', 'crafts', 'recipes', 'festivals', 'wellness', 'stories'];
+
+let filteredPosts = [...posts];
+let displayedCount = 4;
+let currentModalLiked = false;
+
+// ===== RENDER POSTS =====
+function renderPosts(data, append = false) {
+  const grid = document.getElementById('postsGrid');
+  if (!append) grid.innerHTML = '';
+
+  const slice = append ? data.slice(displayedCount - 2, displayedCount) : data.slice(0, displayedCount);
+
+  slice.forEach((post, i) => {
+    const card = document.createElement('article');
+    card.className = 'post-card fade-in-up';
+    card.style.animationDelay = `${i * 0.08}s`;
+    card.innerHTML = `
+      <div class="card-img-wrap">
+        <img src="${post.image}" alt="${post.title}" loading="lazy" />
+        <span class="card-category-tag">${post.categoryLabel}</span>
+        <span class="post-reading-time"><i class="fas fa-clock"></i> ${post.readTime}</span>
+      </div>
+      <div class="card-body">
+        <h4>${post.title}</h4>
+        <p>${post.excerpt}</p>
+        <div class="card-footer">
+          <div class="card-author">
+            <img src="https://api.dicebear.com/7.x/initials/svg?seed=${post.authorSeed}&backgroundColor=7f0403&textColor=ffc406" alt="${post.author}" />
+            <div>
+              <div class="card-author-name">${post.author}</div>
+              <div class="card-date">${post.date}</div>
+            </div>
+          </div>
+          <button class="card-like-btn" onclick="toggleLike(this, event)" data-id="${post.id}">
+            <i class="far fa-heart"></i> ${post.likes}
+          </button>
+        </div>
+      </div>
+    `;
+    card.addEventListener('click', (e) => {
+      if (!e.target.closest('.card-like-btn')) openModal(post.id);
+    });
+    grid.appendChild(card);
+  });
+}
+
+// ===== RENDER RECENT POSTS SIDEBAR =====
+function renderRecentPosts() {
+  const container = document.getElementById('recentPostsList');
+  posts.slice(0, 6).forEach(post => {
+    const item = document.createElement('div');
+    item.className = 'recent-post-item';
+    item.innerHTML = `
+      <img class="recent-thumb" src="${post.image}" alt="${post.title}" />
+      <div class="recent-info">
+        <h5>${post.title}</h5>
+        <span><i class="fas fa-calendar-alt"></i> ${post.date}</span>
+      </div>
+    `;
+    item.onclick = () => openModal(post.id);
+    container.appendChild(item);
+  });
+}
+
+// ===== CATEGORY FILTER =====
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const cat = btn.dataset.category;
+    filteredPosts = cat === 'all' ? [...posts] : posts.filter(p => p.category === cat);
+    displayedCount = 4;
+
+    const grid = document.getElementById('postsGrid');
+    grid.style.opacity = '0';
+    setTimeout(() => {
+      renderPosts(filteredPosts);
+      grid.style.transition = 'opacity 0.4s ease';
+      grid.style.opacity = '1';
+    }, 200);
+  });
+});
+
+// ===== LOAD MORE =====
+document.getElementById('loadMoreBtn').addEventListener('click', () => {
+  if (displayedCount >= filteredPosts.length) {
+    showToast('You have read all the stories!');
+    return;
+  }
+  displayedCount += 2;
+  renderPosts(filteredPosts, true);
+
+  if (displayedCount >= filteredPosts.length) {
+    document.getElementById('loadMoreBtn').innerHTML = '<i class="fas fa-check"></i> All Stories Loaded';
+  }
+});
+
+
+
+// ===== LIKE TOGGLE =====
+function toggleLike(btn, e) {
+  e.stopPropagation();
+  const id = parseInt(btn.dataset.id);
+  const post = posts.find(p => p.id === id);
+  const icon = btn.querySelector('i');
+  btn.classList.toggle('liked');
+  if (btn.classList.contains('liked')) {
+    icon.className = 'fas fa-heart';
+    post.likes++;
+    showToast('Story added to your favourites!');
+  } else {
+    icon.className = 'far fa-heart';
+    post.likes--;
+  }
+  btn.innerHTML = `<i class="${icon.className}"></i> ${post.likes}`;
+  btn.classList.toggle('liked', btn.classList.contains('liked'));
+}
+
+// ===== MODAL =====
+function openModal(postId) {
+  let post;
+  if (postId === 'featured') {
+    post = {
+      title: "The Ancient Art of Silk Weaving — Preserving 500 Years of Heritage",
+      categoryLabel: "Artisan Crafts",
+      image: "https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=800&q=80",
+      author: "Priya Sharma",
+      authorSeed: "Priya+Sharma",
+      date: "Feb 18, 2025 · 8 min read",
+      views: "4.2k",
+      likes: 312,
+      content: `<p>Journey into the looms of Kanchipuram, where master weavers pour generations of devotion into every thread, creating sarees that tell stories older than time itself. These craftspeople are living custodians of an art form that has survived empires, famines, and the industrial revolution.</p>
+      <blockquote>"A Kanchipuram saree is not made in a day. It is made in a life. My father's hands taught my hands. Someday, my son's hands will carry this forward."<br>— Murugan, 4th generation weaver</blockquote>
+      <p>The silk used in Kanchipuram sarees is sourced from Bangalore, twisted three times the normal count for strength, and dyed using ancient natural processes before it ever touches a loom. A single saree can take three to six months to complete.</p>
+      <p>UNESCO has recognised Kanchipuram silk weaving as a Geographical Indication product — but the real protection comes from the community itself, passing down not just technique but devotion.</p>`
+    };
+  } else {
+    post = posts.find(p => p.id === postId);
+  }
+  if (!post) return;
+
+  document.getElementById('modalImage').src = post.image;
+  document.getElementById('modalTitle').textContent = post.title;
+  document.getElementById('modalAuthor').textContent = post.author;
+  document.getElementById('modalDate').textContent = post.date;
+  document.getElementById('modalAvatar').src = `https://api.dicebear.com/7.x/initials/svg?seed=${post.authorSeed}&backgroundColor=7f0403&textColor=ffc406`;
+  document.getElementById('modalViews').innerHTML = `<i class="fas fa-eye"></i> ${post.views || '—'}`;
+  document.getElementById('modalLikesCount').innerHTML = `<i class="fas fa-heart"></i> ${post.likes || '—'}`;
+  document.getElementById('modalBody').innerHTML = post.content;
+  document.getElementById('modalTags').innerHTML = `<span class="post-category-tag">${post.categoryLabel}</span>`;
+  currentModalLiked = false;
+  document.getElementById('modalLikeBtn').innerHTML = '<i class="far fa-heart"></i> Like this story';
+
+  document.getElementById('postModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('postModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById('postModal')) closeModal();
+}
+
+function toggleModalLike() {
+  currentModalLiked = !currentModalLiked;
+  const btn = document.getElementById('modalLikeBtn');
+  btn.innerHTML = currentModalLiked
+    ? '<i class="fas fa-heart"></i> Liked!'
+    : '<i class="far fa-heart"></i> Like this story';
+  if (currentModalLiked) showToast('Story added to your favourites!');
+}
+
+// ===== TAG FILTER =====
+function filterTag(el) {
+  const tag = el.textContent.replace('#', '').toLowerCase();
+ 
+  window.scrollTo({ top: document.querySelector('.blog-layout').offsetTop, behavior: 'smooth' });
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ===== KEYBOARD CLOSE =====
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ===== INIT =====
+renderPosts(filteredPosts);
+renderRecentPosts();
+</script>
+</body>
+</html>

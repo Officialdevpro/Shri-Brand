@@ -93,14 +93,14 @@
     border-color: #ffc406;
     color: #7f0403;
     transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 5px 15px rgba(255, 196, 6, 0.3);
+   
 }
 
 .tab-btn.active {
     background: #ffc406;
     color: #7f0403;
     border-color: #ffc406;
-    box-shadow: 0 8px 20px rgba(255, 196, 6, 0.4);
+   
     transform: translateY(-2px) scale(1.05);
 }
 
@@ -521,7 +521,11 @@
 .fade-up {
     opacity: 0;
     transform: translateY(30px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    transition: all 0.8s ease-out, transform 0.8s ease-out;
+    -webkit-transition: all 0.8s ease-out, transform 0.8s ease-out;
+    -moz-transition: all 0.8s ease-out, transform 0.8s ease-out;
+    -ms-transition: all 0.8s ease-out, transform 0.8s ease-out;
+    -o-transition: all 0.8s ease-out, transform 0.8s ease-out;
 }
 
 .fade-up.visible {
@@ -587,4 +591,32 @@
     .solution-layout {
         gap: 20px;
     }
+}
+
+
+.floral-design{
+    position: absolute;
+    bottom: -14px;
+    left: -30px;
+    z-index: -1;
+}
+.floral-design img {
+    width: 150px;
+    height: auto;
+    opacity: 0.8;
+    transition: all 0.5s ease;
+     mix-blend-mode: multiply;
+}
+.floral-design-top{
+    position: absolute;
+    top: -20px;
+    right: -30px;
+    z-index: -1;
+}
+.floral-design-top img {
+    width: 150px;
+    height: auto;
+    opacity: 0.8;
+    transition: all 0.5s ease;
+     mix-blend-mode: multiply;
 }

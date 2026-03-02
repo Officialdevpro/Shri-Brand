@@ -103,6 +103,119 @@
       object-fit: cover;
       object-position: center;
     }
+
+    /* ── Incubatee Badge ── */
+    .incubatee-badge {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 5%;
+      transform: translateX(-50%);
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      opacity: 0;
+      animation: fadeSlideUp 1s ease forwards;
+      animation-delay: 1.2s;
+    }
+
+    .incubatee-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 300;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.7);
+      margin: 0;
+    }
+
+    .incubatee-org {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .incubatee-line {
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #ffc406, transparent);
+    }
+
+    .incubatee-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #ffc406;
+      letter-spacing: 1.5px;
+      margin: 0;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ── Incubatee Badge — Responsive ── */
+    @media (max-width: 1024px) {
+      .incubatee-badge {
+        bottom: 2rem;
+      }
+
+      .incubatee-name {
+        font-size: 1.05rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .incubatee-badge {
+        bottom: 2.5rem;
+      }
+
+      .incubatee-text {
+        font-size: 0.65rem;
+        letter-spacing: 2px;
+      }
+
+      .incubatee-name {
+        font-size: 0.95rem;
+        letter-spacing: 1px;
+      }
+
+      .incubatee-line {
+        width: 28px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .incubatee-badge {
+        bottom: 1.2rem;
+        gap: 0.25rem;
+      }
+
+      .incubatee-text {
+        font-size: 0.55rem;
+        letter-spacing: 1.5px;
+      }
+
+      .incubatee-name {
+        font-size: 0.8rem;
+      }
+
+      .incubatee-line {
+        width: 20px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .incubatee-badge {
+        bottom: 1rem;
+      }
+
+      .incubatee-text {
+        font-size: 0.5rem;
+      }
+
+      .incubatee-name {
+        font-size: 0.72rem;
+      }
+    }
   </style>
 </head>
 
@@ -128,10 +241,10 @@
           <a class="nav-link" href="#home" role="menuitem">Home<span class="underline" aria-hidden="true"></span></a>
           <a class="nav-link" href="#products" role="menuitem">Products<span class="underline"
               aria-hidden="true"></span></a>
-          <a class="nav-link" href="#about" role="menuitem">About Us<span class="underline"
-              aria-hidden="true"></span></a>
+
           <a class="nav-link" href="#ourstory" role="menuitem">Our Story<span class="underline"
               aria-hidden="true"></span></a>
+          <a class="nav-link" href="#blog" role="menuitem">Blog<span class="underline" aria-hidden="true"></span></a>
           <a class="nav-link" href="#contact" role="menuitem">Contact Us<span class="underline"
               aria-hidden="true"></span></a>
         </div>
@@ -183,13 +296,14 @@
             <i class="fas fa-box-open"></i>
             <span>Products</span>
           </a>
-          <a class="nav-item" href="#about" onclick="closeSidebar()">
-            <i class="fas fa-info-circle"></i>
-            <span>About Us</span>
-          </a>
+
           <a class="nav-item" href="#ourstory" onclick="closeSidebar()">
             <i class="fas fa-book-open"></i>
             <span>Our Story</span>
+          </a>
+          <a class="nav-item" href="#blog" onclick="closeSidebar()">
+            <i class="fas fa-info-circle"></i>
+            <span>Blog</span>
           </a>
           <a class="nav-item" href="#contact" onclick="closeSidebar()">
             <i class="fas fa-envelope"></i>
@@ -278,9 +392,9 @@
       visibility: visible;
     }
 
+    /* ── Cart item: nested structure (.product-details > .selecteditems) ── */
     .product-details {
       text-align: center;
-
       font-size: 16px;
       width: 100% !important;
     }
@@ -320,9 +434,53 @@
       justify-content: flex-start;
       align-items: center;
       width: 100%;
+      border: none;
+      border-radius: 3px;
     }
 
-    .product-details .selecteditems .product-d .btns {
+    /* ── Cart item: flat structure (.selecteditems.product-details on same div) ── */
+    .selecteditems.product-details {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      text-align: left;
+      padding: 10px 10px;
+      border-bottom: 1px solid #818181;
+      width: 100%;
+    }
+
+    .selecteditems.product-details .card-img img {
+      width: 120px !important;
+      height: 120px !important;
+      -o-object-fit: cover;
+      object-fit: cover;
+      -o-object-position: center;
+      object-position: center;
+      border-radius: 10% !important;
+    }
+
+    .selecteditems.product-details .product-d {
+      margin-left: 10px;
+      flex: 1;
+    }
+
+    .selecteditems.product-details .product-d h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 4px 0;
+    }
+
+    .selecteditems.product-details .product-d p,
+    .selecteditems.product-details .product-d span {
+      font-size: 12px !important;
+      color: #666666;
+    }
+
+    .selecteditems.product-details .product-d .btns {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
       border: none;
       border-radius: 3px;
     }
@@ -385,7 +543,10 @@
     <div id="card">
       <!-- Cart Header -->
       <div class="cart-header">
-        <h3>Your Cart</h3>
+        <div class="cart-header-left" onclick="toggleCard()">
+          <i class="fas fa-arrow-left"></i>
+          <h3>Your Cart</h3>
+        </div>
         <span id="cart-item-count">0 items</span>
       </div>
 
@@ -429,6 +590,16 @@
           <span class="hero-title-line highlight">Fragrances</span>
         </h1>
         <p class="hero-subtitle">Sacred Aromas from Temple Flowers</p>
+
+        <!-- Incubatee Badge -->
+        <div class="incubatee-badge" id="incubatee-badge">
+          <p class="incubatee-text">A proud incubatee at</p>
+          <div class="incubatee-org">
+            <span class="incubatee-line"></span>
+            <p class="incubatee-name">Sona Incubation Foundation</p>
+            <span class="incubatee-line"></span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -494,14 +665,14 @@
       .skeleton-card {
         width: 250px;
         background: #fff;
-       
+
         overflow: hidden;
-         padding: 5px;
+        padding: 5px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       }
 
       .skeleton-img {
-       
+
         width: 100%;
         height: 200px;
         background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -551,168 +722,81 @@
     </style>
 
     <section class="pro-cont">
-      <!-- ========== Products (single) ========== -->
-      <div class="veg-container showcard">
-        <h3>Single Pack</h3>
-        <ul class="products-ul">
-          <% if (products && products.length> 0) { %>
-            <% products.forEach(function(product) { %>
-              <li>
-                <div class="card" data-product-id="<%= product._id %>" data-slug="<%= product.slug %>"
-                  style="cursor:pointer">
-                  <% if (product.stock <=0) { %>
-                    <span class="stock-label">Out of Stock</span>
-                    <% } %>
-                      <div class="card-img">
-                        <img loading="lazy" src="<%= product.mainImage %>" alt="<%= product.name %>" class="img" />
-                      </div>
-                      <div class="product-description">
-                        <p class="product-title">
-                          <%= product.name %>
-                        </p>
-                        <small class="sample">
-                          <%= product.shortDescription.slice(0, 55) %>..
-                        </small><br />
-                        <p class="rupees"><span class="rupees"></span>₹<%= product.price %>
-                        </p>
-                        <% if (product.originalPrice) { %>
-                          <span class="light">M.R.P:<strike class="light">₹<%= product.originalPrice %></strike>(<%=
-                              product.discountPercentage %>% Off)</span>
-                          <% } %>
-                      </div>
-                      <button class="addtoplate" data-item-name="<%= product.productType %>"
-                        data-id="<%= product._id %>">
-                        Add to Cart
-                      </button>
-                </div>
-              </li>
-              <% }); %>
-                <% } else { %>
-                  <!-- Skeleton placeholders -->
-                  <% for (var i=0; i < 6; i++) { %>
-                    <li>
-                      <div class="skeleton-card">
-                        <div class="skeleton-img"></div>
-                        <div class="skeleton-body">
-                          <div class="skeleton-line title"></div>
-                          <div class="skeleton-line desc"></div>
-                          <div class="skeleton-line price"></div>
-                          <div class="skeleton-line btn"></div>
-                        </div>
-                      </div>
-                    </li>
-                    <% } %>
-                      <% } %>
-        </ul>
-      </div>
-
-      <!-- ========== Combo Packs ========== -->
-      <div class="non-veg-container showcard">
-        <h3>Combo Pack</h3>
-        <ul class="products-ul">
-          <% if (comboPacks && comboPacks.length> 0) { %>
-            <% comboPacks.forEach(function(product) { %>
-              <li>
-                <div class="card" data-product-id="<%= product._id %>" data-slug="<%= product.slug %>"
-                  style="cursor:pointer">
-                  <% if (product.stock <=0) { %>
-                    <span class="stock-label">Out of Stock</span>
-                    <% } %>
-                      <div class="card-img">
-                        <img loading="lazy" src="<%= product.mainImage %>" alt="<%= product.name %>" class="img" />
-                      </div>
-                      <div class="product-description">
-                        <p class="product-title">
-                          <%= product.name %>
-                        </p>
-                        <small class="sample">
-                          <%= product.shortDescription %>
-                        </small><br />
-                        <p class="rupees"><span class="rupees"></span>₹<%= product.price %>
-                        </p>
-                        <% if (product.originalPrice) { %>
-                          <span class="light">M.R.P:<strike class="light">₹<%= product.originalPrice %></strike>(<%=
-                              product.discountPercentage %>% Off)</span>
-                          <% } %>
-                      </div>
-                      <button class="addtoplate" data-item-name="<%= product.productType %>"
-                        data-id="<%= product._id %>">
-                        Add to Cart
-                      </button>
-                </div>
-              </li>
-              <% }); %>
-                <% } else { %>
-                  <% for (var i=0; i < 6; i++) { %>
-                    <li>
-                      <div class="skeleton-card">
-                        <div class="skeleton-img"></div>
-                        <div class="skeleton-body">
-                          <div class="skeleton-line title"></div>
-                          <div class="skeleton-line desc"></div>
-                          <div class="skeleton-line price"></div>
-                          <div class="skeleton-line btn"></div>
-                        </div>
-                      </div>
-                    </li>
-                    <% } %>
-                      <% } %>
-        </ul>
-      </div>
-
-      <!-- ========== Gift Packs ========== -->
-      <div class="recommended-section showcard">
-        <h3>Gift Pack</h3>
-        <div class="cards-container">
-          <% if (giftPacks && giftPacks.length> 0) { %>
-            <% giftPacks.forEach(function(product) { %>
-              <div class="gift-card" data-product-id="<%= product._id %>" data-slug="<%= product.slug %>"
-                style="cursor:pointer">
-                <div class="gift-card-img">
-                  <img loading="lazy" src="<%= product.mainImage %>" alt="<%= product.name %>" class="img" />
-                </div>
-                <div class="gift-card-info">
-                  <h4>
-                    <%= product.name %>
-                  </h4>
-                  <p class="gift-desc">
-                    <%= product.shortDescription %>
-                  </p>
-                  <div class="gift-price">
-                    <span class="gift-current">₹<%= product.price %></span>
-                    <% if (product.originalPrice) { %>
-                      <span class="gift-original">₹<%= product.originalPrice %></span>
-                      <span class="gift-discount">
-                        <%= product.discountPercentage %>% Off
-                      </span>
-                      <% } %>
-                  </div>
-                  <button class="addtoplate" data-item-name="<%= product.productType %>" data-id="<%= product._id %>">
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
-              <% }); %>
-                <% } else { %>
-                  <% for (var i=0; i < 6; i++) { %>
-                    <div class="skeleton-card">
-                      <div class="skeleton-img"></div>
-                      <div class="skeleton-body">
-                        <div class="skeleton-line title"></div>
-                        <div class="skeleton-line desc"></div>
-                        <div class="skeleton-line price"></div>
-                        <div class="skeleton-line btn"></div>
-                      </div>
-                    </div>
-                    <% } %>
-                      <% } %>
-        </div>
-      </div>
+      <% if (categories && categories.length> 0) { %>
+        <% categories.forEach(function(cat) { %>
+          <div class="veg-container showcard">
+            <h3>
+              <%= cat.label %>
+            </h3>
+            <ul class="products-ul">
+              <% if (cat.products && cat.products.length> 0) { %>
+                <% cat.products.forEach(function(product) { %>
+                  <% var sortedPacks=(product.packs || []).slice().sort(function(a,b){ return a.weightValue -
+                    b.weightValue; }); %>
+                    <% var dp=null; for (var pi=0; pi < sortedPacks.length; pi++) { if (sortedPacks[pi].stock> 0) { dp =
+                      sortedPacks[pi]; break; } } if (!dp && sortedPacks.length > 0) dp = sortedPacks[0]; %>
+                      <% var totalStock=sortedPacks.reduce(function(s,p){ return s + (p.stock||0); }, 0); %>
+                        <li>
+                          <div class="card" data-product-id="<%= product._id %>" data-slug="<%= product.slug %>"
+                            style="cursor:pointer">
+                            <% if (totalStock <=0) { %>
+                              <span class="stock-label">Out of Stock</span>
+                              <% } %>
+                                <div class="card-img">
+                                  <img loading="lazy" src="<%= product.mainImage %>" alt="<%= product.name %>"
+                                    class="img" />
+                                </div>
+                                <div class="product-description">
+                                  <p class="product-title">
+                                    <%= product.name %>
+                                  </p>
+                                  <small class="sample">
+                                    <%= product.shortDescription.slice(0, 55) %>..
+                                  </small><br />
+                                  <% if (dp) { %>
+                                    <p class="rupees"><span class="rupees"></span>₹<%= dp.price %>
+                                        <% if (sortedPacks.length> 1) { %>
+                                          <small style="color:#888;font-weight:400"> (<%= dp.weight %>)</small>
+                                          <% } %>
+                                    </p>
+                                    <% if (dp.originalPrice && dp.originalPrice> dp.price) { %>
+                                      <span class="light">M.R.P:<strike class="light">₹<%= dp.originalPrice %></strike>(
+                                        <%= dp.discountPercentage %>% Off)</span>
+                                      <% } %>
+                                        <% } %>
+                                </div>
+                                <button class="addtoplate" data-item-name="<%= product.productType %>"
+                                  data-id="<%= product._id %>" data-pack-weight="<%= dp ? dp.weight : '' %>">
+                                  Add to Cart
+                                </button>
+                          </div>
+                        </li>
+                        <% }); %>
+                          <% } else { %>
+                            <!-- Skeleton placeholders -->
+                            <% for (var i=0; i < 6; i++) { %>
+                              <li>
+                                <div class="skeleton-card">
+                                  <div class="skeleton-img"></div>
+                                  <div class="skeleton-body">
+                                    <div class="skeleton-line title"></div>
+                                    <div class="skeleton-line desc"></div>
+                                    <div class="skeleton-line price"></div>
+                                    <div class="skeleton-line btn"></div>
+                                  </div>
+                                </div>
+                              </li>
+                              <% } %>
+                                <% } %>
+            </ul>
+          </div>
+          <% }); %>
+            <% } %>
     </section>
 
 
 
-    <section class="about-section" id="about">
+    <!-- <section class="about-section" id="about">
       <div class="about-container">
         <div class="main-content">
           <div class="company-header">
@@ -896,18 +980,9 @@
           </div>
         </aside>
       </div>
-    </section>
+    </section> -->
 
-    <div class="story-section">
-      <h2 class="section-title fade-up attractive">
-        Our Journey From Temple Blessing to Fragrant Stick
-      </h2>
-      <h3 class="section-subtitle fade-up">
-        The Sacred Journey of Temple-Flower Transformation
-      </h3>
-      <div class="story-container" id="storyContainer"></div>
-      <div class="summary fade-up" id="summaryBox"></div>
-    </div>
+
 
     <section id="ourstory">
       <div class="ourstory-container">
@@ -992,25 +1067,25 @@
               <div class="image-card">
                 <img src="/assets/images/pages/our-story/waste.png" alt="Temple flowers discarded" />
                 <div class="caption">
-                  Fig 1: Temple flowers thrown in the garbage
+                  Temple flowers thrown in the garbage
                 </div>
               </div>
               <div class="image-card">
                 <img src="/assets/images/pages/our-story/flowers.png" alt="Blessed flowers as waste" />
                 <div class="caption">
-                  Fig 2: Temple blessed flowers destined for disposal
+                  Temple blessed flowers destined for disposal
                 </div>
               </div>
               <div class="image-card">
                 <img src="/assets/images/pages/our-story/mentorship.png" alt="Shri C Valliappa" />
                 <div class="caption">
-                  Fig 3: Shri C Valliappa - The Visionary Mentor
+                  Shri C Valliappa - The Visionary Mentor
                 </div>
               </div>
               <div class="image-card">
                 <img src="/assets/images/pages/our-story/flavor.png" alt="Arudhra products" />
                 <div class="caption">
-                  Fig 4: Arudhra Creations - Sacred Agarbathi Products
+                  Arudhra Creations - Sacred Agarbathi Products
                 </div>
               </div>
             </div>
@@ -1363,6 +1438,23 @@
         </div>
       </div>
     </section>
+    <div class="story-section">
+      <h2 class="section-title fade-up attractive">
+        Our Journey From Temple Blessing to Fragrant Stick
+      </h2>
+      <h3 class="section-subtitle fade-up">
+        The Sacred Journey of Temple-Flower Transformation
+      </h3>
+      <div class="story-container" id="storyContainer"></div>
+      <div class="summary fade-up" id="summaryBox"></div>
+    </div>
+
+
+    <section class="blog-section" id="blog">
+      <div>Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi placeat hic culpa alias, omnis soluta ut
+        officia nisi doloremque quasi ex. Rerum earum consequatur cupiditate! Ducimus eveniet repudiandae obcaecati
+        illum?</div>
+    </section>
 
     <div class="body" id="contact">
       <div class="form-container">
@@ -1532,12 +1624,21 @@
     <footer class="modern-footer">
       <div class="footer-container">
         <div class="footer-row">
-          <div class="footer-col about">
-            <h3>Address</h3>
-            <p>Arudhra Creations Private Limited, Salem, Tamil Nadu, India</p>
-            <div class="email">
-              <p><strong>Email :</strong> arudhra2025@gmail.com</p>
-            </div>
+          <div class="footer-col">
+            <h3>Regd. Office</h3>
+            <p class="footer-addr">Arudhra Creations Pvt Ltd.,<br>
+              2nd Floor, 35/78-Abirami Gardens,<br>
+              Chinna Thirupathi (P.O.),<br>
+              Salem - 636 008</p>
+          </div>
+
+          <div class="footer-col">
+            <h3>Corporate Office</h3>
+            <p class="footer-addr">Arudhra Creations Pvt Ltd.,<br>
+              2nd Floor, Sona Incubation Foundation,<br>
+              University Block,<br>
+              Sona College of Technology,<br>
+              Salem - 636 005</p>
           </div>
 
           <div class="footer-col">
@@ -1545,30 +1646,30 @@
             <ul>
               <li><a href="#home">Home</a></li>
               <li><a href="#products">Products</a></li>
-              <li><a href="#about">About Us</a></li>
               <li><a href="#ourstory">Our Story</a></li>
+              <li><a href="#blog">Blog</a></li>
               <li><a href="#contact">Contact Us</a></li>
             </ul>
           </div>
 
-          <div class="footer-col social">
+          <div class="footer-col">
             <h3>Follow Us</h3>
             <div class="social-icons">
-              <a target="_blank" rel="noopener noreferrer" href="https://www.facebook.com/share/16n2n7rprz/"><i
-                  class="fab fa-facebook-f" aria-hidden="true"></i></a>
+              <a target="_blank" rel="noopener noreferrer" href="https://www.facebook.com/share/16n2n7rprz/"
+                title="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
               <a target="_blank" rel="noopener noreferrer"
-                href="https://www.instagram.com/shri__brand?igsh=czc1YWQ5c291M3E4"><i class="fab fa-instagram"
-                  aria-hidden="true"></i></a>
-              <a href="#"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+                href="https://www.instagram.com/shri__brand?igsh=czc1YWQ5c291M3E4" title="Instagram"><i
+                  class="fab fa-instagram" aria-hidden="true"></i></a>
+              <a target="_blank" rel="noopener noreferrer"
+                href="https://www.linkedin.com/company/108403087/admin/dashboard/" title="LinkedIn"><i
+                  class="fab fa-linkedin-in" aria-hidden="true"></i></a>
             </div>
+            <p class="footer-email-text"><i class="fas fa-envelope"></i> arudhra2025@gmail.com</p>
           </div>
         </div>
 
-        <hr />
         <div class="footer-bottom">
-          <p>
-            © Arudhra Creations Private Limited, Salem | All rights reserved.
-          </p>
+          <p>© 2025 Arudhra Creations Private Limited, Salem | All rights reserved.</p>
         </div>
       </div>
     </footer>
@@ -1635,7 +1736,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="/js/app.js"></script>
   <script src="/js/form.js"></script>
-  <script src="/js/products.js"></script>
+  <script src="/js/product.js"></script>
   <script src="/js/ourstory.js"></script>
 </body>
 

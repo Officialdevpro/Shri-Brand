@@ -626,6 +626,99 @@
             padding-left: 12px;
         }
 
+        /* ─── Packs Section ────────────────────────────────── */
+        .packs-section {
+            margin: 1.2rem 0;
+            border-top: 1px dashed #dccbbd;
+            padding-top: 1rem;
+        }
+
+        .packs-section-title {
+            font-weight: 700;
+            color: #4f3d31;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pack-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+            background: #faf5ef;
+            border: 1px solid #eee1d4;
+            border-radius: 16px;
+            padding: 10px 12px;
+        }
+
+        .pack-row input {
+            flex: 1;
+            min-width: 60px;
+            padding: 0.55rem 0.7rem;
+            font-size: 0.85rem;
+            border-radius: 12px;
+        }
+
+        .pack-row-remove {
+            background: #e04f3a;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        .pack-row-remove:hover {
+            background: #c84b3a;
+            transform: scale(1.1);
+        }
+
+        .add-pack-btn {
+            background: #ecf3e7;
+            border: 1px dashed #a7c596;
+            border-radius: 30px;
+            padding: 0.5rem 1.2rem;
+            color: #4a6e3a;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+            margin-top: 4px;
+        }
+
+        .add-pack-btn:hover {
+            background: #dfe9d6;
+        }
+
+        .pack-tag {
+            display: inline-block;
+            background: #eee7e0;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #5a4a3a;
+            margin: 2px;
+        }
+
+        .pack-tag .pack-tag-price {
+            color: #1f3a3a;
+            font-weight: 700;
+        }
+
         .meta-icons {
             display: flex;
             flex-wrap: wrap;
@@ -861,7 +954,8 @@
             </div>
             <div class="bulk-controls">
                 <button class="bulk-btn" id="bulkSkipBtn"><i class="fas fa-forward"></i> Skip This</button>
-                <button class="bulk-btn danger" id="bulkCancelBtn"><i class="fas fa-times"></i> Cancel Bulk Mode</button>
+                <button class="bulk-btn danger" id="bulkCancelBtn"><i class="fas fa-times"></i> Cancel Bulk
+                    Mode</button>
             </div>
         </div>
 
@@ -889,12 +983,13 @@
                     </div>
                     <div class="form-row">
                         <label><i class="fas fa-list"></i> Type / Cat.</label>
-                        <div class="form-field" style="display:flex;gap:12px;">
-                            <select id="productType" name="productType" style="flex:1;">
-                                <option value="single">single</option>
-                                <option value="combo">combo</option>
-                                <option value="gift">gift</option>
-                            </select>
+                        <div class="form-field" style="display:flex;gap:12px;align-items:center;">
+                            <select id="productType" name="productType" style="flex:1;"></select>
+                            <button type="button" id="manageCategoriesBtn"
+                                style="background:#ecf3e7;border:1px solid #a7c596;border-radius:20px;padding:4px 12px;font-size:0.78rem;font-weight:600;color:#4a6e3a;cursor:pointer;white-space:nowrap;"
+                                title="Manage categories">
+                                <i class="fas fa-cog"></i> Manage
+                            </button>
                             <select id="fragranceCategory" name="fragranceCategory" style="flex:1;">
                                 <option value="floral">floral</option>
                                 <option value="woody">woody</option>
@@ -902,6 +997,21 @@
                                 <option value="heritage">heritage</option>
                                 <option value="mixed">mixed</option>
                             </select>
+                        </div>
+                    </div>
+                    <!-- Category Manager Mini-UI -->
+                    <div id="categoryManager"
+                        style="display:none;background:#faf4ee;border:1px dashed #dccbbd;border-radius:16px;padding:1rem;margin-bottom:1rem;">
+                        <div style="font-weight:700;font-size:0.85rem;color:#4f3d31;margin-bottom:8px;"><i
+                                class="fas fa-layer-group"></i> Manage Product Categories</div>
+                        <div id="categoryList" style="margin-bottom:8px;"></div>
+                        <div style="display:flex;gap:8px;">
+                            <input type="text" id="newCatName" placeholder="name (e.g. festive)"
+                                style="flex:1;padding:6px 10px;border:1px solid #dccbbd;border-radius:8px;font-size:0.82rem;">
+                            <input type="text" id="newCatLabel" placeholder="Label (e.g. Festive Collection)"
+                                style="flex:1;padding:6px 10px;border:1px solid #dccbbd;border-radius:8px;font-size:0.82rem;">
+                            <button type="button" id="addCategoryBtn"
+                                style="background:#4a6e3a;color:white;border:none;border-radius:8px;padding:6px 14px;font-size:0.82rem;font-weight:600;cursor:pointer;">Add</button>
                         </div>
                     </div>
                     <div class="form-row">
@@ -914,34 +1024,21 @@
                         <div class="form-field"><textarea id="fullDescription" name="fullDescription" maxlength="2000"
                                 placeholder="Handcrafted using natural rose extracts..." required></textarea></div>
                     </div>
-                    <div class="form-row">
-                        <label><i class="fas fa-coins"></i> Price / Orig</label>
-                        <div class="form-field" style="display:flex;gap:12px;">
-                            <input type="number" id="price" name="price" placeholder="Price" step="0.01" min="0"
-                                style="flex:1;" required>
-                            <input type="number" id="originalPrice" name="originalPrice" placeholder="Original"
-                                step="0.01" min="0" style="flex:1;">
+                    <!-- ═════ Packs Section ═════ -->
+                    <div class="packs-section">
+                        <div class="packs-section-title">
+                            <i class="fas fa-boxes"></i> Product Packs (weight variants) *
                         </div>
+                        <div id="packsContainer"></div>
+                        <button type="button" class="add-pack-btn" id="addPackBtn">
+                            <i class="fas fa-plus"></i> Add Pack
+                        </button>
                     </div>
+
                     <div class="form-row">
-                        <label><i class="fas fa-boxes"></i> Stock / Sold</label>
-                        <div class="form-field" style="display:flex;gap:12px;">
-                            <input type="number" id="stock" name="stock" placeholder="Stock" min="0" style="flex:1;">
-                            <input type="number" id="totalSold" name="totalSold" placeholder="Sold" min="0"
-                                style="flex:1;">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <label><i class="fas fa-weight-hanging"></i> Weight / Burn</label>
-                        <div class="form-field" style="display:flex;gap:12px;">
-                            <input type="text" id="weight" name="weight" placeholder="50g, 100ml..." style="flex:1;">
-                            <input type="text" id="burnTime" name="burnTime" placeholder="45 minutes" style="flex:1;">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <label><i class="fas fa-check-circle"></i> Stick count</label>
-                        <div class="form-field"><input type="number" id="stickCount" name="stickCount" placeholder="40"
-                                min="0"></div>
+                        <label><i class="fas fa-fire"></i> Burn Time</label>
+                        <div class="form-field"><input type="text" id="burnTime" name="burnTime"
+                                placeholder="45 minutes"></div>
                     </div>
                     <div class="form-row">
                         <label><i class="fas fa-check-double"></i> Used for</label>
@@ -1015,6 +1112,7 @@
             'use strict';
 
             const API_BASE = 'http://127.0.0.1:5000/api/v1/products';
+            const CAT_API = 'http://127.0.0.1:5000/api/v1/categories';
 
             // ═══════════════════════════════════════════════════════
             // BULK PRODUCT DATA - 8 Fragrances
@@ -1026,12 +1124,11 @@
                     fragranceCategory: "floral",
                     shortDescription: "Soft, devotional floral fragrance reminiscent of rose garlands offered to goddesses in South Indian temples",
                     fullDescription: "Soft, devotional floral fragrance reminiscent of rose garlands offered to goddesses in South Indian temples. Perfect for daily puja, meditation, and creating a soothing home ambience. Also ideal for Durga Puja, Lakshmi Puja, and feminine spiritual spaces.",
-                    price: 20,
-                    originalPrice: 40,
-                    stock: 100,
-                    weight: "10g",
+                    packs: [
+                        { weight: "40g", weightValue: 40, price: 20, originalPrice: 40, discountPercentage: 50, stock: 100, stickCount: 20, totalSold: 0, lowStockThreshold: 10 },
+                        { weight: "80g", weightValue: 80, price: 35, originalPrice: 70, discountPercentage: 50, stock: 50, stickCount: 40, totalSold: 0, lowStockThreshold: 10 }
+                    ],
                     burnTime: "45 minutes",
-                    stickCount: 20,
                     usedFor: "pooja, meditation, relaxation"
                 },
                 {
@@ -1040,10 +1137,10 @@
                     fragranceCategory: "floral",
                     shortDescription: "Calming and soothing aromatic notes bringing tranquility and relaxation to meditation practice",
                     fullDescription: "Calming and soothing aromatic notes bringing tranquility and relaxation to meditation practice. Excellent for yoga spaces, personal prayer rooms, and bedtime spiritual rituals. Blended from traditional South Indian herbal essences.",
-                    price: 20,
-                    originalPrice: 40,
-                    stock: 100,
-                    weight: "10g",
+                    packs: [
+                        { weight: "40g", weightValue: 40, price: 20, originalPrice: 40, discountPercentage: 50, stock: 100 },
+                        { weight: "80g", weightValue: 80, price: 35, originalPrice: 70, discountPercentage: 50, stock: 50 }
+                    ],
                     burnTime: "45 minutes",
                     stickCount: 20,
                     usedFor: "pooja, meditation, relaxation"
@@ -1054,10 +1151,10 @@
                     fragranceCategory: "floral",
                     shortDescription: "Traditional temple floral scent, iconic in South Indian shrine traditions",
                     fullDescription: "Traditional temple floral scent, iconic in South Indian shrine traditions. Reminiscent of the ambience inside ancient Tamil temples and pilgrimage centers. Deeply spiritual, connecting to generations of devotional practice. Perfect for family puja and festive occasions.",
-                    price: 20,
-                    originalPrice: 40,
-                    stock: 100,
-                    weight: "10g",
+                    packs: [
+                        { weight: "40g", weightValue: 40, price: 20, originalPrice: 40, discountPercentage: 50, stock: 100 },
+                        { weight: "80g", weightValue: 80, price: 35, originalPrice: 70, discountPercentage: 50, stock: 50 }
+                    ],
                     burnTime: "45 minutes",
                     stickCount: 20,
                     usedFor: "pooja, meditation, relaxation"
@@ -1068,10 +1165,10 @@
                     fragranceCategory: "woody",
                     shortDescription: "Classic woody, sacred aroma highly revered in Hindu rituals and Vedic practices",
                     fullDescription: "Classic woody, sacred aroma highly revered in Hindu rituals and Vedic practices. Specifically suited for homams, special poojas, and ceremonial occasions. Believed to enhance spiritual focus and inner clarity. Premium choice for serious meditation and mantra recitation.",
-                    price: 20,
-                    originalPrice: 40,
-                    stock: 100,
-                    weight: "10g",
+                    packs: [
+                        { weight: "40g", weightValue: 40, price: 20, originalPrice: 40, discountPercentage: 50, stock: 100 },
+                        { weight: "80g", weightValue: 80, price: 35, originalPrice: 70, discountPercentage: 50, stock: 50 }
+                    ],
                     burnTime: "45 minutes",
                     stickCount: 20,
                     usedFor: "pooja, meditation, relaxation"
@@ -1082,10 +1179,10 @@
                     fragranceCategory: "heritage",
                     shortDescription: "Traditional South Indian devotional fragrance with rich, distinctive character",
                     fullDescription: "Traditional South Indian devotional fragrance with rich, distinctive character. Represents the aromatic heritage of Tamil Nadu and Dravidian temple traditions. Carries deep spiritual significance in South Indian customs. Perfect for connecting with ancestral and cultural spiritual roots.",
-                    price: 20,
-                    originalPrice: 40,
-                    stock: 100,
-                    weight: "10g",
+                    packs: [
+                        { weight: "40g", weightValue: 40, price: 20, originalPrice: 40, discountPercentage: 50, stock: 100 },
+                        { weight: "80g", weightValue: 80, price: 35, originalPrice: 70, discountPercentage: 50, stock: 50 }
+                    ],
                     burnTime: "45 minutes",
                     stickCount: 20,
                     usedFor: "pooja, meditation, relaxation"
@@ -1096,10 +1193,10 @@
                     fragranceCategory: "resin",
                     shortDescription: "Temple-style resinous fragrance widely used in South Indian shrines with purifying properties",
                     fullDescription: "Temple-style resinous fragrance widely used in South Indian shrines. Believed to have purifying and cleansing properties. Creates sacred ambience during rituals, ceremonies, and special occasions. Used in temple archana and spiritual purification practices.",
-                    price: 20,
-                    originalPrice: 40,
-                    stock: 100,
-                    weight: "10g",
+                    packs: [
+                        { weight: "40g", weightValue: 40, price: 20, originalPrice: 40, discountPercentage: 50, stock: 100 },
+                        { weight: "80g", weightValue: 80, price: 35, originalPrice: 70, discountPercentage: 50, stock: 50 }
+                    ],
                     burnTime: "45 minutes",
                     stickCount: 20,
                     usedFor: "pooja, meditation, relaxation"
@@ -1110,10 +1207,10 @@
                     fragranceCategory: "floral",
                     shortDescription: "Fragrance inspired by jasmine garlands and flowers offered to deities in Tamil temples",
                     fullDescription: "Fragrance inspired by jasmine garlands and flowers offered to deities in Tamil temples. Fresh, floral, and deeply connected to South Indian temple rituals. Perfect for creating festive, celebratory spiritual ambience. Popular during festivals, weddings, and family gatherings.",
-                    price: 20,
-                    originalPrice: 40,
-                    stock: 100,
-                    weight: "10g",
+                    packs: [
+                        { weight: "40g", weightValue: 40, price: 20, originalPrice: 40, discountPercentage: 50, stock: 100 },
+                        { weight: "80g", weightValue: 80, price: 35, originalPrice: 70, discountPercentage: 50, stock: 50 }
+                    ],
                     burnTime: "45 minutes",
                     stickCount: 20,
                     usedFor: "pooja, meditation, relaxation"
@@ -1124,10 +1221,10 @@
                     fragranceCategory: "floral",
                     shortDescription: "Fragrance inspired by screw pine flowers traditionally used in South Indian worship",
                     fullDescription: "Fragrance inspired by screw pine flowers traditionally used in South Indian worship. Delicate, unique aroma representing the botanical diversity of temple offerings. Carries spiritual connection to regional flora and Tamil temple practices. Ideal for those seeking traditional, culturally-rooted fragrance experience.",
-                    price: 20,
-                    originalPrice: 40,
-                    stock: 100,
-                    weight: "10g",
+                    packs: [
+                        { weight: "40g", weightValue: 40, price: 20, originalPrice: 40, discountPercentage: 50, stock: 100 },
+                        { weight: "80g", weightValue: 80, price: 35, originalPrice: 70, discountPercentage: 50, stock: 50 }
+                    ],
                     burnTime: "45 minutes",
                     stickCount: 20,
                     usedFor: "pooja, meditation, relaxation"
@@ -1139,6 +1236,7 @@
             let pendingDeleteId = null;
             let currentImages = { main: null, gallery: [null, null, null, null] };
             let removedSlots = new Set();
+            let formPacks = []; // current packs in the form
 
             // Bulk mode state
             let bulkModeActive = false;
@@ -1156,6 +1254,8 @@
             const notification = $('notification');
             const slotsContainer = $('imageSlotsContainer');
             const deleteModal = $('deleteModal');
+            const packsContainer = $('packsContainer');
+            const addPackBtn = $('addPackBtn');
 
             // Bulk mode elements
             const bulkBanner = $('bulkBanner');
@@ -1194,25 +1294,25 @@
                 }
 
                 const product = BULK_PRODUCTS[bulkCurrentIndex];
-                
+
                 // Reset form for new product
                 resetForm();
-                
+
                 // Fill form with bulk product data
                 $('name').value = product.name;
                 $('productType').value = product.productType;
                 $('fragranceCategory').value = product.fragranceCategory;
                 $('shortDescription').value = product.shortDescription;
                 $('fullDescription').value = product.fullDescription;
-                $('price').value = product.price;
-                $('originalPrice').value = product.originalPrice;
-                $('stock').value = product.stock;
-                $('weight').value = product.weight;
                 $('burnTime').value = product.burnTime;
-                $('stickCount').value = product.stickCount;
+
                 $('usedFor').value = product.usedFor;
                 $('isActive').checked = true;
                 $('isFeatured').checked = false;
+
+                // Load packs into form
+                formPacks = (product.packs || []).map(p => ({ ...p }));
+                renderPackRows();
 
                 // Update bulk progress
                 const progress = ((bulkCurrentIndex + 1) / BULK_PRODUCTS.length) * 100;
@@ -1222,10 +1322,10 @@
 
                 // Update form title
                 formTitle.textContent = `Add Product ${bulkCurrentIndex + 1}/${BULK_PRODUCTS.length}: ${product.name}`;
-                
+
                 // Scroll to top
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                
+
                 showNotification(`Ready for ${product.name} - Please upload the main image and submit`, 'info', 4000);
             }
 
@@ -1420,6 +1520,8 @@
                 $('isFeatured').checked = false;
                 currentImages = { main: null, gallery: [null, null, null, null] };
                 removedSlots.clear();
+                formPacks = [{ weight: '40g', weightValue: 40, price: 0, originalPrice: 0, discountPercentage: 0, stock: 0, stickCount: 0, totalSold: 0, lowStockThreshold: 10 }];
+                renderPackRows();
                 renderImageSlots();
             }
 
@@ -1451,38 +1553,50 @@
 
                 productGrid.innerHTML = products.map(prod => {
                     const id = prod._id || prod.id;
-                    const stockVal = prod.stock || 0;
-                    const isLow = stockVal <= (prod.lowStockThreshold || 10) && stockVal > 0;
-                    const isOut = stockVal === 0;
-                    const discount = prod.originalPrice && prod.originalPrice > prod.price
-                        ? Math.round(((prod.originalPrice - prod.price) / prod.originalPrice) * 100) : 0;
+                    const packs = prod.packs || [];
+                    const sortedPacks = [...packs].sort((a, b) => a.weightValue - b.weightValue);
+                    const defaultPack = sortedPacks[0] || {};
+                    const totalStock = packs.reduce((s, p) => s + (p.stock || 0), 0);
+                    const isLow = totalStock <= (prod.lowStockThreshold || 10) && totalStock > 0;
+                    const isOut = totalStock === 0;
                     const galleryCount = (prod.images && prod.images.length) || 0;
                     const imageHtml = prod.mainImage
                         ? `<img class="main-image-thumb" src="${prod.mainImage}" alt="${prod.name}"
                            onerror="this.outerHTML='<div class=\\'image-placeholder\\'><i class=\\'fas fa-image\\'></i></div>';">`
                         : `<div class="image-placeholder"><i class="fas fa-image"></i></div>`;
 
+                    // Build packs display
+                    const packsHtml = sortedPacks.map(p => {
+                        const disc = p.originalPrice && p.originalPrice > p.price
+                            ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 0;
+                        return `<span class="pack-tag">
+                            ${p.weight}: <span class="pack-tag-price">₹${p.price}</span>
+                            ${p.originalPrice && p.originalPrice > p.price ? ` <s style="color:#8f7a68;font-size:0.65rem">₹${p.originalPrice}</s>` : ''}
+                            ${disc > 0 ? ` <span style="color:#b34a3c;font-size:0.62rem">-${disc}%</span>` : ''}
+                            <span style="color:#6a5d53"> (${p.stock})</span>
+                        </span>`;
+                    }).join('');
+
                     return `<div class="product-card">
                     <div class="card-badges">
                         <span class="badge">${prod.fragranceCategory || 'floral'}</span>
                         ${prod.productType !== 'single' ? `<span class="badge">${prod.productType}</span>` : ''}
                         ${prod.isFeatured ? '<span class="badge featured"><i class="fas fa-star"></i> featured</span>' : ''}
-                        <span class="badge ${isOut ? 'out-stock' : isLow ? 'low-stock' : 'stock'}">${isOut ? 'out of stock' : isLow ? stockVal + ' (low)' : stockVal + ' in stock'}</span>
+                        <span class="badge ${isOut ? 'out-stock' : isLow ? 'low-stock' : 'stock'}">${isOut ? 'out of stock' : isLow ? totalStock + ' (low)' : totalStock + ' in stock'}</span>
                     </div>
                     <div class="product-title">${prod.name || 'Unnamed'}</div>
                     <div class="product-slug"><i class="fas fa-link"></i> ${prod.slug || 'no-slug'}</div>
                     <div class="price-area">
-                        <span class="current-price">₹${prod.price || 0}</span>
-                        ${prod.originalPrice ? `<span class="original-price">₹${prod.originalPrice}</span>` : ''}
-                        ${discount > 0 ? `<span class="discount">-${discount}%</span>` : ''}
+                        <span class="current-price">₹${defaultPack.price || 0}</span>
+                        ${defaultPack.originalPrice && defaultPack.originalPrice > defaultPack.price ? `<span class="original-price">₹${defaultPack.originalPrice}</span>` : ''}
+                        <small style="color:#6a5d53">${defaultPack.weight || ''}</small>
                     </div>
+                    <div style="margin:4px 0 6px;">${packsHtml}</div>
                     <div class="desc">${prod.shortDescription || 'No description'}</div>
                     <div class="meta-icons">
-                        <span><i class="fas fa-weight-hanging"></i> ${prod.weight || '—'}</span>
                         <span><i class="fas fa-clock"></i> ${prod.burnTime || '—'}</span>
                         ${prod.stickCount ? `<span><i class="fas fa-arrows-alt-h"></i> ${prod.stickCount} sticks</span>` : ''}
-                        ${prod.totalSold ? `<span><i class="fas fa-chart-line"></i> ${prod.totalSold} sold</span>` : ''}
-                    </div>
+                        ${prod.totalSold ? `<span><i class="fas fa-chart-line"></i> ${prod.totalSold} sold</span>` : ''}                    </div>
                     <div class="image-thumb-group">
                         ${imageHtml}
                         ${galleryCount > 0 ? `<div class="extra-images"><span><i class="fas fa-images"></i> +${galleryCount} gallery</span></div>` : ''}
@@ -1518,16 +1632,24 @@
                     $('fragranceCategory').value = prod.fragranceCategory || 'floral';
                     $('shortDescription').value = prod.shortDescription || '';
                     $('fullDescription').value = prod.fullDescription || '';
-                    $('price').value = prod.price || '';
-                    $('originalPrice').value = prod.originalPrice || '';
-                    $('stock').value = prod.stock ?? '';
-                    $('totalSold').value = prod.totalSold ?? '';
-                    $('weight').value = prod.weight || '';
                     $('burnTime').value = prod.burnTime || '';
-                    $('stickCount').value = prod.stickCount || '';
                     $('usedFor').value = Array.isArray(prod.usedFor) ? prod.usedFor.join(', ') : (prod.usedFor || '');
                     $('isFeatured').checked = !!prod.isFeatured;
                     $('isActive').checked = prod.isActive !== false;
+
+                    // Load packs
+                    formPacks = (prod.packs || []).map(p => ({
+                        weight: p.weight || '',
+                        weightValue: p.weightValue || 0,
+                        price: p.price || 0,
+                        originalPrice: p.originalPrice || 0,
+                        discountPercentage: p.discountPercentage || 0,
+                        stock: p.stock || 0,
+                        stickCount: p.stickCount || 0,
+                        totalSold: p.totalSold || 0,
+                        lowStockThreshold: p.lowStockThreshold ?? 10,
+                    }));
+                    renderPackRows();
 
                     currentImages.main = prod.mainImage || null;
                     currentImages.gallery = [
@@ -1598,19 +1720,38 @@
                     return;
                 }
 
+                // Read pack rows from DOM into formPacks
+                readPackRowsFromDOM();
+
+                if (formPacks.length === 0) {
+                    showNotification('At least one pack is required.', 'error');
+                    return;
+                }
+
+                // Validate packs
+                for (let i = 0; i < formPacks.length; i++) {
+                    const p = formPacks[i];
+                    if (!p.weight || !p.weightValue || p.price === undefined) {
+                        showNotification(`Pack ${i + 1}: Weight and Price are required.`, 'error');
+                        return;
+                    }
+                }
+
                 setSubmitLoading(true);
 
                 const formData = new FormData();
 
                 const textFields = [
                     'name', 'slug', 'sku', 'productType', 'fragranceCategory',
-                    'shortDescription', 'fullDescription', 'price', 'originalPrice',
-                    'stock', 'totalSold', 'weight', 'burnTime', 'stickCount', 'usedFor',
+                    'shortDescription', 'fullDescription', 'burnTime', 'usedFor',
                 ];
                 textFields.forEach(field => {
                     const val = $(field).value.trim();
                     if (val) formData.append(field, val);
                 });
+
+                // Append packs as JSON string
+                formData.append('packs', JSON.stringify(formPacks));
 
                 formData.append('isFeatured', $('isFeatured').checked ? 'true' : 'false');
                 formData.append('isActive', $('isActive').checked ? 'true' : 'false');
@@ -1647,7 +1788,7 @@
                         id ? '✅ Product updated!' : '✅ Product created!',
                         'success'
                     );
-                    
+
                     // If in bulk mode, move to next product
                     if (bulkModeActive && !id) {
                         bulkCurrentIndex++;
@@ -1655,7 +1796,7 @@
                     } else {
                         resetForm();
                     }
-                    
+
                     await fetchProducts();
                 } catch (err) {
                     showNotification(`Save failed: ${err.message}`, 'error', 6000);
@@ -1673,9 +1814,133 @@
             bulkSkipBtn.addEventListener('click', skipCurrentBulkProduct);
             bulkCancelBtn.addEventListener('click', cancelBulkMode);
 
+            // ═══════════════════════════════════════════════════════
+            // PACK ROWS MANAGEMENT
+            // ═══════════════════════════════════════════════════════
+            function renderPackRows() {
+                packsContainer.innerHTML = formPacks.map((pack, idx) => `
+                    <div class="pack-row" data-pack-idx="${idx}">
+                        <input type="text" placeholder="Weight (e.g. 40g)" value="${pack.weight || ''}" data-field="weight" style="flex:0.8">
+                        <input type="number" placeholder="Weight#" value="${pack.weightValue || ''}" data-field="weightValue" min="0" style="flex:0.6" title="Numeric weight value for sorting">
+                        <input type="number" placeholder="Price" value="${pack.price || ''}" data-field="price" step="0.01" min="0" style="flex:0.8">
+                        <input type="number" placeholder="MRP" value="${pack.originalPrice || ''}" data-field="originalPrice" step="0.01" min="0" style="flex:0.8">
+                        <input type="number" placeholder="Disc%" value="${pack.discountPercentage || ''}" data-field="discountPercentage" min="0" max="100" style="flex:0.5">
+                        <input type="number" placeholder="Stock" value="${pack.stock || ''}" data-field="stock" min="0" style="flex:0.6">
+                        <input type="number" placeholder="Sticks" value="${pack.stickCount || ''}" data-field="stickCount" min="0" style="flex:0.5" title="Stick count for this pack">
+                        <input type="number" placeholder="Sold" value="${pack.totalSold || ''}" data-field="totalSold" min="0" style="flex:0.5" title="Total sold for this pack">
+                        <input type="number" placeholder="Low Stk" value="${pack.lowStockThreshold ?? 10}" data-field="lowStockThreshold" min="0" style="flex:0.5" title="Low stock threshold">
+                        ${formPacks.length > 1 ? `<button type="button" class="pack-row-remove" data-remove-pack="${idx}" title="Remove pack"><i class="fas fa-times"></i></button>` : ''}
+                    </div>
+                `).join('');
+
+                // Wire up remove buttons
+                packsContainer.querySelectorAll('.pack-row-remove').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.dataset.removePack);
+                        formPacks.splice(idx, 1);
+                        renderPackRows();
+                    });
+                });
+            }
+
+            function readPackRowsFromDOM() {
+                formPacks = [];
+                packsContainer.querySelectorAll('.pack-row').forEach(row => {
+                    const weight = row.querySelector('[data-field="weight"]').value.trim();
+                    const weightValue = parseFloat(row.querySelector('[data-field="weightValue"]').value) || 0;
+                    const price = parseFloat(row.querySelector('[data-field="price"]').value) || 0;
+                    const originalPrice = parseFloat(row.querySelector('[data-field="originalPrice"]').value) || 0;
+                    const discountPercentage = parseFloat(row.querySelector('[data-field="discountPercentage"]').value) || 0;
+                    const stock = parseInt(row.querySelector('[data-field="stock"]').value) || 0;
+                    const stickCount = parseInt(row.querySelector('[data-field="stickCount"]').value) || 0;
+                    const totalSold = parseInt(row.querySelector('[data-field="totalSold"]').value) || 0;
+                    const lowStockThreshold = parseInt(row.querySelector('[data-field="lowStockThreshold"]').value) ?? 10;
+                    formPacks.push({ weight, weightValue, price, originalPrice, discountPercentage, stock, stickCount, totalSold, lowStockThreshold });
+                });
+            }
+
+            addPackBtn.addEventListener('click', () => {
+                readPackRowsFromDOM();
+                formPacks.push({ weight: '', weightValue: 0, price: 0, originalPrice: 0, discountPercentage: 0, stock: 0, stickCount: 0, totalSold: 0, lowStockThreshold: 10 });
+                renderPackRows();
+            });
+
             // ─── Init ───────────────────────────────────────────────
+            formPacks = [{ weight: '40g', weightValue: 40, price: 0, originalPrice: 0, discountPercentage: 0, stock: 0, stickCount: 0, totalSold: 0, lowStockThreshold: 10 }];
+            renderPackRows();
             renderImageSlots();
             fetchProducts();
+            loadCategories();
+
+            // ═══════════════════════════════════════════════════════
+            // CATEGORY MANAGEMENT
+            // ═══════════════════════════════════════════════════════
+            async function loadCategories() {
+                try {
+                    const res = await fetch(CAT_API);
+                    const json = await res.json();
+                    const cats = json.data || [];
+                    const sel = $('productType');
+                    sel.innerHTML = cats.map(c => `<option value="${c.name}">${c.label || c.name}</option>`).join('');
+                    if (cats.length === 0) {
+                        sel.innerHTML = '<option value="single">single</option>';
+                    }
+                    renderCategoryList(cats);
+                } catch (err) {
+                    console.error('Failed to load categories:', err);
+                    $('productType').innerHTML = '<option value="single">single</option><option value="combo">combo</option><option value="gift">gift</option>';
+                }
+            }
+
+            function renderCategoryList(cats) {
+                $('categoryList').innerHTML = cats.map(c =>
+                    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                        <span style="flex:1;font-size:0.82rem;"><strong>${c.name}</strong> — ${c.label}</span>
+                        <button type="button" data-delete-cat="${c._id || c.id}" style="background:#ffe9e5;color:#9f4a3a;border:none;border-radius:6px;padding:3px 10px;font-size:0.75rem;font-weight:600;cursor:pointer;">✕</button>
+                    </div>`
+                ).join('');
+
+                $('categoryList').querySelectorAll('[data-delete-cat]').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        if (!confirm('Delete this category?')) return;
+                        try {
+                            const res = await fetch(`${CAT_API}/${btn.dataset.deleteCat}`, { method: 'DELETE' });
+                            const json = await res.json();
+                            if (!res.ok) throw new Error(json.message || 'Delete failed');
+                            showNotification('Category deleted', 'success');
+                            loadCategories();
+                        } catch (err) {
+                            showNotification(err.message, 'error');
+                        }
+                    });
+                });
+            }
+
+            $('manageCategoriesBtn').addEventListener('click', () => {
+                const mgr = $('categoryManager');
+                mgr.style.display = mgr.style.display === 'none' ? 'block' : 'none';
+            });
+
+            $('addCategoryBtn').addEventListener('click', async () => {
+                const name = $('newCatName').value.trim();
+                const label = $('newCatLabel').value.trim();
+                if (!name || !label) { showNotification('Name and label are required', 'error'); return; }
+                try {
+                    const res = await fetch(CAT_API, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, label }),
+                    });
+                    const json = await res.json();
+                    if (!res.ok) throw new Error(json.message || 'Create failed');
+                    showNotification('Category created!', 'success');
+                    $('newCatName').value = '';
+                    $('newCatLabel').value = '';
+                    loadCategories();
+                } catch (err) {
+                    showNotification(err.message, 'error');
+                }
+            });
         })();
     </script>
 </body>

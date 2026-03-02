@@ -156,21 +156,25 @@ document.addEventListener("DOMContentLoaded", () => {
       number: "01",
       title: "Offered at South Indian Temples",
       text: "Devotees and priests offer fresh flowers—rose, jasmine, champa, sambrani—during archana and festivals. These sacred blooms fill temples with divine fragrance and devotion.",
+      design:"../assets/images/Florals/9.png"
     },
     {
       number: "02",
       title: "Respectfully Collected",
       text: "Before flowers are discarded, our team collects them from partnered temples with reverence, ensuring spiritual sanctity is preserved while preventing floral waste.",
+      design:"../assets/images/Florals/3.png"
     },
     {
       number: "03",
       title: "Gently Dried & Hand-Processed",
       text: "Flowers are dried under controlled conditions and blended with sandalwood, rose, jasmine, and natural aromatics. No synthetic chemicals. No charcoal binding.",
+      design:"../assets/images/Florals/10.png"
     },
     {
       number: "04",
       title: "Rolled into 'Shri' Agarbathi",
       text: "Skilled artisans hand-roll each 9-inch stick. The final agarbathi retains temple purity and gives 45 minutes of continuous divine fragrance.",
+      design:"../assets/images/Florals/5.png"
     },
   ];
 
@@ -190,6 +194,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="story-title">${item.title}</div>
         <div class="story-line"></div>
         <p class="story-text">${item.text}</p>
+        <div class="floral-design">
+        <img src="${item.design}" alt="${item.title}" class="story-image" />
+        </div>
       `;
       frag.appendChild(card);
     });

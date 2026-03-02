@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        /* ── Brand Palette (from style.css) ── */
+        --primary:        #7f0403;
+        --primary-dark:   #5a0000;
+        --primary-light:  #a00505;
+        --gold:           #ffc406;
+        --gold-bright:    #ffd700;
+        --gold-pale:      #fff3b0;
+        --gold-muted:     #e6ac00;
+
+        /* ── Backgrounds ── */
+        --bg:             #f7f7f7;
+        --bg-card:        #ffffff;
+        --bg-header:      #fdfcfb;
+        --parch:          #fffcf5;
+        --cream:          #fdf8f0;
+        --cream-mid:      #f9f5eb;
+        --cream-deep:     #f1ead7;
+
+        /* ── Text ── */
+        --text-dark:      #1a1a1a;
+        --text-mid:       #4b5563;
+        --text-light:     #6b7280;
+
+        /* ── Borders & Shadows ── */
+        --border:         #e5e7eb;
+        --border-warm:    #e8dfc8;
+        --white:          #ffffff;
+        --sh-sm:  0 2px 14px rgba(127, 4, 3, 0.06);
+        --sh-md:  0 8px 36px rgba(127, 4, 3, 0.11);
+        --sh-lg:  0 18px 60px rgba(127, 4, 3, 0.17);
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html { scroll-behavior: smooth; scrollbar-width: none; }
+      html::-webkit-scrollbar { display: none; }
+      body {
+        font-family: "Inter", "Source Sans 3", sans-serif;
+        background: var(--bg);
+        color: var(--text-dark);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ══ HERO / HEADER ══ */
+      .header {
+        background: linear-gradient(135deg, #7f0403 0%, #a00505 100%);
+        color: white;
+        padding: 60px 60px 50px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .header::after {
+        content: "";
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--gold) 30%, var(--gold-bright) 50%, var(--gold) 70%, transparent);
+      }
+      .header h1 {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(1.9rem, 5vw, 3rem);
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.25;
+        margin-bottom: 14px;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      }
+      .header h1 em {
+        font-style: italic;
+        color: var(--gold);
+      }
+      .header p {
+        font-size: 1rem;
+        font-weight: 300;
+        color: rgba(255,255,255,0.88);
+        line-height: 1.8;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      /* Sparkle Particles */
+      .sparkle-particles {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 1;
+        pointer-events: none;
+      }
+      .sparkle {
+        position: absolute;
+        width: 4px; height: 4px;
+        background: radial-gradient(circle, rgba(255,196,6,0.9), rgba(255,215,0,0.3));
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(255,196,6,0.8);
+        animation: sparkleFloat 15s infinite ease-in-out;
+        opacity: 0;
+      }
+      .sparkle:nth-child(1) { left: 10%; animation-delay: 0s;   animation-duration: 12s; }
+      .sparkle:nth-child(2) { left: 20%; animation-delay: 2s;   animation-duration: 14s; }
+      .sparkle:nth-child(3) { left: 30%; animation-delay: 4s;   animation-duration: 16s; }
+      .sparkle:nth-child(4) { left: 50%; animation-delay: 1s;   animation-duration: 13s; }
+      .sparkle:nth-child(5) { left: 60%; animation-delay: 3s;   animation-duration: 15s; }
+      .sparkle:nth-child(6) { left: 70%; animation-delay: 5s;   animation-duration: 17s; }
+      .sparkle:nth-child(7) { left: 80%; animation-delay: 2.5s; animation-duration: 14.5s; }
+      .sparkle:nth-child(8) { left: 90%; animation-delay: 4.5s; animation-duration: 16.5s; }
+      @keyframes sparkleFloat {
+        0%   { bottom: -10px; opacity: 0; transform: translateX(0) scale(0); }
+        10%  { opacity: 0.8;  transform: translateX(20px) scale(1); }
+        50%  { opacity: 1;    transform: translateX(-30px) scale(1.3); }
+        90%  { opacity: 0.6; }
+        100% { bottom: 100%; opacity: 0; transform: translateX(10px) scale(0.8); }
+      }
+      .header .sparkle-particles,
+      .header h1,
+      .header p {
+        position: relative;
+        z-index: 2;
+      }
+
+      /* ══ CATEGORY NAV ══ */
+      .cat-nav {
+        background: var(--white);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      }
+      .cat-nav-inner {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 0 24px;
+        display: flex;
+        overflow-x: auto;
+        scrollbar-width: none;
+        gap: 4px;
+      }
+      .cat-nav-inner::-webkit-scrollbar { display: none; }
+      .cat-btn {
+        flex: 0 0 auto;
+        padding: 14px 22px;
+        font-family: "Inter", sans-serif;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: var(--text-light);
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: color 0.22s, border-color 0.22s;
+        white-space: nowrap;
+      }
+      .cat-btn:hover { color: var(--primary); }
+      .cat-btn.active {
+        color: var(--primary);
+        border-bottom-color: var(--gold);
+      }
+
+      /* ══ PAGE ══ */
+      .page {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 44px 24px 80px;
+      }
+
+      /* ══ SECTION HEADING ══ */
+      .sec-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 26px;
+      }
+      .sec-head h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: var(--primary);
+        white-space: nowrap;
+      }
+      .sec-line {
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, var(--border), transparent);
+      }
+      .sec-gem { color: var(--gold); font-size: 0.82rem; }
+
+      /* ══ FEATURED SLIDER ══ */
+      .featured-section {
+        position: relative;
+        margin-bottom: 50px;
+      }
+      .feat-label-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+      .feat-label-row h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: var(--primary);
+        white-space: nowrap;
+      }
+      .feat-label-row .sec-line {
+        flex: 1; height: 1px;
+        background: linear-gradient(90deg, var(--border), transparent);
+      }
+      .feat-label-row .sec-gem { color: var(--gold); font-size: 0.82rem; }
+
+      .feat-slider-outer {
+        display: flex;
+        align-items: center;
+        position: relative;
+      }
+      .feat-arrow {
+        flex-shrink: 0;
+        width: 48px; height: 48px;
+        background: var(--white);
+        border: 1.5px solid var(--border);
+        border-radius: 50%;
+        color: var(--primary);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--sh-sm);
+        transition: background 0.22s, color 0.22s, border-color 0.22s, transform 0.22s, box-shadow 0.22s;
+        z-index: 10;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .feat-arrow:hover {
+        background: var(--primary);
+        color: var(--white);
+        border-color: var(--primary);
+        box-shadow: var(--sh-md);
+      }
+      .feat-arrow.fa-left  { left:  -24px; }
+      .feat-arrow.fa-right { right: -24px; }
+      .feat-arrow:active { transform: translateY(-50%) scale(0.93); }
+
+      .feat-viewport { flex: 1; overflow: hidden; border-radius: 8px; }
+      .feat-strip {
+        display: flex;
+        transition: transform 0.52s cubic-bezier(0.42, 0, 0.18, 1);
+        will-change: transform;
+      }
+
+      /* Individual slide */
+      .featured {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: 370px;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-top: 3px solid var(--primary);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: var(--sh-md);
+        position: relative;
+        width: 100%;
+        flex-shrink: 0;
+        cursor: pointer;
+        transition: box-shadow 0.32s;
+      }
+      .featured:hover { box-shadow: var(--sh-lg); }
+      .feat-img { position: relative; overflow: hidden; height: 100%; }
+      .feat-body {
+        padding: 40px 36px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden;
+        background: linear-gradient(160deg, var(--white) 0%, var(--cream) 100%);
+        border-left: 1px solid var(--border);
+      }
+      .feat-badge {
+        position: absolute;
+        top: 18px; left: 18px;
+        z-index: 5;
+        background: var(--gold);
+        color: var(--primary-dark);
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-family: "Inter", sans-serif;
+      }
+      .feat-img img {
+        width: 100%; height: 100%;
+        object-fit: cover; display: block;
+        transition: transform 0.5s;
+      }
+      .featured:hover .feat-img img { transform: scale(1.04); }
+      .feat-veil {
+        position: absolute; inset: 0;
+        background: linear-gradient(160deg, rgba(90,0,0,0.2) 0%, transparent 55%);
+      }
+      .feat-body h2 {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(1.1rem, 2vw, 1.55rem);
+        font-weight: 700;
+        color: var(--text-dark);
+        line-height: 1.35;
+        margin-bottom: 12px;
+      }
+      .feat-body p {
+        font-size: 0.88rem;
+        font-weight: 400;
+        color: var(--text-mid);
+        line-height: 1.82;
+        margin-bottom: 22px;
+      }
+      .read-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin-top: 20px;
+        align-self: flex-start;
+        padding: 10px 24px;
+        background: var(--primary);
+        color: var(--white);
+        font-family: "Inter", sans-serif;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: background 0.22s, transform 0.22s, box-shadow 0.22s;
+        box-shadow: 0 4px 14px rgba(127,4,3,0.25);
+      }
+      .read-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(127,4,3,0.35);
+      }
+      .read-btn i { font-size: 0.65rem; transition: transform 0.22s; }
+      .read-btn:hover i { transform: translateX(3px); }
+
+      /* Tags */
+      .feat-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+      .feat-tag {
+        display: inline-block;
+        background: var(--cream-mid);
+        color: var(--primary);
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 50px;
+        border: 1px solid var(--border-warm);
+        font-family: "Inter", sans-serif;
+      }
+      .feat-meta-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 4px; }
+      .feat-meta-item { display: flex; align-items: center; gap: 5px; font-size: 0.74rem; color: var(--text-light); font-family: "Inter", sans-serif; }
+      .feat-meta-item i { font-size: 0.66rem; color: var(--gold-muted); }
+
+      /* Dots */
+      .feat-dots { display: flex; justify-content: center; gap: 8px; margin-top: 18px; }
+      .feat-dot {
+        width: 28px; height: 3px;
+        border-radius: 2px;
+        background: var(--border);
+        border: none; cursor: pointer;
+        transition: background 0.28s, width 0.28s;
+        padding: 0;
+      }
+      .feat-dot.active { background: var(--primary); width: 44px; }
+
+      /* Counter */
+      .feat-counter {
+        position: absolute;
+        bottom: 18px; right: 22px;
+        z-index: 6;
+        font-family: "Inter", sans-serif;
+        font-size: 0.72rem;
+        color: var(--text-light);
+        background: rgba(255,252,245,0.92);
+        padding: 3px 10px;
+        border-radius: 50px;
+        border: 1px solid var(--border);
+        pointer-events: none;
+      }
+
+      /* ══ POSTS GRID ══ */
+      .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+        width: 100%;
+        align-items: stretch;
+      }
+      .post-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-top: 3px solid transparent;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        box-shadow: var(--sh-sm);
+        transition: border-top-color 0.25s, box-shadow 0.32s, transform 0.32s;
+        animation: fadeUp 0.45s ease both;
+        min-width: 0; width: 100%;
+        display: flex; flex-direction: column;
+      }
+      .post-card:hover {
+        border-top-color: var(--gold);
+        box-shadow: var(--sh-md);
+        transform: translateY(-5px);
+      }
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(18px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .post-card:nth-child(1) { animation-delay: 0.04s; }
+      .post-card:nth-child(2) { animation-delay: 0.10s; }
+      .post-card:nth-child(3) { animation-delay: 0.16s; }
+      .post-card:nth-child(4) { animation-delay: 0.22s; }
+
+      .card-img {
+        position: relative; overflow: hidden;
+        aspect-ratio: 16/10; flex-shrink: 0;
+      }
+      .card-img img {
+        width: 100%; height: 100%;
+        object-fit: cover; display: block;
+        transition: transform 0.48s;
+      }
+      .post-card:hover .card-img img { transform: scale(1.06); }
+      .card-cat {
+        position: absolute; top: 11px; left: 11px;
+        background: var(--gold);
+        color: var(--primary-dark);
+        font-size: 0.58rem; font-weight: 700;
+        letter-spacing: 1.5px; text-transform: uppercase;
+        padding: 3px 9px; border-radius: 50px;
+        font-family: "Inter", sans-serif;
+      }
+      .card-time {
+        position: absolute; bottom: 10px; right: 10px;
+        background: rgba(0,0,0,0.55);
+        color: rgba(255,255,255,0.92);
+        font-size: 0.66rem; padding: 3px 8px;
+        border-radius: 50px;
+        display: flex; align-items: center; gap: 4px;
+        font-family: "Inter", sans-serif;
+      }
+      .card-body {
+        padding: 14px 16px 16px;
+        display: flex; flex-direction: column; flex: 1;
+      }
+      .card-body h4 {
+        font-family: "Playfair Display", serif;
+        font-size: 0.88rem; font-weight: 700;
+        color: var(--text-dark);
+        line-height: 1.38; margin-bottom: 7px;
+        transition: color 0.2s;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: calc(0.88rem * 1.38 * 2);
+      }
+      .post-card:hover .card-body h4 { color: var(--primary); }
+      .card-body p {
+        font-size: 0.76rem; font-weight: 400;
+        color: var(--text-light);
+        line-height: 1.62; margin-bottom: 12px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex: 1;
+      }
+
+      /* Card Tags */
+      .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+      .card-tag {
+        display: inline-block;
+        background: var(--cream-mid);
+        color: var(--primary);
+        border: 1px solid var(--border-warm);
+        font-size: 0.57rem; font-weight: 700;
+        letter-spacing: 0.8px; text-transform: uppercase;
+        padding: 3px 8px; border-radius: 50px;
+        font-family: "Inter", sans-serif;
+      }
+
+      /* Card Footer */
+      .card-foot {
+        display: flex; align-items: center;
+        padding-top: 11px;
+        border-top: 1px solid var(--border);
+      }
+      .card-meta-item {
+        display: flex; align-items: center; gap: 5px;
+        font-size: 0.65rem; font-weight: 600;
+        color: var(--text-light);
+        white-space: nowrap;
+        padding: 0 10px;
+        border-right: 1px solid var(--border);
+        line-height: 1;
+        font-family: "Inter", sans-serif;
+      }
+      .card-meta-item:first-child { padding-left: 0; }
+      .card-meta-item i { font-size: 0.6rem; color: var(--gold-muted); }
+
+      /* ══ PAGINATION ══ */
+      .pagination-wrap {
+        margin-top: 36px;
+        display: flex; flex-direction: column;
+        align-items: center; gap: 16px;
+      }
+      .pagination-info {
+        display: flex; align-items: center; gap: 10px;
+        font-size: 0.72rem; color: var(--text-light);
+        font-weight: 600; letter-spacing: 0.5px;
+        font-family: "Inter", sans-serif;
+      }
+      .pagination-info .info-dot {
+        width: 4px; height: 4px;
+        border-radius: 50%; background: var(--gold);
+      }
+      .pagination {
+        display: flex; align-items: center; gap: 6px;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 50px;
+        padding: 8px 14px;
+        box-shadow: var(--sh-sm);
+        position: relative;
+      }
+      .pagination::before, .pagination::after {
+        content: "";
+        position: absolute; top: 50%; transform: translateY(-50%);
+        width: 28px; height: 2px;
+        background: linear-gradient(90deg, transparent, var(--gold));
+      }
+      .pagination::before { left: -34px; }
+      .pagination::after  { right: -34px; background: linear-gradient(270deg, transparent, var(--gold)); }
+
+      .pg-arrow {
+        display: flex; align-items: center; justify-content: center;
+        width: 36px; height: 36px;
+        border: 1.5px solid var(--border);
+        border-radius: 50%;
+        background: var(--cream);
+        color: var(--primary);
+        font-size: 0.72rem; cursor: pointer; flex-shrink: 0;
+        transition: background 0.22s, border-color 0.22s, color 0.22s, transform 0.18s;
+      }
+      .pg-arrow:hover:not(:disabled) {
+        background: var(--primary); color: var(--white);
+        border-color: var(--primary); transform: translateY(-1px);
+      }
+      .pg-arrow:disabled { opacity: 0.35; cursor: not-allowed; }
+
+      .pg-num {
+        display: flex; align-items: center; justify-content: center;
+        width: 36px; height: 36px;
+        border: 1.5px solid transparent;
+        border-radius: 50%;
+        background: transparent;
+        font-family: "Inter", sans-serif;
+        font-size: 0.86rem; font-weight: 600;
+        color: var(--text-mid); cursor: pointer;
+        position: relative;
+        transition: background 0.22s, border-color 0.22s, color 0.22s, transform 0.18s;
+      }
+      .pg-num:hover:not(.active) {
+        background: var(--cream-mid);
+        border-color: var(--border-warm);
+        color: var(--primary); transform: translateY(-1px);
+      }
+      .pg-num.active {
+        background: var(--primary); color: var(--white);
+        border-color: var(--primary);
+        box-shadow: 0 3px 12px rgba(127,4,3,0.28);
+      }
+      .pg-num.active::after {
+        content: "✦";
+        position: absolute; top: -12px; left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.42rem; color: var(--gold); line-height: 1;
+      }
+      .pg-ellipsis {
+        width: 28px; display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem; color: var(--text-light);
+        letter-spacing: 1px; user-select: none;
+      }
+      .pg-sep { width: 1px; height: 24px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
+
+      .pagination-jump {
+        display: flex; align-items: center; gap: 8px;
+        font-size: 0.7rem; color: var(--text-light);
+        font-weight: 600; letter-spacing: 0.5px;
+        font-family: "Inter", sans-serif;
+      }
+      .pg-jump-input {
+        width: 44px; height: 30px;
+        text-align: center;
+        border: 1.5px solid var(--border);
+        border-radius: 50px;
+        background: var(--white);
+        font-family: "Inter", sans-serif;
+        font-size: 0.86rem; color: var(--text-dark);
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .pg-jump-input:focus { border-color: var(--gold); }
+      .pg-jump-btn {
+        height: 30px; padding: 0 14px;
+        background: var(--cream-mid);
+        border: 1.5px solid var(--border-warm);
+        border-radius: 50px;
+        font-family: "Inter", sans-serif;
+        font-size: 0.68rem; font-weight: 700;
+        letter-spacing: 1px; text-transform: uppercase;
+        color: var(--primary); cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+      }
+      .pg-jump-btn:hover {
+        background: var(--primary); color: var(--white);
+        border-color: var(--primary);
+      }
+
+      /* ══ RESPONSIVE ══ */
+      @media (max-width: 1200px) {
+        .page { padding: 36px 20px 70px; }
+        .posts-grid { gap: 14px; }
+        .card-body h4 { font-size: 0.82rem; }
+        .feat-body { padding: 30px 26px; }
+        .feat-arrow.fa-left  { left:  -20px; }
+        .feat-arrow.fa-right { right: -20px; }
+      }
+      @media (max-width: 1024px) {
+        .page { padding: 32px 18px 60px; }
+        .posts-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+        .card-body { padding: 12px 12px 14px; }
+        .card-body h4 { font-size: 0.8rem; }
+        .feat-body { padding: 26px 22px; }
+        .feat-body h2 { font-size: 1.1rem; }
+        .feat-arrow { width: 40px; height: 40px; font-size: 0.8rem; }
+        .feat-arrow.fa-left  { left:  -18px; }
+        .feat-arrow.fa-right { right: -18px; }
+        .pg-num, .pg-arrow { width: 32px; height: 32px; }
+      }
+      @media (max-width: 960px) {
+        .page { padding: 28px 16px 56px; }
+        .posts-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+        .featured { height: 300px; }
+        .feat-body { padding: 28px 24px; }
+        .feat-arrow { width: 38px; height: 38px; }
+        .feat-arrow.fa-left  { left:  -16px; }
+        .feat-arrow.fa-right { right: -16px; }
+      }
+      @media (max-width: 768px) {
+        .page { padding: 24px 20px 50px; }
+        .posts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .featured { grid-template-columns: 1fr; height: auto; }
+        .feat-img { height: 200px; }
+        .feat-body {
+          height: auto; padding: 24px 20px;
+          border-left: none; border-top: 1px solid var(--border);
+        }
+        .feat-body h2 { font-size: 1.2rem; }
+        .feat-body p { font-size: 0.86rem; }
+        .feat-arrow { width: 36px; height: 36px; font-size: 0.76rem; }
+        .feat-arrow.fa-left  { left:  -14px; }
+        .feat-arrow.fa-right { right: -14px; }
+        .sec-head h2 { font-size: 1.15rem; }
+        .pagination::before, .pagination::after { display: none; }
+        .pagination-wrap { gap: 12px; }
+        .pg-num, .pg-arrow { width: 34px; height: 34px; font-size: 0.84rem; }
+        .header { padding: 44px 20px 40px; }
+      }
+      @media (max-width: 600px) {
+        .header h1 { font-size: 1.7rem; }
+        .header p { font-size: 0.88rem; }
+        .page { padding: 20px 14px 44px; }
+        .posts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .cat-btn { padding: 13px 14px; font-size: 0.72rem; }
+        .feat-body { padding: 20px 16px; }
+        .feat-body h2 { font-size: 1.05rem; }
+        .read-btn { padding: 8px 18px; font-size: 0.7rem; }
+        .feat-arrow { width: 32px; height: 32px; font-size: 0.7rem; }
+        .feat-arrow.fa-left  { left:  -12px; }
+        .feat-arrow.fa-right { right: -12px; }
+        .pg-num, .pg-arrow { width: 30px; height: 30px; font-size: 0.78rem; }
+        .pg-sep { display: none; }
+        .pagination-info { font-size: 0.68rem; }
+        .pagination-jump { display: none; }
+      }
+      @media (max-width: 480px) {
+        .header { padding: 36px 14px 32px; }
+        .header h1 { font-size: 1.5rem; }
+        .header p { display: none; }
+        .page { padding: 18px 12px 40px; }
+        .posts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+        .card-img { aspect-ratio: 1/1; }
+        .card-body { padding: 10px 10px 12px; }
+        .card-body h4 { font-size: 0.78rem; line-height: 1.32; }
+        .card-body p { display: none; }
+        .card-meta-item { font-size: 0.58rem; }
+        .cat-btn { padding: 11px 11px; font-size: 0.68rem; }
+        .sec-head { margin-bottom: 18px; }
+        .sec-head h2, .feat-label-row h2 { font-size: 1.05rem; }
+        .feat-badge { font-size: 0.55rem; padding: 3px 9px; }
+        .feat-body h2 { font-size: 0.95rem; }
+        .feat-body p { font-size: 0.82rem; -webkit-line-clamp: 3; }
+        .feat-arrow { width: 30px; height: 30px; font-size: 0.65rem; }
+        .feat-arrow.fa-left  { left:  -10px; }
+        .feat-arrow.fa-right { right: -10px; }
+        .feat-dot { width: 20px; }
+        .feat-dot.active { width: 32px; }
+        .pg-num, .pg-arrow { width: 28px; height: 28px; font-size: 0.74rem; }
+        .pg-num.active::after { display: none; }
+        .pagination-info { flex-direction: column; gap: 3px; text-align: center; }
+        .info-dot { display: none; }
+      }
+      @media (max-width: 380px) {
+        .header h1 { font-size: 1.3rem; }
+        .page { padding: 14px 10px 36px; }
+        .posts-grid { gap: 8px; }
+        .card-body h4 { font-size: 0.72rem; }
+        .cat-btn { padding: 10px 9px; font-size: 0.63rem; }
+        .feat-body h2 { font-size: 0.88rem; }
+        .feat-arrow { width: 26px; height: 26px; font-size: 0.6rem; }
+        .feat-arrow.fa-left  { left:  -8px; }
+        .feat-arrow.fa-right { right: -8px; }
+        .pg-num, .pg-arrow { width: 26px; height: 26px; font-size: 0.7rem; }
+        .pagination { gap: 2px; padding: 5px 5px; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="sparkle-particles">
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+      </div>
+      <h1>Stories Behind Every <em>Sacred Flame</em></h1>
+      <p>From ancient temple rituals to the hands that craft each stick —
+        discover the heritage, ingredients &amp; devotion within every fragrance.</p>
+    </div>
+
+    <!-- CATEGORY NAV -->
+    <nav class="cat-nav">
+      <div class="cat-nav-inner">
+        <button class="cat-btn active" data-cat="all">All Stories</button>
+        <button class="cat-btn" data-cat="traditions">Traditions</button>
+        <button class="cat-btn" data-cat="crafts">Artisan Crafts</button>
+        <button class="cat-btn" data-cat="recipes">Sacred Recipes</button>
+        <button class="cat-btn" data-cat="festivals">Festivals</button>
+        <button class="cat-btn" data-cat="wellness">Wellness</button>
+        <button class="cat-btn" data-cat="stories">Community</button>
+      </div>
+    </nav>
+
+    <!-- PAGE -->
+    <div class="page">
+      <!-- FEATURED SLIDER -->
+      <section class="featured-section">
+        <div class="feat-label-row">
+          <h2>Featured Stories</h2>
+          <div class="sec-line"></div>
+          <span class="sec-gem"><i class="fas fa-star"></i></span>
+        </div>
+        <div class="feat-slider-outer">
+          <button class="feat-arrow fa-left" id="featPrev" aria-label="Previous featured story">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <div class="feat-viewport">
+            <div class="feat-strip" id="featStrip"></div>
+          </div>
+          <button class="feat-arrow fa-right" id="featNext" aria-label="Next featured story">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        <div class="feat-dots" id="featDots"></div>
+      </section>
+
+      <!-- LATEST STORIES -->
+      <div class="sec-head">
+        <h2>Latest Stories</h2>
+        <div class="sec-line"></div>
+        <span class="sec-gem"><i class="fas fa-sun"></i></span>
+      </div>
+
+      <div class="posts-grid" id="postsGrid"></div>
+
+      <!-- PAGINATION -->
+      <div class="pagination-wrap">
+        <div class="pagination-info">
+          <span id="pgInfoText">Showing 1–4 of 6 stories</span>
+          <span class="info-dot"></span>
+          <span id="pgInfoPage">Page 1 of 2</span>
+        </div>
+        <div class="pagination">
+          <button class="pg-arrow" id="pgPrev" title="Previous page">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <div class="pg-sep"></div>
+          <div id="pgNumbers" style="display:flex;align-items:center;gap:4px;"></div>
+          <div class="pg-sep"></div>
+          <button class="pg-arrow" id="pgNext" title="Next page">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        <div class="pagination-jump">
+          <span>Go to page</span>
+          <input class="pg-jump-input" id="pgJumpInput" type="number" min="1" placeholder="—" />
+          <button class="pg-jump-btn" id="pgJumpBtn">Go</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const FEATURED = [
+        {
+          id: "f1",
+          title: "The Ancient Art of Silk Weaving — Preserving 500 Years of Heritage",
+          catLabel: "Artisan Crafts",
+          tags: ["Artisan Crafts", "Heritage", "Kanchipuram"],
+          img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80",
+          author: "Priya Sharma", seed: "Priya+Sharma",
+          date: "Feb 18, 2025 · 8 min read", views: "4.2k", likes: 312,
+          body: `<p>Journey into the looms of Kanchipuram, where master weavers pour generations of devotion into every thread, creating sarees that tell stories older than time itself.</p><blockquote>"A Kanchipuram saree is not made in a day. It is made in a life."</blockquote>`,
+        },
+        {
+          id: "f2",
+          title: "Kolam: Sacred Geometry Drawn at the Threshold of Every Tamil Home",
+          catLabel: "Traditions",
+          tags: ["Traditions", "Sacred Art", "Tamil Nadu"],
+          img: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=900&q=80",
+          author: "Deepa Krishnan", seed: "Deepa+Krishnan",
+          date: "Feb 5, 2025 · 5 min read", views: "2.7k", likes: 194,
+          body: `<p>Before the world wakes up, Tamil women step outside their homes with fistfuls of rice flour, bending low to trace intricate geometric patterns on the ground.</p><blockquote>"The impermanence is the point. By nightfall it will be gone."</blockquote>`,
+        },
+        {
+          id: "f3",
+          title: "Bronze Casting in Swamimalai: Where Chola Craftsmanship Lives On",
+          catLabel: "Artisan Crafts",
+          tags: ["Artisan Crafts", "Chola", "Bronze"],
+          img: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=900&q=80",
+          author: "Arjun Natarajan", seed: "Arjun+Natarajan",
+          date: "Jan 28, 2025 · 7 min read", views: "1.9k", likes: 156,
+          body: `<p>In Swamimalai, a small town in Kumbakonam district, a craft that dates back to the 9th century Chola empire still breathes.</p><blockquote>"We do not make idols. We invoke the divine into form."</blockquote>`,
+        },
+        {
+          id: "f4",
+          title: "Pongal Beyond the Pot: The Deep Spiritual Meaning of Tamil's Harvest Festival",
+          catLabel: "Festivals",
+          tags: ["Festivals", "Culture", "Pongal"],
+          img: "https://images.unsplash.com/photo-1606787364406-a3cdf06c6d0c?w=900&q=80",
+          author: "Lakshmi Iyer", seed: "Lakshmi+Iyer",
+          date: "Jan 15, 2025 · 5 min read", views: "5.3k", likes: 412,
+          body: `<p>In mid-January, when the sun begins its northward journey, Tamil Nadu transforms. Clay pots overflow with sweetened milk and rice.</p><blockquote>"When the milk boils over, it carries our gratitude to Surya Bhagavan."</blockquote>`,
+        },
+      ];
+
+      const POSTS = [
+        { id:1, title:"The Women Behind the Loom: Stories from Tamil Nadu's Weaving Villages", excerpt:"Meet the unsung heroines who carry forward centuries of textile wisdom, weaving stories of resilience into every vibrant thread.", cat:"stories", catLabel:"Community", tags:["Community","Traditions","Tamil Nadu"], comments:14, img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80", author:"Meena Rajan", date:"Feb 12, 2025", time:"6 min", views:"3.1k", likes:218, body:"" },
+        { id:2, title:"Kolam: Sacred Geometry Drawn at the Threshold of Every Tamil Home", excerpt:"Every morning, a ritual of devotion unfolds in rice flour and sacred geometry — the timeless art of Kolam.", cat:"traditions", catLabel:"Traditions", tags:["Traditions","Sacred Art"], comments:9, img:"https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=500&q=80", author:"Deepa Krishnan", date:"Feb 5, 2025", time:"5 min", views:"2.7k", likes:194, body:"" },
+        { id:3, title:"Bronze Casting in Swamimalai: Where Chola Craftsmanship Lives On", excerpt:"The lost-wax casting technique, unchanged since the Chola dynasty, continues in the hands of a few devoted Sthapathis.", cat:"crafts", catLabel:"Artisan Crafts", tags:["Artisan Crafts","Heritage"], comments:6, img:"https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=500&q=80", author:"Arjun Natarajan", date:"Jan 28, 2025", time:"7 min", views:"1.9k", likes:156, body:"" },
+        { id:4, title:"Pongal Beyond the Pot: The Deep Spiritual Meaning of Tamil's Harvest Festival", excerpt:"Pongal is far more than a harvest celebration — it is a cosmic reckoning of gratitude, community, and renewal.", cat:"festivals", catLabel:"Festivals", tags:["Festivals","Culture","Tamil Nadu"], comments:21, img:"https://images.unsplash.com/photo-1606787364406-a3cdf06c6d0c?w=500&q=80", author:"Lakshmi Iyer", date:"Jan 15, 2025", time:"5 min", views:"5.3k", likes:412, body:"" },
+        { id:5, title:"Turmeric: The Golden Healer in Every South Indian Kitchen", excerpt:"From sacred ceremonies to everyday cooking and Ayurvedic medicine — turmeric's story in Tamil culture is golden in every sense.", cat:"wellness", catLabel:"Wellness", tags:["Wellness","Ayurveda"], comments:11, img:"https://images.unsplash.com/photo-1615485500704-8e3b1a64d5ab?w=500&q=80", author:"Dr. Vani Subramanian", date:"Jan 8, 2025", time:"4 min", views:"4.1k", likes:287, body:"" },
+        { id:6, title:"The Sacred Thread: Understanding the Making of Pooja Vastrams", excerpt:"Every colour, every fibre, every border pattern in a temple garment carries precise devotional significance.", cat:"traditions", catLabel:"Traditions", tags:["Traditions","Temple Arts"], comments:7, img:"https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=500&q=80", author:"Priya Sharma", date:"Dec 20, 2024", time:"6 min", views:"2.2k", likes:173, body:"" },
+      ];
+
+      /* ── FEATURED SLIDER ── */
+      let featIdx = 0, featAutoTimer = null;
+
+      function buildFeatSlides() {
+        const strip = document.getElementById("featStrip");
+        const dots  = document.getElementById("featDots");
+        strip.innerHTML = dots.innerHTML = "";
+        FEATURED.forEach((f, i) => {
+          const slide = document.createElement("article");
+          slide.className = "featured";
+          slide.innerHTML = `
+            <span class="feat-badge">✦ Featured ${i+1} / ${FEATURED.length}</span>
+            <div class="feat-img">
+              <img src="${f.img}" alt="${f.title}" loading="${i===0?"eager":"lazy"}" />
+              <div class="feat-veil"></div>
+            </div>
+            <div class="feat-body">
+              <div class="feat-tags">${(f.tags||[f.catLabel]).map(t=>`<span class="feat-tag">${t}</span>`).join("")}</div>
+              <h2>${f.title}</h2>
+              <p>${f.body.replace(/<[^>]+>/g,"").slice(0,160)}…</p>
+              <div class="feat-meta-row">
+                <span class="feat-meta-item"><i class="fas fa-calendar-alt"></i> ${f.date.split("·")[0].trim()}</span>
+                <span class="feat-meta-item"><i class="fas fa-eye"></i> ${f.views}</span>
+                <span class="feat-meta-item"><i class="fas fa-heart"></i> ${f.likes}</span>
+              </div>
+              <button class="read-btn">Read Full Story <i class="fas fa-arrow-right"></i></button>
+            </div>`;
+          strip.appendChild(slide);
+          const dot = document.createElement("button");
+          dot.className = "feat-dot" + (i===0?" active":"");
+          dot.setAttribute("aria-label", `Go to featured story ${i+1}`);
+          dot.addEventListener("click", () => goFeat(i));
+          dots.appendChild(dot);
+        });
+      }
+
+      function goFeat(idx) {
+        featIdx = (idx + FEATURED.length) % FEATURED.length;
+        document.getElementById("featStrip").style.transform = `translateX(-${featIdx * 100}%)`;
+        document.querySelectorAll(".feat-dot").forEach((d,i) => d.classList.toggle("active", i===featIdx));
+        resetFeatAuto();
+      }
+      function resetFeatAuto() {
+        clearInterval(featAutoTimer);
+        featAutoTimer = setInterval(() => goFeat(featIdx+1), 5500);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        buildFeatSlides();
+        document.getElementById("featPrev").addEventListener("click", () => goFeat(featIdx-1));
+        document.getElementById("featNext").addEventListener("click", () => goFeat(featIdx+1));
+        let touchStartX = 0;
+        const viewport = document.querySelector(".feat-viewport");
+        viewport.addEventListener("touchstart", e => { touchStartX = e.touches[0].clientX; }, {passive:true});
+        viewport.addEventListener("touchend", e => {
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          if (Math.abs(dx) > 40) goFeat(dx < 0 ? featIdx+1 : featIdx-1);
+        });
+        document.addEventListener("keydown", e => {
+          if (e.key==="ArrowLeft")  goFeat(featIdx-1);
+          if (e.key==="ArrowRight") goFeat(featIdx+1);
+        });
+        resetFeatAuto();
+      });
+
+      /* ── POSTS GRID + PAGINATION ── */
+      const PER_PAGE = 4;
+      let filtered = [...POSTS], currentPage = 1;
+      const totalPages = () => Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+
+      function renderGrid() {
+        const grid = document.getElementById("postsGrid");
+        grid.innerHTML = "";
+        const start = (currentPage-1) * PER_PAGE;
+        filtered.slice(start, start+PER_PAGE).forEach((p, i) => {
+          const el = document.createElement("article");
+          el.className = "post-card";
+          el.style.animationDelay = `${i*0.07}s`;
+          el.innerHTML = `
+            <div class="card-img">
+              <img src="${p.img}" alt="${p.title}" loading="lazy" />
+              <span class="card-time"><i class="fas fa-clock"></i> ${p.time}</span>
+            </div>
+            <div class="card-body">
+              <div class="card-tags">${(p.tags||[p.catLabel]).map(t=>`<span class="card-tag">${t}</span>`).join("")}</div>
+              <h4>${p.title}</h4>
+              <p>${p.excerpt}</p>
+              <div class="card-foot">
+                <span class="card-meta-item"><i class="fas fa-calendar-alt"></i> ${p.date}</span>
+                <span class="card-meta-item"><i class="fas fa-eye"></i> ${p.views}</span>
+                <span class="card-meta-item"><i class="fas fa-comment-dots"></i> ${p.comments||0}</span>
+                <span class="card-meta-item" style="border-right:none;margin-left:auto;padding-right:0;"><i class="fas fa-heart"></i> ${p.likes}</span>
+              </div>
+            </div>`;
+          el.addEventListener("click", () => console.log("navigate to story:", p.id));
+          grid.appendChild(el);
+        });
+      }
+
+      function renderPagination() {
+        const total = totalPages();
+        const start = (currentPage-1)*PER_PAGE+1;
+        const end = Math.min(currentPage*PER_PAGE, filtered.length);
+        document.getElementById("pgInfoText").textContent = filtered.length ? `Showing ${start}–${end} of ${filtered.length} stories` : "No stories found";
+        document.getElementById("pgInfoPage").textContent = `Page ${currentPage} of ${total}`;
+        document.getElementById("pgPrev").disabled = currentPage === 1;
+        document.getElementById("pgNext").disabled = currentPage === total;
+        const numsEl = document.getElementById("pgNumbers");
+        numsEl.innerHTML = "";
+        const makeNum = n => {
+          const b = document.createElement("button");
+          b.className = "pg-num" + (n===currentPage?" active":"");
+          b.textContent = n;
+          b.addEventListener("click", () => goToPage(n));
+          return b;
+        };
+        const makeEllipsis = () => {
+          const s = document.createElement("span");
+          s.className = "pg-ellipsis"; s.textContent = "···"; return s;
+        };
+        if (total <= 5) {
+          for (let i=1; i<=total; i++) numsEl.appendChild(makeNum(i));
+        } else {
+          const pages = [...new Set([1,total,currentPage,currentPage-1,currentPage+1].filter(p=>p>=1&&p<=total))].sort((a,b)=>a-b);
+          pages.forEach((p,idx) => {
+            if (idx>0 && p-pages[idx-1]>1) numsEl.appendChild(makeEllipsis());
+            numsEl.appendChild(makeNum(p));
+          });
+        }
+        const ji = document.getElementById("pgJumpInput");
+        ji.max = total; ji.placeholder = `1–${total}`;
+      }
+
+      function goToPage(n) {
+        const total = totalPages();
+        if (n<1||n>total) return;
+        currentPage = n;
+        renderGrid(); renderPagination();
+        document.querySelector(".sec-head").scrollIntoView({behavior:"smooth", block:"start"});
+      }
+
+      document.getElementById("pgPrev").addEventListener("click", () => goToPage(currentPage-1));
+      document.getElementById("pgNext").addEventListener("click", () => goToPage(currentPage+1));
+      document.getElementById("pgJumpBtn").addEventListener("click", () => {
+        const v = parseInt(document.getElementById("pgJumpInput").value);
+        if (!isNaN(v)) { goToPage(v); document.getElementById("pgJumpInput").value=""; }
+      });
+      document.getElementById("pgJumpInput").addEventListener("keydown", e => {
+        if (e.key==="Enter") document.getElementById("pgJumpBtn").click();
+      });
+
+      document.querySelectorAll(".cat-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("active"));
+          btn.classList.add("active");
+          const cat = btn.dataset.cat;
+          filtered = cat==="all" ? [...POSTS] : POSTS.filter(p=>p.cat===cat);
+          currentPage = 1;
+          const grid = document.getElementById("postsGrid");
+          grid.style.opacity = "0";
+          setTimeout(() => {
+            renderGrid(); renderPagination();
+            grid.style.transition = "opacity 0.32s";
+            grid.style.opacity = "1";
+          }, 160);
+        });
+      });
+
+      renderGrid();
+      renderPagination();
+    </script>
+  </body>
+</html>

@@ -391,6 +391,9 @@ const createTransporter = () => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    tls: {
+      rejectUnauthorized: false, // 👈 Add this
+    },
   });
 };
 
@@ -409,7 +412,9 @@ const sendEmail = async (options) => {
     logger.info(`Email sent to ${options.email}`, { subject: options.subject });
     return { success: true };
   } catch (error) {
-    logger.error(`Email sending error: ${error.message}`, { to: options.email });
+    logger.error(`Email sending error: ${error.message}`, {
+      to: options.email,
+    });
     return { success: false, error: error.message };
   }
 };
@@ -435,7 +440,7 @@ const sendOTPEmail = async (email, name, otp) => {
 
     <p style="font-size:13px; color:#9a7070;">Didn't create an account with us? You can safely ignore this email.</p>
     `,
-    "This is an automated message — please do not reply directly to this email."
+    "This is an automated message — please do not reply directly to this email.",
   );
 
   return await sendEmail({
@@ -466,7 +471,7 @@ const sendPasswordResetEmail = async (email, name, resetURL) => {
       If you did not request a password reset, please ignore this email — your password will remain unchanged.
     </div>
     `,
-    "This is an automated message — please do not reply directly to this email."
+    "This is an automated message — please do not reply directly to this email.",
   );
 
   return await sendEmail({
@@ -510,7 +515,7 @@ const sendWelcomeEmail = async (email, name) => {
     </div>
 
     <p style="margin-top: 20px;">If you have any questions or need assistance, our support team is always here for you.</p>
-    `
+    `,
   );
 
   return await sendEmail({
@@ -539,7 +544,7 @@ const sendAccountLockedEmail = async (email, name, lockMinutes) => {
       <strong>If this wasn't you</strong> — we strongly recommend resetting your password immediately to secure your account.
     </div>
     `,
-    "This security alert was triggered automatically. Do not share your credentials with anyone."
+    "This security alert was triggered automatically. Do not share your credentials with anyone.",
   );
 
   return await sendEmail({
@@ -551,7 +556,11 @@ const sendAccountLockedEmail = async (email, name, lockMinutes) => {
 };
 
 // ── Inquiry Confirmation (to user) ────────────────────────────────────────────
-const sendInquiryConfirmationEmail = async (email, fullName, purposeOfInquiry) => {
+const sendInquiryConfirmationEmail = async (
+  email,
+  fullName,
+  purposeOfInquiry,
+) => {
   const html = baseTemplate(
     `<div class="header-badge">✦ Inquiry Received</div>`,
     `
@@ -580,7 +589,7 @@ const sendInquiryConfirmationEmail = async (email, fullName, purposeOfInquiry) =
 
     <p style="font-size:13px; color:#9a7070;">Did not submit this inquiry? Please disregard this email.</p>
     `,
-    "This is an automated confirmation — please do not reply directly to this email."
+    "This is an automated confirmation — please do not reply directly to this email.",
   );
 
   return await sendEmail({
@@ -593,7 +602,14 @@ const sendInquiryConfirmationEmail = async (email, fullName, purposeOfInquiry) =
 
 // ── Inquiry Notification (to admin) ──────────────────────────────────────────
 const sendInquiryNotificationToAdmin = async (inquiryData) => {
-  const { fullName, email, mobileNumber, cityRegion, purposeOfInquiry, message } = inquiryData;
+  const {
+    fullName,
+    email,
+    mobileNumber,
+    cityRegion,
+    purposeOfInquiry,
+    message,
+  } = inquiryData;
 
   const html = baseTemplate(
     `<div class="header-badge">📬 New Inquiry Alert</div>`,
@@ -632,7 +648,7 @@ const sendInquiryNotificationToAdmin = async (inquiryData) => {
       </div>
     </div>
     `,
-    "Admin notification — generated automatically by the Shri Brand inquiry system."
+    "Admin notification — generated automatically by the Shri Brand inquiry system.",
   );
 
   return await sendEmail({
