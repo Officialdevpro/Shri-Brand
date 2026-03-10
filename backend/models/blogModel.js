@@ -63,9 +63,9 @@ const BlockSchema = new Schema(
     },
 
     // ── image ──
-    url:     { type: String, trim: true },
+    url: { type: String, trim: true },
     caption: { type: String, trim: true, maxlength: [500, 'Caption too long'] },
-    alt:     { type: String, trim: true, maxlength: [300, 'Alt text too long'] },
+    alt: { type: String, trim: true, maxlength: [300, 'Alt text too long'] },
 
     // ── divider ──
     style: {
@@ -78,7 +78,7 @@ const BlockSchema = new Schema(
 
     // ── list ──
     ordered: { type: Boolean, default: false },
-    items:   { type: [String], default: undefined },  // undefined → not stored unless set
+    items: { type: [String], default: undefined },  // undefined → not stored unless set
 
     // ── code ──
     language: { type: String, trim: true }
@@ -147,7 +147,7 @@ const PostSchema = new Schema(
         type: String,
         trim: true,
         validate: {
-          validator: (v) => !v || /^https?:\/\/.+/.test(v),
+          validator: (v) => !v || /^(https?:\/\/.+|data:.+)/.test(v),
           message: 'coverImage.url must be a valid URL'
         }
       },
@@ -196,14 +196,14 @@ const PostSchema = new Schema(
 
     // ── STATS (calculated, not user-supplied) ──
     stats: {
-      wordCount:  { type: Number, default: 0, min: 0 },
+      wordCount: { type: Number, default: 0, min: 0 },
       blockCount: { type: Number, default: 0, min: 0 },
       imageCount: { type: Number, default: 0, min: 0 }
     },
 
     // ── SETTINGS ──
     settings: {
-      isFeatured:    { type: Boolean, default: false },
+      isFeatured: { type: Boolean, default: false },
       allowComments: { type: Boolean, default: true }
     },
 
@@ -242,7 +242,8 @@ PostSchema.index({ search_text: 'text', title: 'text', subtitle: 'text' });
 // ─────────────────────────────────────────────
 //  CROSS-FIELD BLOCK VALIDATION  (pre-validate)
 // ─────────────────────────────────────────────
-PostSchema.pre('validate', function (next) {
+PostSchema.pre('validate', function () {
+  console.log('[blogModel pre-validate] ▸ running block validation...');
   const errors = [];
 
   this.blocks.forEach((block, i) => {
@@ -261,8 +262,8 @@ PostSchema.pre('validate', function (next) {
       case 'image':
         if (!block.url || !block.url.trim()) {
           errors.push(`${prefix}: url is required`);
-        } else if (!/^https?:\/\/.+/.test(block.url)) {
-          errors.push(`${prefix}: url must start with http:// or https://`);
+        } else if (!/^(https?:\/\/.+|data:.+)/.test(block.url)) {
+          errors.push(`${prefix}: url must start with http://, https://, or data:`);
         }
         break;
 
@@ -284,61 +285,56 @@ PostSchema.pre('validate', function (next) {
         }
         break;
 
-      // paragraph, blockquote, pullquote, idea, warning, info
-      // — text/html is optional (empty blocks are allowed during drafting)
       default:
         break;
     }
   });
 
   if (errors.length) {
-    return next(new mongoose.Error.ValidationError(
-      new Error(errors.join('; '))
-    ));
+    const errMsg = errors.join('; ');
+    console.log('[blogModel pre-validate] ✗ block validation errors:', errMsg);
+    throw new Error(errMsg);
   }
-
-  next();
+  console.log('[blogModel pre-validate] ✓ passed');
 });
 
 // ─────────────────────────────────────────────
 //  PRE-SAVE HOOK
 // ─────────────────────────────────────────────
-PostSchema.pre('save', function (next) {
-  try {
-    // 1. Auto-generate slug from title (only when title changes and slug not manually set)
-    if (this.isModified('title') && this.title && !this.isModified('slug')) {
-      this.slug = buildSlug(this.title);
-    }
+PostSchema.pre('save', function () {
+  console.log('[blogModel pre-save] ▸ running pre-save hooks...');
 
-    // 2. Rebuild derived fields whenever blocks change
-    if (this.isModified('blocks')) {
-      this.rendered_html = renderBlocks(this.blocks);
-      this.search_text   = extractText(this.blocks);
-
-      this.stats.blockCount = this.blocks.length;
-      this.stats.imageCount = this.blocks.filter(b => b.type === 'image').length;
-      this.stats.wordCount  = countWords(this.search_text);
-
-      // Auto-set readTime unless already manually assigned
-      if (!this.readTime || this._autoReadTime) {
-        const mins = Math.max(1, Math.ceil(this.stats.wordCount / WPM));
-        this.readTime    = `${mins} min read`;
-        this._autoReadTime = true; // mark as auto so next save can overwrite
-      }
-    }
-
-    // 3. Set publishDate when first publishing
-    if (this.isModified('status') && this.status === 'published' && !this.publishDate) {
-      this.publishDate = new Date();
-    }
-
-    // 4. Refresh lastSavedAt
-    this.lastSavedAt = new Date();
-
-    next();
-  } catch (err) {
-    next(err);
+  // 1. Auto-generate slug from title (only when title changes and slug not manually set)
+  if (this.isModified('title') && this.title && !this.isModified('slug')) {
+    this.slug = buildSlug(this.title);
+    console.log('[blogModel pre-save] ▸ auto-slug:', this.slug);
   }
+
+  // 2. Rebuild derived fields whenever blocks change
+  if (this.isModified('blocks')) {
+    this.rendered_html = renderBlocks(this.blocks);
+    this.search_text = extractText(this.blocks);
+
+    this.stats.blockCount = this.blocks.length;
+    this.stats.imageCount = this.blocks.filter(b => b.type === 'image').length;
+    this.stats.wordCount = countWords(this.search_text);
+
+    // Auto-set readTime unless already manually assigned
+    if (!this.readTime || this._autoReadTime) {
+      const mins = Math.max(1, Math.ceil(this.stats.wordCount / WPM));
+      this.readTime = `${mins} min read`;
+      this._autoReadTime = true;
+    }
+  }
+
+  // 3. Set publishDate when first publishing
+  if (this.isModified('status') && this.status === 'published' && !this.publishDate) {
+    this.publishDate = new Date();
+  }
+
+  // 4. Refresh lastSavedAt
+  this.lastSavedAt = new Date();
+  console.log('[blogModel pre-save] ✓ done');
 });
 
 // ─────────────────────────────────────────────
@@ -381,7 +377,7 @@ PostSchema.statics.search = function (query, { limit = 20 } = {}) {
  * Mark a post as published and set publishDate if not already set.
  */
 PostSchema.methods.publish = function () {
-  this.status      = 'published';
+  this.status = 'published';
   this.publishDate = this.publishDate || new Date();
   return this.save();
 };
@@ -471,8 +467,8 @@ function renderBlocks(blocks) {
           return `<div class="editor-info"><span aria-hidden="true">ℹ️</span> ${escapeText(d.text)}</div>`;
 
         case 'image': {
-          const src     = escapeAttr(d.url || '');
-          const alt     = escapeAttr(d.alt || d.caption || '');
+          const src = escapeAttr(d.url || '');
+          const alt = escapeAttr(d.alt || d.caption || '');
           const caption = d.caption ? `<figcaption>${escapeText(d.caption)}</figcaption>` : '';
           return `<figure><img src="${src}" alt="${alt}" loading="lazy"/>${caption}</figure>`;
         }
@@ -481,7 +477,7 @@ function renderBlocks(blocks) {
           return `<div class="divider divider--${escapeAttr(d.style || 'plain')}" aria-hidden="true"></div>`;
 
         case 'list': {
-          const tag   = d.ordered ? 'ol' : 'ul';
+          const tag = d.ordered ? 'ol' : 'ul';
           const items = (d.items || []).map(item => `<li>${escapeText(item)}</li>`).join('');
           return `<${tag}>${items}</${tag}>`;
         }
@@ -510,9 +506,9 @@ function extractText(blocks) {
   return blocks
     .map(b => {
       switch (b.type) {
-        case 'image':   return [b.caption, b.alt].filter(Boolean).join(' ');
+        case 'image': return [b.caption, b.alt].filter(Boolean).join(' ');
         case 'divider': return '';
-        case 'list':    return (b.items || []).join(' ');
+        case 'list': return (b.items || []).join(' ');
         case 'paragraph':
           // strip inline HTML tags from stored html string
           return (b.html || b.text || '').replace(/<[^>]+>/g, '').trim();

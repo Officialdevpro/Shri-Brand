@@ -4,27 +4,36 @@ const catchAsync = require("../utils/catchAsync");
 
 // Render Home Page with SSR products grouped by dynamic categories
 exports.renderHomePage = catchAsync(async (req, res, next) => {
-    // Fetch all active categories sorted by display order
+    // 1. Fetch ALL active products
+    const products = await Product.find({ isActive: true })
+        .sort("createdAt")
+        .select("name slug mainImage shortDescription packs productType _id");
+
+    // 2. Group products by productType
+    const grouped = {};
+    products.forEach((p) => {
+        const type = (p.productType || "other").toLowerCase();
+        if (!grouped[type]) grouped[type] = [];
+        grouped[type].push(p);
+    });
+
+    // 3. Fetch categories for display labels & ordering (optional)
     const categories = await Category.find({ isActive: true }).sort("order name");
+    const catMap = {};
+    categories.forEach((c) => {
+        catMap[c.name.toLowerCase()] = { label: c.label, order: c.order };
+    });
 
-    // For each category, fetch matching products
-    const categoryData = await Promise.all(
-        categories.map(async (cat) => {
-            const products = await Product.find({
-                productType: cat.name,
-                isActive: true,
-            })
-                .sort("-createdAt")
-                .limit(12)
-                .select("name slug mainImage shortDescription packs productType _id");
+    // 4. Build category data — use Category label if available, else capitalize type
+    const categoryData = Object.keys(grouped).map((type) => ({
+        name: type,
+        label: catMap[type] ? catMap[type].label : type.charAt(0).toUpperCase() + type.slice(1),
+        order: catMap[type] ? catMap[type].order : 999,
+        products: grouped[type],
+    }));
 
-            return {
-                name: cat.name,
-                label: cat.label,
-                products,
-            };
-        })
-    );
+    // Sort by category order
+    categoryData.sort((a, b) => a.order - b.order);
 
     res.status(200).render("index", {
         categories: categoryData,

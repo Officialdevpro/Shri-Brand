@@ -1,48 +1,65 @@
 'use strict';
 
-// middlewares/validatePost.js
-
 const AppError = require('../utils/AppError');
 
-// ── Mirror constants from blogModel (single source of truth kept in model) ──
-const VALID_BLOCK_TYPES = [
+// ─────────────────────────────────────────────
+//  CONSTANTS (mirror blogModel.js)
+// ─────────────────────────────────────────────
+const BLOCK_TYPES = [
   'paragraph', 'heading', 'blockquote', 'pullquote',
   'idea', 'warning', 'info', 'image', 'divider', 'list', 'code'
 ];
-const VALID_DIVIDER_STYLES = ['diamond', 'flame', 'stars', 'wave', 'plain'];
-const VALID_CATEGORIES = [
+const DIVIDER_STYLES = ['diamond', 'flame', 'stars', 'wave', 'plain'];
+const CATEGORIES = [
   'traditions', 'artisan-crafts', 'festivals',
   'wellness', 'community', 'sacred-recipes'
 ];
-const VALID_STATUSES = ['draft', 'published', 'archived'];
+const POST_STATUSES = ['draft', 'published', 'archived'];
+
+const TITLE_MAX = 300;
+const SUBTITLE_MAX = 500;
+const AUTHOR_MAX = 100;
+const TAGS_MAX = 20;
+const TAG_LENGTH_MAX = 60;
+const COMMENT_MIN = 1;
+const COMMENT_MAX = 2000;
+const READTIME_MAX = 50;
+const CAPTION_MAX = 500;
+const ALT_MAX = 300;
+const SLUG_PATTERN = /^[a-z0-9-]+$/;
+const URL_PATTERN = /^(https?:\/\/.+|data:.+)/;
 
 // ─────────────────────────────────────────────
-//  INTERNAL HELPERS
+//  GENERIC HELPERS
 // ─────────────────────────────────────────────
 
 /**
- * Throw ONE AppError that lists every problem at once —
- * so the client sees the full picture in a single request.
+ * Collect all field errors and return a single formatted 400 AppError.
+ * Keeps the entire error list visible to the client in one shot.
  */
-const fail = (errors) =>
-  new AppError(`Validation failed: ${errors.join(' | ')}`, 400);
+function buildError(errors) {
+  if (!errors.length) return null;
+  const message =
+    errors.length === 1
+      ? errors[0]
+      : `Validation failed with ${errors.length} errors: ${errors.join(' | ')}`;
+  const err = new AppError(message, 400);
+  err.validationErrors = errors; // handy for consumers / tests
+  return err;
+}
+
+/** Trim a string safely; returns '' for nullish values. */
+const trim = (v) => (typeof v === 'string' ? v.trim() : '');
+
+// ─────────────────────────────────────────────
+//  BLOCK VALIDATOR
+// ─────────────────────────────────────────────
 
 /**
- * Return a NEW object containing only the listed keys.
- * Protects controllers from mass-assignment.
+ * Validates each block in the blocks array.
+ * Returns an array of error strings (empty = valid).
  */
-const pick = (obj, ...keys) => {
-  const out = {};
-  keys.forEach((k) => {
-    if (Object.prototype.hasOwnProperty.call(obj, k)) out[k] = obj[k];
-  });
-  return out;
-};
-
-// ─────────────────────────────────────────────
-//  BLOCK ARRAY VALIDATOR
-// ─────────────────────────────────────────────
-const validateBlocks = (blocks) => {
+function validateBlocks(blocks) {
   const errors = [];
 
   if (!Array.isArray(blocks)) {
@@ -50,281 +67,358 @@ const validateBlocks = (blocks) => {
     return errors;
   }
 
+  if (blocks.length > 500) {
+    errors.push('A post cannot have more than 500 blocks');
+  }
+
   blocks.forEach((block, i) => {
-    const p = `blocks[${i}]`;
+    const prefix = `blocks[${i}]`;
 
     if (!block || typeof block !== 'object') {
-      errors.push(`${p}: must be an object`);
+      errors.push(`${prefix}: must be an object`);
       return;
     }
 
-    // id — required, non-empty string
-    if (!block.id || typeof block.id !== 'string' || !block.id.trim()) {
-      errors.push(`${p}: id is required and must be a non-empty string`);
+    // ── type ──
+    if (!block.type) {
+      errors.push(`${prefix}: type is required`);
+      return; // can't validate further without type
     }
-
-    // type — must be a known value before we check type-specific rules
-    if (!block.type || !VALID_BLOCK_TYPES.includes(block.type)) {
+    if (!BLOCK_TYPES.includes(block.type)) {
       errors.push(
-        `${p}: type must be one of [${VALID_BLOCK_TYPES.join(', ')}], received "${block.type}"`
+        `${prefix}: "${block.type}" is not a valid block type. Allowed: ${BLOCK_TYPES.join(', ')}`
       );
       return;
     }
 
+    // ── id (optional but recommended) ──
+    if (block.id !== undefined && typeof block.id !== 'string') {
+      errors.push(`${prefix}: id must be a string`);
+    }
+
+    // ── type-specific rules ──
     switch (block.type) {
-      case 'heading':
+      case 'heading': {
         if (!block.level || ![1, 2, 3].includes(Number(block.level))) {
-          errors.push(`${p} (heading): level must be 1, 2, or 3`);
+          errors.push(`${prefix} (heading): level must be 1, 2, or 3`);
         }
-        if (!block.text || !String(block.text).trim()) {
-          errors.push(`${p} (heading): text is required`);
-        }
-        break;
-
-      case 'image':
-        if (!block.url || !String(block.url).trim()) {
-          errors.push(`${p} (image): url is required`);
-        } else if (!/^(https?:\/\/.+|data:.+)/.test(block.url)) {
-          errors.push(`${p} (image): url must begin with http://, https://, or data:`);
-        }
-        if (block.caption && String(block.caption).length > 500) {
-          errors.push(`${p} (image): caption cannot exceed 500 characters`);
+        if (!trim(block.text)) {
+          errors.push(`${prefix} (heading): text is required`);
         }
         break;
+      }
 
-      case 'divider':
-        if (!block.style || !VALID_DIVIDER_STYLES.includes(block.style)) {
+      case 'image': {
+        if (!trim(block.url)) {
+          errors.push(`${prefix} (image): url is required`);
+        } else if (!URL_PATTERN.test(block.url)) {
+          errors.push(`${prefix} (image): url must start with http:// or https://`);
+        }
+        if (block.caption && block.caption.length > CAPTION_MAX) {
+          errors.push(`${prefix} (image): caption cannot exceed ${CAPTION_MAX} characters`);
+        }
+        if (block.alt && block.alt.length > ALT_MAX) {
+          errors.push(`${prefix} (image): alt text cannot exceed ${ALT_MAX} characters`);
+        }
+        break;
+      }
+
+      case 'divider': {
+        if (!block.style || !DIVIDER_STYLES.includes(block.style)) {
           errors.push(
-            `${p} (divider): style must be one of [${VALID_DIVIDER_STYLES.join(', ')}]`
+            `${prefix} (divider): style must be one of [${DIVIDER_STYLES.join(', ')}]`
           );
         }
         break;
+      }
 
-      case 'list':
+      case 'list': {
         if (!Array.isArray(block.items) || block.items.length === 0) {
-          errors.push(`${p} (list): items must be a non-empty array`);
+          errors.push(`${prefix} (list): items must be a non-empty array`);
+        } else {
+          block.items.forEach((item, j) => {
+            if (typeof item !== 'string' || !item.trim()) {
+              errors.push(`${prefix} (list): items[${j}] must be a non-empty string`);
+            }
+          });
         }
         break;
+      }
 
-      case 'code':
-        if (!block.text || !String(block.text).trim()) {
-          errors.push(`${p} (code): text (code content) is required`);
+      case 'code': {
+        if (!trim(block.text)) {
+          errors.push(`${prefix} (code): text (code content) is required`);
+        }
+        if (block.language !== undefined && typeof block.language !== 'string') {
+          errors.push(`${prefix} (code): language must be a string`);
         }
         break;
+      }
 
       // paragraph, blockquote, pullquote, idea, warning, info
-      // text/html are optional — editors may create empty draft blocks
+      // — content is optional during drafting, so no required check
       default:
         break;
     }
   });
 
   return errors;
-};
+}
 
 // ─────────────────────────────────────────────
-//  POST — CREATE
+//  POST VALIDATORS
 // ─────────────────────────────────────────────
+
+/**
+ * Core post field validator shared by create and update.
+ * `isCreate` enforces required fields that are optional on update.
+ */
+function validatePostFields(body, isCreate = false) {
+  const errors = [];
+
+  // ── title ──
+  if (isCreate || body.title !== undefined) {
+    const title = trim(body.title);
+    if (!title) {
+      errors.push('title is required');
+    } else if (title.length > TITLE_MAX) {
+      errors.push(`title cannot exceed ${TITLE_MAX} characters (currently ${title.length})`);
+    }
+  }
+
+  // ── subtitle ──
+  if (body.subtitle !== undefined) {
+    const subtitle = trim(body.subtitle);
+    if (subtitle.length > SUBTITLE_MAX) {
+      errors.push(`subtitle cannot exceed ${SUBTITLE_MAX} characters (currently ${subtitle.length})`);
+    }
+  }
+
+  // ── slug ──
+  if (body.slug !== undefined) {
+    const slug = trim(body.slug).toLowerCase();
+    if (slug && !SLUG_PATTERN.test(slug)) {
+      errors.push('slug may only contain lowercase letters, numbers, and hyphens');
+    }
+    if (slug.length > 100) {
+      errors.push('slug cannot exceed 100 characters');
+    }
+  }
+
+  // ── category ──
+  if (body.category !== undefined) {
+    if (!CATEGORIES.includes(body.category)) {
+      errors.push(
+        `"${body.category}" is not a valid category. Allowed: ${CATEGORIES.join(', ')}`
+      );
+    }
+  }
+
+  // ── tags ──
+  if (body.tags !== undefined) {
+    if (!Array.isArray(body.tags)) {
+      errors.push('tags must be an array of strings');
+    } else {
+      if (body.tags.length > TAGS_MAX) {
+        errors.push(`tags cannot contain more than ${TAGS_MAX} entries (got ${body.tags.length})`);
+      }
+      body.tags.forEach((tag, i) => {
+        if (typeof tag !== 'string') {
+          errors.push(`tags[${i}] must be a string`);
+        } else if (!tag.trim()) {
+          errors.push(`tags[${i}] cannot be an empty string`);
+        } else if (tag.length > TAG_LENGTH_MAX) {
+          errors.push(`tags[${i}] cannot exceed ${TAG_LENGTH_MAX} characters`);
+        }
+      });
+    }
+  }
+
+  // ── author ──
+  if (body.author !== undefined) {
+    const author = trim(body.author);
+    if (author.length > AUTHOR_MAX) {
+      errors.push(`author cannot exceed ${AUTHOR_MAX} characters`);
+    }
+  }
+
+  // ── publishDate ──
+  if (body.publishDate !== undefined && body.publishDate !== null && body.publishDate !== '') {
+    const d = new Date(body.publishDate);
+    if (isNaN(d.getTime())) {
+      errors.push(`publishDate "${body.publishDate}" is not a valid date`);
+    }
+  }
+
+  // ── readTime ──
+  if (body.readTime !== undefined) {
+    const rt = trim(body.readTime);
+    if (rt.length > READTIME_MAX) {
+      errors.push(`readTime cannot exceed ${READTIME_MAX} characters`);
+    }
+  }
+
+  // ── coverImage ──
+  if (body.coverImage !== undefined && body.coverImage !== null) {
+    if (typeof body.coverImage !== 'object') {
+      errors.push('coverImage must be an object with a url field');
+    } else {
+      const coverUrl = trim(body.coverImage.url);
+      if (coverUrl && !URL_PATTERN.test(coverUrl)) {
+        errors.push('coverImage.url must be a valid http/https URL');
+      }
+      if (body.coverImage.alt && body.coverImage.alt.length > ALT_MAX) {
+        errors.push(`coverImage.alt cannot exceed ${ALT_MAX} characters`);
+      }
+    }
+  }
+
+  // ── status ──
+  if (body.status !== undefined) {
+    if (!POST_STATUSES.includes(body.status)) {
+      errors.push(
+        `"${body.status}" is not a valid status. Allowed: ${POST_STATUSES.join(', ')}`
+      );
+    }
+  }
+
+  // ── settings ──
+  if (body.settings !== undefined) {
+    if (typeof body.settings !== 'object' || Array.isArray(body.settings)) {
+      errors.push('settings must be an object');
+    } else {
+      if (
+        body.settings.isFeatured !== undefined &&
+        typeof body.settings.isFeatured !== 'boolean'
+      ) {
+        errors.push('settings.isFeatured must be a boolean');
+      }
+      if (
+        body.settings.allowComments !== undefined &&
+        typeof body.settings.allowComments !== 'boolean'
+      ) {
+        errors.push('settings.allowComments must be a boolean');
+      }
+    }
+  }
+
+  // ── blocks ──
+  if (body.blocks !== undefined) {
+    const blockErrors = validateBlocks(body.blocks);
+    errors.push(...blockErrors);
+  }
+
+  return errors;
+}
+
+// ─────────────────────────────────────────────
+//  EXPORTED MIDDLEWARE
+// ─────────────────────────────────────────────
+
+/**
+ * POST /api/v1/blogs
+ * Validates all required + optional fields for creating a new post.
+ */
 exports.validateCreatePost = (req, res, next) => {
-  const errors = [];
-  const { title, subtitle, blocks, category, tags, settings, status, coverImage } = req.body;
-
-  // title — required
-  if (!title || !String(title).trim()) {
-    errors.push('title is required');
-  } else if (String(title).trim().length > 300) {
-    errors.push('title cannot exceed 300 characters');
-  }
-
-  // subtitle — optional
-  if (subtitle !== undefined && String(subtitle).length > 500) {
-    errors.push('subtitle cannot exceed 500 characters');
-  }
-
-  // blocks — optional array
-  if (blocks !== undefined) {
-    errors.push(...validateBlocks(blocks));
-  }
-
-  // category — optional enum
-  if (category !== undefined && !VALID_CATEGORIES.includes(category)) {
-    errors.push(`category must be one of [${VALID_CATEGORIES.join(', ')}]`);
-  }
-
-  // tags — optional array, max 20
-  if (tags !== undefined) {
-    if (!Array.isArray(tags)) {
-      errors.push('tags must be an array');
-    } else if (tags.length > 20) {
-      errors.push('posts may not have more than 20 tags');
-    }
-  }
-
-  // status — optional enum (defaults to draft in model)
-  if (status !== undefined && !VALID_STATUSES.includes(status)) {
-    errors.push(`status must be one of [${VALID_STATUSES.join(', ')}]`);
-  }
-
-  // settings — optional object
-  if (settings !== undefined) {
-    if (typeof settings !== 'object' || Array.isArray(settings)) {
-      errors.push('settings must be an object');
-    } else {
-      if (
-        settings.isFeatured !== undefined &&
-        typeof settings.isFeatured !== 'boolean'
-      ) {
-        errors.push('settings.isFeatured must be a boolean');
-      }
-      if (
-        settings.allowComments !== undefined &&
-        typeof settings.allowComments !== 'boolean'
-      ) {
-        errors.push('settings.allowComments must be a boolean');
-      }
-    }
-  }
-
-  // coverImage — optional object with URL
-  if (coverImage !== undefined) {
-    if (typeof coverImage !== 'object' || Array.isArray(coverImage)) {
-      errors.push('coverImage must be an object');
-    } else if (coverImage.url && !/^(https?:\/\/.+|data:.+)/.test(coverImage.url)) {
-      errors.push('coverImage.url must be a valid http/https URL or data URI');
-    }
-  }
-
-  if (errors.length) return next(fail(errors));
-
-  // Strip unknown keys — protect against mass-assignment
-  req.body = pick(
-    req.body,
-    'title', 'subtitle', 'slug', 'blocks',
-    'coverImage', 'category', 'tags',
-    'author', 'publishDate', 'readTime',
-    'settings', 'status'
-  );
-
+  console.log('[validateCreatePost] ▸ incoming body keys:', Object.keys(req.body));
+  const errors = validatePostFields(req.body, true); // isCreate = true
+  if (errors.length) console.log('[validateCreatePost] ✗ validation errors:', errors);
+  else console.log('[validateCreatePost] ✓ validation passed');
+  const err = buildError(errors);
+  if (err) return next(err);
   next();
 };
 
-// ─────────────────────────────────────────────
-//  POST — UPDATE  (all fields optional)
-// ─────────────────────────────────────────────
+/**
+ * PATCH /api/v1/blogs/:id
+ * Validates only the fields provided; skips missing optional fields.
+ * Rejects completely empty bodies.
+ */
 exports.validateUpdatePost = (req, res, next) => {
-  const errors = [];
-  const { title, subtitle, blocks, category, tags, settings, status, coverImage } = req.body;
-
-  if (!Object.keys(req.body).length) {
-    return next(new AppError('Request body is empty. Provide at least one field to update.', 400));
-  }
-
-  if (title !== undefined) {
-    if (!String(title).trim()) {
-      errors.push('title cannot be blank');
-    } else if (String(title).trim().length > 300) {
-      errors.push('title cannot exceed 300 characters');
-    }
-  }
-
-  if (subtitle !== undefined && String(subtitle).length > 500) {
-    errors.push('subtitle cannot exceed 500 characters');
-  }
-
-  if (blocks !== undefined) {
-    errors.push(...validateBlocks(blocks));
-  }
-
-  if (category !== undefined && !VALID_CATEGORIES.includes(category)) {
-    errors.push(`category must be one of [${VALID_CATEGORIES.join(', ')}]`);
-  }
-
-  if (tags !== undefined) {
-    if (!Array.isArray(tags)) {
-      errors.push('tags must be an array');
-    } else if (tags.length > 20) {
-      errors.push('posts may not have more than 20 tags');
-    }
-  }
-
-  if (status !== undefined && !VALID_STATUSES.includes(status)) {
-    errors.push(`status must be one of [${VALID_STATUSES.join(', ')}]`);
-  }
-
-  if (settings !== undefined) {
-    if (typeof settings !== 'object' || Array.isArray(settings)) {
-      errors.push('settings must be an object');
-    } else {
-      if (
-        settings.isFeatured !== undefined &&
-        typeof settings.isFeatured !== 'boolean'
-      ) {
-        errors.push('settings.isFeatured must be a boolean');
-      }
-      if (
-        settings.allowComments !== undefined &&
-        typeof settings.allowComments !== 'boolean'
-      ) {
-        errors.push('settings.allowComments must be a boolean');
-      }
-    }
-  }
-
-  if (coverImage !== undefined) {
-    if (typeof coverImage !== 'object' || Array.isArray(coverImage)) {
-      errors.push('coverImage must be an object');
-    } else if (coverImage.url && !/^https?:\/\/.+/.test(coverImage.url)) {
-      errors.push('coverImage.url must be a valid http/https URL');
-    }
-  }
-
-  if (errors.length) return next(fail(errors));
-
-  req.body = pick(
-    req.body,
-    'title', 'subtitle', 'slug', 'blocks',
-    'coverImage', 'category', 'tags',
-    'author', 'publishDate', 'readTime',
+  console.log('[validateUpdatePost] ▸ incoming body keys:', Object.keys(req.body));
+  const UPDATABLE = [
+    'title', 'subtitle', 'slug', 'blocks', 'coverImage',
+    'category', 'tags', 'author', 'publishDate', 'readTime',
     'settings', 'status'
-  );
+  ];
 
+  const provided = Object.keys(req.body).filter(k => UPDATABLE.includes(k));
+  console.log('[validateUpdatePost] ▸ updatable fields found:', provided);
+
+  if (provided.length === 0) {
+    console.log('[validateUpdatePost] ✗ no updatable fields');
+    return next(
+      new AppError(
+        'Update body must contain at least one updatable field: ' + UPDATABLE.join(', '),
+        400
+      )
+    );
+  }
+
+  const errors = validatePostFields(req.body, false); // isCreate = false
+  if (errors.length) console.log('[validateUpdatePost] ✗ validation errors:', errors);
+  else console.log('[validateUpdatePost] ✓ validation passed');
+  const err = buildError(errors);
+  if (err) return next(err);
   next();
 };
 
 // ─────────────────────────────────────────────
-//  COMMENT — CREATE
+//  COMMENT VALIDATORS
 // ─────────────────────────────────────────────
+
+/**
+ * POST /api/v1/blogs/:id/comments
+ */
 exports.validateCreateComment = (req, res, next) => {
-  const { body } = req.body;
+  const errors = [];
 
-  if (!body || !String(body).trim()) {
-    return next(new AppError('Comment body is required', 400));
-  }
-  if (String(body).trim().length > 1000) {
-    return next(new AppError('Comment cannot exceed 1000 characters', 400));
+  const body = trim(req.body.body);
+
+  if (!body) {
+    errors.push('Comment body is required');
+  } else {
+    if (body.length < COMMENT_MIN) {
+      errors.push(`Comment must be at least ${COMMENT_MIN} character`);
+    }
+    if (body.length > COMMENT_MAX) {
+      errors.push(
+        `Comment cannot exceed ${COMMENT_MAX} characters (currently ${body.length})`
+      );
+    }
   }
 
-  // Sanitise — only pass body forward
-  req.body = { body: String(body).trim() };
+  // Sanitise: replace body with trimmed version so controller receives clean data
+  if (!errors.length) req.body.body = body;
+
+  const err = buildError(errors);
+  if (err) return next(err);
   next();
 };
 
-// ─────────────────────────────────────────────
-//  COMMENT — UPDATE
-// ─────────────────────────────────────────────
+/**
+ * PATCH /api/v1/blogs/:id/comments/:commentId
+ */
 exports.validateUpdateComment = (req, res, next) => {
-  const { body } = req.body;
+  const errors = [];
 
-  if (body === undefined) {
-    return next(new AppError('body field is required to update a comment', 400));
-  }
-  if (!String(body).trim()) {
-    return next(new AppError('Comment body cannot be blank', 400));
-  }
-  if (String(body).trim().length > 1000) {
-    return next(new AppError('Comment cannot exceed 1000 characters', 400));
+  if (req.body.body === undefined) {
+    errors.push('body is required to update a comment');
+  } else {
+    const body = trim(req.body.body);
+
+    if (!body) {
+      errors.push('Comment body cannot be empty');
+    } else if (body.length > COMMENT_MAX) {
+      errors.push(
+        `Comment cannot exceed ${COMMENT_MAX} characters (currently ${body.length})`
+      );
+    }
+
+    if (!errors.length) req.body.body = body;
   }
 
-  req.body = { body: String(body).trim() };
+  const err = buildError(errors);
+  if (err) return next(err);
   next();
 };

@@ -2,10 +2,10 @@
 
 // controllers/postController.js
 
-const Post    = require('../models/blogModel');
+const Post = require('../models/blogModel');
 const Comment = require('../models/commentModel');
 const catchAsync = require('../utils/catchAsync');
-const AppError   = require('../utils/AppError');
+const AppError = require('../utils/AppError');
 
 // ─────────────────────────────────────────────
 //  PRIVATE HELPERS
@@ -25,9 +25,9 @@ const buildPostFilter = (query, isAdmin = false) => {
     filter.status = query.status;
   }
 
-  if (query.category)  filter.category               = query.category;
-  if (query.tag)       filter.tags                   = query.tag;
-  if (query.author)    filter.author                 = query.author;
+  if (query.category) filter.category = query.category;
+  if (query.tag) filter.tags = query.tag;
+  if (query.author) filter.author = query.author;
   if (query.featured !== undefined) {
     filter['settings.isFeatured'] = query.featured === 'true';
   }
@@ -40,13 +40,13 @@ const buildPostFilter = (query, isAdmin = false) => {
  * Max limit = 50 to prevent accidental full-collection dumps.
  */
 const parsePagination = (query) => {
-  const page  = Math.max(1, parseInt(query.page,  10) || 1);
+  const page = Math.max(1, parseInt(query.page, 10) || 1);
   const limit = Math.min(50, Math.max(1, parseInt(query.limit, 10) || 10));
-  const skip  = (page - 1) * limit;
+  const skip = (page - 1) * limit;
 
   const ALLOWED_SORT = ['publishDate', 'createdAt', 'title', 'updatedAt'];
-  const sortField    = ALLOWED_SORT.includes(query.sortBy) ? query.sortBy : 'publishDate';
-  const sortOrder    = query.order === 'asc' ? 1 : -1;
+  const sortField = ALLOWED_SORT.includes(query.sortBy) ? query.sortBy : 'publishDate';
+  const sortOrder = query.order === 'asc' ? 1 : -1;
 
   return { page, limit, skip, sort: { [sortField]: sortOrder } };
 };
@@ -62,6 +62,7 @@ const parsePagination = (query) => {
 //           ?status (admin), ?page, ?limit, ?sortBy, ?order
 
 exports.getAllPosts = catchAsync(async (req, res, next) => {
+  console.log('[getAllPosts] ▸ query params:', req.query);
   const isAdmin = req.user && req.user.role === 'admin';
   const { page, limit, skip, sort } = parsePagination(req.query);
 
@@ -74,9 +75,9 @@ exports.getAllPosts = catchAsync(async (req, res, next) => {
     const posts = await Post.search(req.query.search.trim(), { limit });
 
     return res.status(200).json({
-      status:  'success',
+      status: 'success',
       results: posts.length,
-      data:    { posts }
+      data: { posts }
     });
   }
 
@@ -95,7 +96,7 @@ exports.getAllPosts = catchAsync(async (req, res, next) => {
   const totalPages = Math.ceil(total / limit);
 
   res.status(200).json({
-    status:  'success',
+    status: 'success',
     results: posts.length,
     pagination: {
       total,
@@ -115,7 +116,7 @@ exports.getAllPosts = catchAsync(async (req, res, next) => {
 
 exports.getPost = catchAsync(async (req, res, next) => {
   const isAdmin = req.user && req.user.role === 'admin';
-  const filter  = { _id: req.params.id };
+  const filter = { _id: req.params.id };
 
   if (!isAdmin) filter.status = 'published';
 
@@ -127,7 +128,7 @@ exports.getPost = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data:   { post }
+    data: { post }
   });
 });
 
@@ -137,7 +138,7 @@ exports.getPost = catchAsync(async (req, res, next) => {
 
 exports.getPostBySlug = catchAsync(async (req, res, next) => {
   const isAdmin = req.user && req.user.role === 'admin';
-  const filter  = { slug: req.params.slug.toLowerCase().trim() };
+  const filter = { slug: req.params.slug.toLowerCase().trim() };
 
   if (!isAdmin) filter.status = 'published';
 
@@ -149,7 +150,7 @@ exports.getPostBySlug = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data:   { post }
+    data: { post }
   });
 });
 
@@ -160,21 +161,41 @@ exports.getPostBySlug = catchAsync(async (req, res, next) => {
 // ==================== CREATE POST ====================
 // POST /api/v1/posts   (admin only)
 
-exports.createPost = catchAsync(async (req, res, next) => {
-  const post = await Post.create(req.body);
+exports.createPost = async (req, res, next) => {
+  try {
+    console.log('[createPost] STEP 1 — received request');
+    console.log('[createPost] body keys:', Object.keys(req.body));
+    console.log('[createPost] title:', req.body.title);
+    console.log('[createPost] blocks count:', (req.body.blocks || []).length);
 
-  res.status(201).json({
-    status:  'success',
-    message: 'Post created successfully',
-    data:    { post }
-  });
-});
+    console.log('[createPost] STEP 2 — calling Post.create()...');
+    const post = await Post.create(req.body);
+    console.log('[createPost] STEP 3 — post created, id:', post._id);
+
+    res.status(201).json({
+      status: 'success',
+      message: 'Post created successfully',
+      data: { post }
+    });
+  } catch (err) {
+    console.error('[createPost] ✗ ERROR caught:');
+    console.error('[createPost] ✗ name:', err.name);
+    console.error('[createPost] ✗ message:', err.message);
+    console.error('[createPost] ✗ stack:', err.stack);
+    if (err.errors) {
+      console.error('[createPost] ✗ validation errors:', JSON.stringify(err.errors, null, 2));
+    }
+    next(err);
+  }
+};
 
 // ==================== UPDATE POST ====================
 // PATCH /api/v1/posts/:id   (admin only)
 // Uses .save() so ALL pre-save hooks (slug, rendered_html, stats) run.
 
 exports.updatePost = catchAsync(async (req, res, next) => {
+  console.log('[updatePost] ▸ updating post id:', req.params.id);
+  console.log('[updatePost] ▸ body keys:', Object.keys(req.body));
   const post = await Post.findById(req.params.id);
 
   if (!post) {
@@ -197,9 +218,9 @@ exports.updatePost = catchAsync(async (req, res, next) => {
   await post.save();
 
   res.status(200).json({
-    status:  'success',
+    status: 'success',
     message: 'Post updated successfully',
-    data:    { post }
+    data: { post }
   });
 });
 
@@ -207,6 +228,7 @@ exports.updatePost = catchAsync(async (req, res, next) => {
 // PATCH /api/v1/posts/:id/publish   (admin only)
 
 exports.publishPost = catchAsync(async (req, res, next) => {
+  console.log('[publishPost] ▸ publishing post id:', req.params.id);
   const post = await Post.findById(req.params.id);
 
   if (!post) {
@@ -220,9 +242,9 @@ exports.publishPost = catchAsync(async (req, res, next) => {
   await post.publish(); // instance method handles status + publishDate + save()
 
   res.status(200).json({
-    status:  'success',
+    status: 'success',
     message: 'Post published successfully',
-    data:    { post }
+    data: { post }
   });
 });
 
@@ -243,9 +265,9 @@ exports.archivePost = catchAsync(async (req, res, next) => {
   await post.archive(); // instance method handles status + save()
 
   res.status(200).json({
-    status:  'success',
+    status: 'success',
     message: 'Post archived successfully',
-    data:    { post }
+    data: { post }
   });
 });
 
@@ -254,6 +276,7 @@ exports.archivePost = catchAsync(async (req, res, next) => {
 // Permanently deletes the post AND all its comments atomically.
 
 exports.deletePost = catchAsync(async (req, res, next) => {
+  console.log('[deletePost] ▸ deleting post id:', req.params.id);
   const post = await Post.findById(req.params.id);
 
   if (!post) {
@@ -268,7 +291,7 @@ exports.deletePost = catchAsync(async (req, res, next) => {
 
   res.status(204).json({
     status: 'success',
-    data:   null
+    data: null
   });
 });
 
@@ -319,7 +342,7 @@ exports.getComments = catchAsync(async (req, res, next) => {
   ]);
 
   res.status(200).json({
-    status:  'success',
+    status: 'success',
     results: comments.length,
     pagination: {
       total,
@@ -356,18 +379,18 @@ exports.createComment = catchAsync(async (req, res, next) => {
 
   // 3) Create — body already validated & sanitised by validateCreateComment middleware
   const comment = await Comment.create({
-    post:   req.params.id,
+    post: req.params.id,
     author: req.user._id,
-    body:   req.body.body
+    body: req.body.body
   });
 
   // 4) Populate author fields for the response
   await comment.populate('author', 'name email');
 
   res.status(201).json({
-    status:  'success',
+    status: 'success',
     message: 'Comment added successfully',
-    data:    { comment }
+    data: { comment }
   });
 });
 
@@ -398,9 +421,9 @@ exports.updateComment = catchAsync(async (req, res, next) => {
   await comment.populate('author', 'name email');
 
   res.status(200).json({
-    status:  'success',
+    status: 'success',
     message: 'Comment updated successfully',
-    data:    { comment }
+    data: { comment }
   });
 });
 
@@ -420,7 +443,7 @@ exports.deleteComment = catchAsync(async (req, res, next) => {
     return next(new AppError('Comment does not belong to this post', 400));
   }
 
-  const isAdmin  = req.user.role === 'admin';
+  const isAdmin = req.user.role === 'admin';
   const isAuthor = comment.author.toString() === req.user._id.toString();
 
   if (!isAdmin && !isAuthor) {
@@ -433,7 +456,7 @@ exports.deleteComment = catchAsync(async (req, res, next) => {
 
   res.status(204).json({
     status: 'success',
-    data:   null
+    data: null
   });
 });
 
@@ -456,9 +479,9 @@ exports.hideComment = catchAsync(async (req, res, next) => {
   await comment.save({ validateBeforeSave: false });
 
   res.status(200).json({
-    status:  'success',
+    status: 'success',
     message: 'Comment hidden successfully',
-    data:    { comment }
+    data: { comment }
   });
 });
 
@@ -481,9 +504,9 @@ exports.unhideComment = catchAsync(async (req, res, next) => {
   await comment.save({ validateBeforeSave: false });
 
   res.status(200).json({
-    status:  'success',
+    status: 'success',
     message: 'Comment restored successfully',
-    data:    { comment }
+    data: { comment }
   });
 });
 

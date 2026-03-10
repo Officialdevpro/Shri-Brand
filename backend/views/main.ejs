@@ -21,7 +21,6 @@
   <link rel="stylesheet" href="/css/mediaquery.css" />
   <link rel="stylesheet" href="/css/products.css" />
   <link rel="stylesheet" href="/css/ourstory.css" />
-  <link rel="stylesheet" href="/css/blog.css" />
 
   <!-- Small page-scoped styles (merged/trimmed) -->
   <style>
@@ -762,8 +761,7 @@
                                     </p>
                                     <% if (dp.originalPrice && dp.originalPrice> dp.price) { %>
                                       <span class="light">M.R.P:<strike class="light">₹<%= dp.originalPrice %></strike>(
-                                        <%= dp.discountPercentage %>% Off)
-                                      </span>
+                                        <%= dp.discountPercentage %>% Off)</span>
                                       <% } %>
                                         <% } %>
                                 </div>
@@ -1453,89 +1451,9 @@
 
 
     <section class="blog-section" id="blog">
-
-      <!-- BLOG HEADER -->
-      <div class="blog-header">
-        <div class="sparkle-particles">
-          <span class="sparkle"></span><span class="sparkle"></span>
-          <span class="sparkle"></span><span class="sparkle"></span>
-          <span class="sparkle"></span><span class="sparkle"></span>
-          <span class="sparkle"></span><span class="sparkle"></span>
-        </div>
-        <h2>Stories Behind Every Sacred Flame</h2>
-        <p>From ancient temple rituals to the hands that craft each stick —
-          discover the heritage, ingredients &amp; devotion within every fragrance.</p>
-      </div>
-
-      <!-- BLOG PAGE -->
-      <div class="blog-page">
-
-        <!-- FEATURED SLIDER -->
-        <section class="blog-featured-section">
-          <div class="blog-feat-label-row">
-            <h3>Featured Stories</h3>
-            <div class="sec-line-blog"></div>
-            <span class="sec-gem-blog"><i class="fas fa-star"></i></span>
-          </div>
-          <div class="blog-feat-slider-outer">
-            <button class="blog-feat-arrow fa-left" id="blogFeatPrev" aria-label="Previous featured story">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <div class="blog-feat-viewport">
-              <div class="blog-feat-strip" id="blogFeatStrip"></div>
-            </div>
-            <button class="blog-feat-arrow fa-right" id="blogFeatNext" aria-label="Next featured story">
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
-          <div class="blog-feat-dots" id="blogFeatDots"></div>
-        </section>
-
-        <!-- LATEST STORIES -->
-        <div class="sec-head-blog" id="blogSecHead">
-          <h3>Latest Stories</h3>
-          <div class="sec-line-blog"></div>
-          <span class="sec-gem-blog"><i class="fas fa-sun"></i></span>
-        </div>
-
-        <!-- SEARCH BOX -->
-        <div class="blog-search-bar-wrap">
-          <i class="fas fa-search blog-search-icon"></i>
-          <input class="blog-search-bar" id="blogSearchInput" type="text"
-            placeholder="Search stories by title, topic, or keyword…" autocomplete="off" />
-          <button class="blog-search-clear" id="blogSearchClear" aria-label="Clear search">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-
-        <!-- POSTS GRID -->
-        <div class="blog-posts-grid" id="blogPostsGrid">
-          <div class="blog-no-results" id="blogNoResults">
-            <div class="blog-no-results-icon"><i class="fas fa-search"></i></div>
-            <h4>No stories found</h4>
-            <p>Try a different keyword or clear the search.</p>
-          </div>
-        </div>
-
-        <!-- PAGINATION -->
-        <div class="blog-pagination-wrap" id="blogPaginationWrap">
-          <div class="blog-pagination-info">
-            <span id="blogPgInfoText">Showing stories…</span>
-            <span class="blog-info-dot"></span>
-            <span id="blogPgInfoPage">Page 1</span>
-          </div>
-          <div class="blog-pagination">
-            <button class="blog-pg-arrow" id="blogPgPrev" title="Previous page"><i
-                class="fas fa-chevron-left"></i></button>
-            <div class="blog-pg-sep"></div>
-            <div id="blogPgNumbers" style="display:flex;align-items:center;gap:4px;"></div>
-            <div class="blog-pg-sep"></div>
-            <button class="blog-pg-arrow" id="blogPgNext" title="Next page"><i
-                class="fas fa-chevron-right"></i></button>
-          </div>
-        </div>
-
-      </div>
+      <div>Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi placeat hic culpa alias, omnis soluta ut
+        officia nisi doloremque quasi ex. Rerum earum consequatur cupiditate! Ducimus eveniet repudiandae obcaecati
+        illum?</div>
     </section>
 
     <div class="body" id="contact">
@@ -1820,7 +1738,6 @@
   <script src="/js/form.js"></script>
   <script src="/js/product.js"></script>
   <script src="/js/ourstory.js"></script>
-  <script src="/js/blog.js"></script>
 </body>
 
 </html>

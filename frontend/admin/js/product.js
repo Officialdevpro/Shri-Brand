@@ -2,6 +2,7 @@
   "use strict";
 
   const API = "http://127.0.0.1:5000/api/v1/products";
+  const CAT_API = "http://127.0.0.1:5000/api/v1/categories";
 
   let products = [],
     isEditing = false,
@@ -23,6 +24,14 @@
   // Pack state — array of pack objects
   let packsState = [];
 
+  // Category state
+  const DEFAULT_CATS = [
+    { name: "single", label: "Single" },
+    { name: "combo", label: "Combo" },
+    { name: "gift", label: "Gift" },
+  ];
+  let categoriesData = [];
+
   const $ = (id) => document.getElementById(id);
 
   init();
@@ -32,6 +41,7 @@
     bindHeroSlot();
     renderStrip();
     renderPacks();
+    fetchCategories();
     fetchProducts();
   }
 
@@ -74,12 +84,235 @@
     });
     $("modalCancel").addEventListener("click", closeModal);
     $("modalConfirm").addEventListener("click", doDelete);
+
+    // Category manager modal
+    $("btnToggleCatMgr").addEventListener("click", openCatModal);
+    $("catModalClose").addEventListener("click", closeCatModal);
+    $("catModalBack").addEventListener("click", (e) => { if (e.target === $("catModalBack")) closeCatModal(); });
+    $("btnAddCat").addEventListener("click", addCategory);
+    $("newCatName").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); addCategory(); } });
+    $("newCatLabel").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); addCategory(); } });
+
+    // Confirm modal
+    $("confirmModalCancel").addEventListener("click", closeConfirmModal);
+    $("confirmModalClose").addEventListener("click", closeConfirmModal);
+    $("confirmModalBack").addEventListener("click", (e) => { if (e.target === $("confirmModalBack")) closeConfirmModal(); });
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         closeDrawer();
         closeModal();
+        closeCatModal();
+        closeConfirmModal();
       }
     });
+  }
+
+  // ── Category Manager ────────────────────────────────
+  function openCatModal() {
+    $("catModalBack").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeCatModal() {
+    $("catModalBack").classList.remove("open");
+    // Only restore overflow if drawer isn't open
+    if (!$("drawer").classList.contains("open")) {
+      document.body.style.overflow = "";
+    }
+  }
+
+  async function fetchCategories() {
+    try {
+      const r = await fetch(CAT_API);
+      if (!r.ok) throw 0;
+      const d = await r.json();
+      categoriesData = d.data || [];
+    } catch {
+      categoriesData = [];
+    }
+
+    // Merge defaults if not already in DB
+    const existingNames = new Set(categoriesData.map((c) => c.name.toLowerCase()));
+    DEFAULT_CATS.forEach((dc) => {
+      if (!existingNames.has(dc.name)) {
+        categoriesData.push({ ...dc, _isDefault: true });
+      }
+    });
+
+    populateCatDropdowns();
+    renderCatManager();
+  }
+
+  function populateCatDropdowns() {
+    const fType = $("fType");
+    const filterType = $("filterType");
+    const prevVal = fType.value;
+
+    fType.innerHTML = "";
+    categoriesData.forEach((c) => {
+      const opt = document.createElement("option");
+      opt.value = c.name;
+      opt.textContent = c.label || c.name.charAt(0).toUpperCase() + c.name.slice(1);
+      fType.appendChild(opt);
+    });
+    if (prevVal && [...fType.options].some((o) => o.value === prevVal)) {
+      fType.value = prevVal;
+    }
+
+    const current = filterType.value;
+    filterType.innerHTML = '<option value="">All Types</option>';
+    categoriesData.forEach((c) => {
+      const opt = document.createElement("option");
+      opt.value = c.name;
+      opt.textContent = c.label || c.name.charAt(0).toUpperCase() + c.name.slice(1);
+      filterType.appendChild(opt);
+    });
+    if (current) filterType.value = current;
+  }
+
+  let dragSrcIdx = null;
+
+  function renderCatManager() {
+    const list = $("catManagerList");
+    if (!list) return;
+
+    if (categoriesData.length === 0) {
+      list.innerHTML = '<div style="font-size:11px;color:#aa9988;padding:6px 0;">No categories yet.</div>';
+      return;
+    }
+
+    list.innerHTML = categoriesData
+      .map((c, i) => {
+        const id = c._id || "";
+        const isDefault = c._isDefault;
+        return `<div class="cat-item" draggable="true" data-cat-idx="${i}">
+          <span class="cat-item-grip"><i class="fas fa-grip-vertical"></i></span>
+          <span class="cat-item-order">${i + 1}</span>
+          <div class="cat-item-info">
+            <span class="cat-item-name">${esc(c.name)}</span>
+            <span class="cat-item-label">— ${esc(c.label || "")}</span>
+          </div>
+          ${isDefault ? '<span class="cat-item-badge">default</span>' : ''}
+          ${!isDefault ? `<button type="button" class="cat-item-rm" data-cat-del="${id}" title="Delete category"><i class="fas fa-trash-alt"></i></button>` : ''}
+        </div>`;
+      })
+      .join("");
+
+    // Bind delete buttons
+    list.querySelectorAll("[data-cat-del]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        deleteCategory(btn.dataset.catDel);
+      });
+    });
+
+    // Bind drag-and-drop
+    list.querySelectorAll(".cat-item").forEach((el) => {
+      el.addEventListener("dragstart", (e) => {
+        dragSrcIdx = parseInt(el.dataset.catIdx, 10);
+        el.classList.add("dragging");
+        e.dataTransfer.effectAllowed = "move";
+      });
+      el.addEventListener("dragend", () => {
+        el.classList.remove("dragging");
+        list.querySelectorAll(".cat-item").forEach((x) => x.classList.remove("drag-over"));
+        dragSrcIdx = null;
+      });
+      el.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        el.classList.add("drag-over");
+      });
+      el.addEventListener("dragleave", () => {
+        el.classList.remove("drag-over");
+      });
+      el.addEventListener("drop", (e) => {
+        e.preventDefault();
+        el.classList.remove("drag-over");
+        const targetIdx = parseInt(el.dataset.catIdx, 10);
+        if (dragSrcIdx === null || dragSrcIdx === targetIdx) return;
+
+        // Reorder in array
+        const [moved] = categoriesData.splice(dragSrcIdx, 1);
+        categoriesData.splice(targetIdx, 0, moved);
+
+        renderCatManager();
+        populateCatDropdowns();
+        saveCategoryOrder();
+      });
+    });
+  }
+
+  async function saveCategoryOrder() {
+    // Update order values and PATCH each category that's in the DB
+    const updates = categoriesData
+      .map((c, i) => ({ ...c, order: i }))
+      .filter((c) => c._id); // only save those with a DB id
+
+    try {
+      await Promise.all(
+        updates.map((c) =>
+          fetch(`${CAT_API}/${c._id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ order: c.order }),
+          })
+        )
+      );
+      showNotif("Category order saved.", "success");
+    } catch {
+      showNotif("Could not save order.", "error");
+    }
+  }
+
+  async function addCategory() {
+    const nameEl = $("newCatName");
+    const labelEl = $("newCatLabel");
+    const name = nameEl.value.trim().toLowerCase();
+    const label = labelEl.value.trim();
+
+    if (!name) { showNotif("Category name is required.", "error"); return; }
+    if (!label) { showNotif("Category label is required.", "error"); return; }
+
+    try {
+      const r = await fetch(CAT_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, label, order: categoriesData.length }),
+      });
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        throw new Error(err.message || "Failed to create category");
+      }
+      showNotif(`Category "${label}" created.`, "success");
+      nameEl.value = "";
+      labelEl.value = "";
+      await fetchCategories();
+    } catch (err) {
+      showNotif(err.message || "Could not create category.", "error");
+    }
+  }
+
+  async function deleteCategory(id) {
+    if (!id) return;
+    showConfirm(
+      "Delete Category",
+      "Are you sure you want to delete this category? Products using it will need to be reassigned.",
+      async () => {
+        try {
+          const r = await fetch(`${CAT_API}/${id}`, { method: "DELETE" });
+          if (!r.ok) {
+            const err = await r.json().catch(() => ({}));
+            throw new Error(err.message || "Delete failed");
+          }
+          showNotif("Category deleted.", "success");
+          await fetchCategories();
+        } catch (err) {
+          showNotif(err.message || "Could not delete category.", "error");
+        }
+      }
+    );
   }
 
   // ── Pack Manager ────────────────────────────────────
@@ -151,14 +384,7 @@
             <label>Low Stock Alert At</label>
             <input type="number" data-pack="${i}" data-key="lowStockThreshold" placeholder="10" min="0" value="${esc(pack.lowStockThreshold)}" />
           </div>
-          <div class="pack-field">
-            <label>Total Sold <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:9px;color:var(--ink-faint,#aa9988)">(auto-tracked)</span></label>
-            <input type="number" data-pack="${i}" data-key="totalSold" placeholder="0" min="0" value="${esc(pack.totalSold || 0)}" readonly />
-          </div>
-          <div class="pack-field" style="grid-column:1/-1;">
-            <label>Pack SKU <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:9px;color:var(--ink-faint,#aa9988)">(optional — auto-generated if blank)</span></label>
-            <input type="text" data-pack="${i}" data-key="sku" placeholder="e.g. SB-RD-40G" value="${esc(pack.sku)}" />
-          </div>
+
         </div>`;
 
       // Live sync inputs → packsState
@@ -508,6 +734,12 @@
         ${p.shortDescription ? `<div class="p-card-desc">${p.shortDescription}</div>` : ""}
         ${specs ? `<div class="p-card-specs">${specs}</div>` : ""}
 
+        ${packs.length > 0 ? `<div class="p-card-packs">${packs.map((pk) => {
+      const st = pk.stock === 0 ? 'out' : pk.stock <= 5 ? 'low' : 'in';
+      const stLbl = pk.stock === 0 ? 'Out' : pk.stock + '';
+      return `<div class="p-pack-chip"><span class="p-pack-chip-wt">${pk.weight || '?'}</span><span class="p-pack-chip-price">₹${(pk.price || 0).toLocaleString('en-IN')}</span><span class="p-pack-chip-stock ${st}">${stLbl}</span></div>`;
+    }).join('')}</div>` : ""}
+
         <!-- ─ MOBILE: horizontal row ─ -->
         <div class="p-card-main-row">
           <div class="p-card-mob-img">
@@ -544,8 +776,18 @@
   }
 
   // ── Edit ───────────────────────────────────────────
-  function startEdit(id) {
-    const p = products.find((x) => (x._id || x.id) === id);
+  async function startEdit(id) {
+    // Always fetch fresh data from API on every Edit click
+    let p;
+    try {
+      const r = await fetch(`${API}/${id}`);
+      if (!r.ok) throw 0;
+      const d = await r.json();
+      p = d.product || d.data || d;
+    } catch {
+      // Fallback to cached data if API fails
+      p = products.find((x) => (x._id || x.id) === id);
+    }
     if (!p) return;
     isEditing = true;
     $("prodId").value = id;
@@ -726,6 +968,33 @@
     }
   }
 
+  // ── Generic Confirm Modal ─────────────────────────
+  let _confirmCallback = null;
+
+  function showConfirm(title, message, onConfirm) {
+    $("confirmModalTitle").textContent = title;
+    $("confirmModalMsg").textContent = message;
+    _confirmCallback = onConfirm;
+
+    // Re-bind OK button (clone to remove old listeners)
+    const okBtn = $("confirmModalOk");
+    const newOk = okBtn.cloneNode(true);
+    okBtn.parentNode.replaceChild(newOk, okBtn);
+    newOk.id = "confirmModalOk";
+    newOk.addEventListener("click", async () => {
+      closeConfirmModal();
+      if (_confirmCallback) await _confirmCallback();
+      _confirmCallback = null;
+    });
+
+    $("confirmModalBack").classList.add("open");
+  }
+
+  function closeConfirmModal() {
+    $("confirmModalBack").classList.remove("open");
+    _confirmCallback = null;
+  }
+
   // ── Form Reset ─────────────────────────────────────
   function resetForm() {
     isEditing = false;
@@ -850,4 +1119,6 @@
       },
     ];
   }
+  // Expose for navigation refresh
+  window.fetchProducts = fetchProducts;
 })();

@@ -17,6 +17,10 @@ const orderRoutes = require("./routes/orderRoutes"); // ← NEW
 const viewRoutes = require("./routes/viewRoutes");
 const postRoutes = require('./routes/blogRoutes');
 const categoryRoutes = require("./routes/categoryRoutes");
+const stockRoutes = require('./routes/stockRoutes');
+const blogImageUpload = require('./routes/blogImgUpload'); // adjust path
+
+
 
 
 // Import middlewares
@@ -75,6 +79,8 @@ app.use("/api/v1/cart", cartRoutes);
 app.use("/api/v1/orders", orderRoutes); // ← NEW
 app.use('/api/v1/blogs', postRoutes);
 app.use('/api/v1/categories', categoryRoutes);
+app.use('/api/v1/production', stockRoutes);
+app.use('/api/v1/blog-images', blogImageUpload);
 
 // ── 404 handler ────────────────────────────────────────────────
 app.use((req, res, next) => {

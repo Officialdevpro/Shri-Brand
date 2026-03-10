@@ -25,7 +25,7 @@
 .ourstory-header {
     background: linear-gradient(135deg, #7f0403 0%, #a00505 100%);
     color: white;
-    padding: 80px 60px 40px;
+    padding: 40px 60px 40px;
     /* Added top padding for fixed nav */
     text-align: center;
     position: relative;

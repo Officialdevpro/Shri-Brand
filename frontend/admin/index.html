@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="./css/order-history.css" />
   <link rel="stylesheet" href="./css/index.css" />
@@ -139,6 +139,463 @@
     .btn-add-pack:hover {
       background: rgba(184, 134, 11, .15);
       border-color: var(--gold, #b8860b);
+    }
+
+    /* ── Category Manager Modal ───────────────────────── */
+    .btn-manage-cat {
+      background: var(--gold-pale, rgba(184, 134, 11, 0.08));
+      border: 1px solid var(--gold-border, rgba(184, 134, 11, 0.35));
+      border-radius: 12px;
+      padding: 2px 10px;
+      font-family: 'Jost', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      color: var(--gold, #b8860b);
+      cursor: pointer;
+      margin-left: 8px;
+      transition: background .2s;
+    }
+
+    .btn-manage-cat:hover {
+      background: rgba(184, 134, 11, .18);
+    }
+
+    .cat-modal {
+      max-width: 460px;
+      width: 94%;
+    }
+
+    .cat-modal::before {
+      background: linear-gradient(90deg, var(--gold, #b8860b), var(--gold-light, #d4a843), transparent);
+    }
+
+    .cat-modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 22px 14px;
+      border-bottom: 1px solid var(--border, rgba(184, 134, 11, 0.18));
+    }
+
+    .cat-modal-head-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cat-modal-ico {
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(184, 134, 11, 0.2);
+      background: rgba(184, 134, 11, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: var(--gold, #b8860b);
+    }
+
+    .cat-modal-eyebrow {
+      font-family: 'Jost', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold, #b8860b);
+      margin-bottom: 2px;
+    }
+
+    .cat-modal-head h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink, #1c1410);
+      letter-spacing: .02em;
+      margin: 0;
+    }
+
+    .cat-modal-close {
+      background: none;
+      border: 1px solid var(--border, rgba(184, 134, 11, 0.18));
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--ink-muted, #7a6a58);
+      font-size: 12px;
+      transition: .15s;
+    }
+
+    .cat-modal-close:hover {
+      border-color: var(--crimson, #7f0403);
+      color: var(--crimson, #7f0403);
+      background: rgba(127, 4, 3, 0.04);
+    }
+
+    .cat-modal-body {
+      padding: 16px 22px 22px;
+    }
+
+    .cat-modal-hint {
+      font-family: 'Jost', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      color: var(--ink-faint, #aa9988);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cat-modal-hint i {
+      color: var(--gold, #b8860b);
+      font-size: 10px;
+    }
+
+    .cat-modal-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+      min-height: 40px;
+    }
+
+    .cat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface, #fff);
+      border: 1px solid var(--border, rgba(184, 134, 11, 0.18));
+      padding: 9px 12px;
+      font-family: 'Jost', sans-serif;
+      font-size: 12px;
+      cursor: grab;
+      transition: box-shadow .15s, border-color .15s, background .15s;
+      user-select: none;
+    }
+
+    .cat-item:hover {
+      border-color: var(--gold, #b8860b);
+      box-shadow: 0 2px 8px rgba(184, 134, 11, 0.08);
+    }
+
+    .cat-item.dragging {
+      opacity: 0.4;
+      border-style: dashed;
+    }
+
+    .cat-item.drag-over {
+      border-color: var(--gold, #b8860b);
+      background: var(--gold-pale, rgba(184, 134, 11, 0.06));
+      box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.12);
+    }
+
+    .cat-item-grip {
+      color: var(--ink-faint, #aa9988);
+      font-size: 11px;
+      cursor: grab;
+      flex-shrink: 0;
+    }
+
+    .cat-item-order {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold, #b8860b);
+      min-width: 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .cat-item-info {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .cat-item-name {
+      font-weight: 600;
+      color: var(--ink, #1c1410);
+      text-transform: capitalize;
+    }
+
+    .cat-item-label {
+      color: var(--ink-muted, #7a6a58);
+      font-size: 11px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .cat-item-badge {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      background: var(--parchment, #f7f3ed);
+      border: 1px solid var(--border, rgba(184, 134, 11, 0.18));
+      color: var(--ink-faint, #aa9988);
+      flex-shrink: 0;
+    }
+
+    .cat-item-rm {
+      background: none;
+      border: 1px solid rgba(127, 4, 3, .15);
+      cursor: pointer;
+      color: var(--crimson, #7f0403);
+      font-size: 10px;
+      padding: 3px 8px;
+      font-family: 'Jost', sans-serif;
+      transition: background .15s;
+      flex-shrink: 0;
+    }
+
+    .cat-item-rm:hover {
+      background: rgba(127, 4, 3, .06);
+    }
+
+    .cat-modal-divider {
+      height: 1px;
+      background: linear-gradient(90deg, var(--border, rgba(184, 134, 11, 0.18)), transparent);
+      margin: 14px 0;
+    }
+
+    .cat-modal-add-label {
+      font-family: 'Jost', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--ink-muted, #7a6a58);
+      margin-bottom: 8px;
+    }
+
+    .cat-modal-add {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cat-modal-add-fields {
+      display: flex;
+      gap: 8px;
+    }
+
+    .cat-modal-add input {
+      flex: 1;
+      padding: 8px 12px;
+      font-family: 'Jost', sans-serif;
+      font-size: 12px;
+      border: 1px solid var(--border, rgba(184, 134, 11, 0.18));
+      background: var(--surface, #fff);
+      color: var(--ink, #1c1410);
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .cat-modal-add input:focus {
+      border-color: var(--gold, #b8860b);
+      box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.08);
+    }
+
+    .cat-modal-add button {
+      align-self: flex-end;
+      background: var(--gold, #b8860b);
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      font-family: 'Jost', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      cursor: pointer;
+      transition: opacity .2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cat-modal-add button:hover {
+      opacity: .85;
+    }
+
+    /* ── Generic Confirm Modal ──────────────────────────── */
+    .confirm-modal {
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .confirm-modal::before {
+      background: linear-gradient(90deg, var(--crimson, #7f0403), var(--crimson-mid, #a0100f), transparent);
+    }
+
+    .confirm-modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px 12px;
+      border-bottom: 1px solid var(--border, rgba(184, 134, 11, 0.18));
+    }
+
+    .confirm-modal-head-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .confirm-modal-ico {
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(127, 4, 3, 0.2);
+      background: rgba(127, 4, 3, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .9rem;
+      color: var(--crimson, #7f0403);
+    }
+
+    .confirm-modal-head h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink, #1c1410);
+      letter-spacing: .02em;
+      margin: 0;
+    }
+
+    .confirm-modal-close {
+      background: none;
+      border: 1px solid var(--border, rgba(184, 134, 11, 0.18));
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--ink-muted, #7a6a58);
+      font-size: 11px;
+      transition: .15s;
+    }
+
+    .confirm-modal-close:hover {
+      border-color: var(--crimson, #7f0403);
+      color: var(--crimson, #7f0403);
+    }
+
+    .confirm-modal-body {
+      padding: 18px 22px;
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--ink-muted, #7a6a58);
+    }
+
+    .confirm-modal-foot {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--border, rgba(184, 134, 11, 0.18));
+    }
+
+    .confirm-modal-foot button {
+      padding: 13px;
+      border: none;
+      font-family: 'Jost', sans-serif;
+      font-size: 12.5px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      cursor: pointer;
+      transition: background .18s;
+    }
+
+    .confirm-modal-cancel {
+      background: var(--parchment, #f7f3ed);
+      color: var(--ink-muted, #7a6a58);
+      border-right: 1px solid var(--border, rgba(184, 134, 11, 0.18)) !important;
+    }
+
+    .confirm-modal-cancel:hover {
+      background: var(--parchment-2, #f0eae0);
+    }
+
+    .confirm-modal-ok {
+      background: var(--crimson, #7f0403);
+      color: #fff;
+    }
+
+    .confirm-modal-ok:hover {
+      background: var(--crimson-mid, #a0100f);
+    }
+
+    /* ── Pack Detail Chips ──────────────────────────────── */
+    .p-card-packs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 0 16px 10px;
+    }
+
+    .p-pack-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      background: var(--parchment-2, #f0eae0);
+      border: 1px solid var(--border, rgba(184, 134, 11, 0.18));
+      font-family: 'Jost', sans-serif;
+      font-size: 10px;
+      color: var(--ink-muted, #7a6a58);
+      line-height: 1;
+    }
+
+    .p-pack-chip-wt {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      color: var(--ink, #1c1410);
+    }
+
+    .p-pack-chip-price {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      color: var(--crimson, #7f0403);
+    }
+
+    .p-pack-chip-stock {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      font-size: 9px;
+    }
+
+    .p-pack-chip-stock.in {
+      color: #2e7d32;
+    }
+
+    .p-pack-chip-stock.low {
+      color: #e65100;
+    }
+
+    .p-pack-chip-stock.out {
+      color: var(--crimson, #7f0403);
+    }
+
+    /* ── Poppins for numbers ────────────────────────────── */
+    .num,
+    .p-card-price,
+    .p-card-mob-price,
+    .p-tag-instock,
+    .p-tag-low,
+    .p-tag-out,
+    .cat-item-order,
+    .pack-row-num,
+    .countNum {
+      font-family: 'Poppins', sans-serif !important;
     }
   </style>
 </head>
@@ -361,9 +818,6 @@
             </div>
             <select class="filter-sel" id="filterType">
               <option value="">All Types</option>
-              <option value="single">Single</option>
-              <option value="combo">Combo</option>
-              <option value="gift">Gift</option>
             </select>
             <select class="filter-sel" id="filterCat">
               <option value="">All Categories</option>
@@ -442,12 +896,11 @@
                   <div class="field">
                     <div class="field-label">
                       <i class="fas fa-list"></i> Product Type
+                      <button type="button" class="btn-manage-cat" id="btnToggleCatMgr" title="Manage categories">
+                        <i class="fas fa-cog"></i> Manage
+                      </button>
                     </div>
-                    <select id="fType">
-                      <option value="single">Single</option>
-                      <option value="combo">Combo</option>
-                      <option value="gift">Gift</option>
-                    </select>
+                    <select id="fType"></select>
                   </div>
                   <div class="field">
                     <div class="field-label">
@@ -462,6 +915,7 @@
                     </select>
                   </div>
                 </div>
+
               </div>
 
               <!-- Section 2 -->
@@ -626,6 +1080,63 @@
               </button>
               <button class="modal-del-btn" id="modalConfirm">
                 <i class="fas fa-trash-alt"></i> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CATEGORY MANAGER MODAL -->
+        <div class="modal-back" id="catModalBack">
+          <div class="modal cat-modal">
+            <div class="cat-modal-head">
+              <div class="cat-modal-head-left">
+                <div class="cat-modal-ico"><i class="fas fa-layer-group"></i></div>
+                <div>
+                  <div class="cat-modal-eyebrow">Product Management</div>
+                  <h3>Manage Categories</h3>
+                </div>
+              </div>
+              <button type="button" class="cat-modal-close" id="catModalClose">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="cat-modal-body">
+              <div class="cat-modal-hint">
+                <i class="fas fa-grip-vertical"></i> Drag to reorder · Order affects home page display
+              </div>
+              <div class="cat-modal-list" id="catManagerList"></div>
+              <div class="cat-modal-divider"></div>
+              <div class="cat-modal-add-label">Add New Category</div>
+              <div class="cat-modal-add">
+                <div class="cat-modal-add-fields">
+                  <input type="text" id="newCatName" placeholder="name (e.g. festive)" />
+                  <input type="text" id="newCatLabel" placeholder="Label (e.g. Festive Collection)" />
+                </div>
+                <button type="button" id="btnAddCat">
+                  <i class="fas fa-plus"></i> Add Category
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GENERIC CONFIRM MODAL -->
+        <div class="modal-back" id="confirmModalBack">
+          <div class="modal confirm-modal">
+            <div class="confirm-modal-head">
+              <div class="confirm-modal-head-left">
+                <div class="confirm-modal-ico"><i class="fas fa-exclamation-triangle"></i></div>
+                <h3 id="confirmModalTitle">Confirm Action</h3>
+              </div>
+              <button type="button" class="confirm-modal-close" id="confirmModalClose">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="confirm-modal-body" id="confirmModalMsg"></div>
+            <div class="confirm-modal-foot">
+              <button class="confirm-modal-cancel" id="confirmModalCancel">Cancel</button>
+              <button class="confirm-modal-ok" id="confirmModalOk">
+                <i class="fas fa-check"></i> Confirm
               </button>
             </div>
           </div>
@@ -1300,7 +1811,25 @@
         p.classList.toggle("active", p.id === "page-" + pageId),
       );
       closeSidebar();
-      if (pageId === "messages" && typeof msgInit === "function") msgInit();
+
+      // Always re-fetch data fresh on every navigation click
+      if (pageId === "products" && typeof fetchProducts === "function") {
+        fetchProducts();
+      } else if (pageId === "messages" && typeof msgInit === "function") {
+        msgInit();
+      } else if (pageId === "users" && typeof loadUsers === "function") {
+        loadUsers();
+      } else if (pageId === "recent-orders" && typeof loadRecentOrders === "function") {
+        loadRecentOrders();
+      } else if (pageId === "order-history" && typeof loadOrderHistory === "function") {
+        loadOrderHistory();
+      } else if (pageId === "dashboard" && typeof loadDashboard === "function") {
+        loadDashboard();
+      } else if (pageId === "inventory" && typeof loadInventory === "function") {
+        loadInventory();
+      } else if (pageId === "blog" && typeof loadBlog === "function") {
+        loadBlog();
+      }
     }
 
     navItems.forEach((btn) =>

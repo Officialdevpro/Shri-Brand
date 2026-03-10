@@ -15,6 +15,12 @@ const {
 
 const router = express.Router();
 
+// ── DEBUG: log every request hitting blog routes ──
+router.use((req, res, next) => {
+  console.log(`[blogRoutes] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // ─────────────────────────────────────────────
 //  POST ROUTES
 // ─────────────────────────────────────────────
