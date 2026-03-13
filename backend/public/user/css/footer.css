@@ -304,11 +304,9 @@ body {
    SECTION BASE
 ========================================= */
 .story-section {
-  padding: 10px 20px;
   max-width: 1300px;
   margin: auto;
   text-align: center;
-  background: #ffffff;
   position: relative;
   overflow: hidden;
 
@@ -316,7 +314,7 @@ body {
   line-height: 1.6;
   color: var(--ui-text);
   background-color: #f8f9fa;
-  padding: 20px;
+  padding: 20px 0;
   background-image: linear-gradient(to bottom right, #fdfcfb, #f9f5eb);
 }
 
@@ -385,7 +383,7 @@ body {
   display: grid;
   gap: 40px;
   grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-  padding: 0 10px;
+  padding: 0 50px;
   position: relative;
   z-index: 5;
 }

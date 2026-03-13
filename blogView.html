@@ -244,74 +244,45 @@
     #articleWrap.visible { display: block; }
 
     /* ══════════════════════════════════════════
-       HERO
+       HERO — text header above, cover image below
     ══════════════════════════════════════════ */
     .hero {
-      position: relative; width: 100%;
-      background: var(--ink); overflow: hidden;
-    }
-    .hero-img {
-      width: 100%; height: 100%;
-      object-fit: cover; display: block;
-      opacity: 0; transition: opacity 1s ease;
-    }
-    .hero-img.loaded { opacity: 1; }
-    .hero-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(26,18,8,.06) 0%,
-        rgba(26,18,8,.15) 40%,
-        rgba(26,18,8,.72) 75%,
-        rgba(26,18,8,.9) 100%
-      );
-    }
-    .hero-content {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: clamp(24px,5vw,56px) clamp(20px,7vw,80px);
-      display: flex; flex-direction: column; gap: 18px;
-    }
-
-    /* No-cover fallback */
-    .hero.no-cover {
+      width: 100%;
       background: linear-gradient(135deg, var(--parchment-2) 0%, var(--parchment) 100%);
       border-bottom: 1px solid var(--border);
     }
-    .hero.no-cover .hero-overlay { display: none; }
-    .hero.no-cover .hero-content {
-      position: relative;
-      padding: clamp(44px,7vw,84px) clamp(20px,8vw,80px);
+
+    /* ── Text block (always on parchment background) ── */
+    .hero-content {
+      padding: clamp(36px,6vw,72px) clamp(20px,8vw,80px) clamp(28px,4vw,44px);
+      display: flex; flex-direction: column; gap: 18px;
+      max-width: 860px; margin: 0 auto;
     }
 
-    /* Category badge — pill */
+    /* Category badge */
     .hero-category {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 6px 16px; border-radius: 999px;
+      background: rgba(127,4,3,.08);
+      border: 1px solid rgba(127,4,3,.18);
+      color: var(--primary);
       font-family: 'Poppins', sans-serif;
       font-size: 10px; font-weight: 600;
       letter-spacing: .2em; text-transform: uppercase;
       width: fit-content;
-    }
-    .hero:not(.no-cover) .hero-category {
-      background: rgba(255,196,6,.15);
-      border: 1px solid rgba(255,196,6,.35);
-      color: var(--gold);
-    }
-    .hero.no-cover .hero-category {
-      background: rgba(127,4,3,.08);
-      border: 1px solid rgba(127,4,3,.18);
-      color: var(--primary);
     }
 
     .hero-title {
       font-family: 'Playfair Display', serif;
       font-weight: 800; line-height: 1.15;
       font-size: clamp(2rem, 5vw, 3.6rem);
+      color: var(--ink);
     }
     .hero-subtitle {
       font-family: 'Poppins', sans-serif;
       font-size: clamp(.95rem, 2vw, 1.1rem);
       font-weight: 300; line-height: 1.7;
+      color: var(--ink-mid);
       max-width: 640px;
     }
 
@@ -329,35 +300,41 @@
       display: flex; flex-wrap: wrap; align-items: center; gap: 16px;
       font-family: 'Poppins', sans-serif;
       font-size: 11px; font-weight: 400; letter-spacing: .04em;
+      color: var(--ink-soft);
     }
     .hero-meta-item { display: flex; align-items: center; gap: 6px; }
-    .hero-meta-item i { font-size: .65rem; color: var(--gold); }
+    .hero-meta-item i { font-size: .65rem; color: var(--gold-deep); }
 
     .hero-tags { display: flex; flex-wrap: wrap; gap: 7px; }
     .hero-tag {
       display: inline-block; padding: 4px 14px;
-      border-radius: 999px; border: 1px solid;
+      border-radius: 999px;
+      border: 1px solid rgba(127,4,3,.2);
+      background: rgba(127,4,3,.05);
+      color: var(--primary);
       font-family: 'Poppins', sans-serif;
       font-size: 9px; font-weight: 600;
       letter-spacing: .16em; text-transform: uppercase;
     }
 
-    .hero:not(.no-cover) .hero-title,
-    .hero:not(.no-cover) .hero-subtitle { color: rgba(255,255,255,.95); }
-    .hero:not(.no-cover) .hero-meta { color: rgba(255,255,255,.65); }
-    .hero:not(.no-cover) .hero-tag {
-      color: var(--gold); border-color: rgba(255,196,6,.3);
-      background: rgba(255,196,6,.08);
+    /* ── Cover image — full-width below the text block ── */
+    .hero-cover-wrap {
+      width: 100%; overflow: hidden;
+      height: clamp(320px, 48vw, 600px);
+      display: none;
     }
-    .hero.no-cover .hero-title { color: var(--ink); }
-    .hero.no-cover .hero-subtitle { color: var(--ink-mid); }
-    .hero.no-cover .hero-meta { color: var(--ink-soft); }
-    .hero.no-cover .hero-tag {
-      color: var(--primary); border-color: rgba(127,4,3,.2);
-      background: rgba(127,4,3,.05);
-    }
+    .hero-cover-wrap.has-image { display: block; }
 
-    .hero:not(.no-cover) { min-height: clamp(420px, 60vh, 640px); }
+    .hero-img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      opacity: 0; transition: opacity .9s ease;
+    }
+    .hero-img.loaded { opacity: 1; }
+
+    /* overlay & old no-cover helpers — kept for JS compat, visually inert */
+    .hero-overlay { display: none; }
+    .hero.no-cover .hero-content { /* same layout, no changes needed */ }
 
     /* ══════════════════════════════════════════
        LAYOUT
@@ -751,7 +728,6 @@
     }
     @media (max-width: 900px) {
       .hero-content { padding: 24px 28px; }
-      .hero:not(.no-cover) { min-height: clamp(340px, 55vw, 500px); }
       .nav-center { display: none; }
       .block-figure { margin: 2em 0; }
       .stats-row { grid-template-columns: repeat(3, 1fr); }
@@ -761,7 +737,6 @@
       .article-layout { grid-template-columns: 1fr; padding-top: 36px; }
       .article-body  { grid-column: 1; }
       .hero-title { font-size: clamp(1.7rem, 6vw, 2.4rem); }
-      .hero:not(.no-cover) { min-height: clamp(280px, 60vw, 440px); }
       .article-footer { padding: 0 18px 48px; }
       .article-body p::first-letter { all: unset; }
       .stats-row { grid-template-columns: repeat(3, 1fr); }
@@ -791,6 +766,250 @@
       .article-body { padding: 0; }
       .hero-overlay { display: none; }
       .hero-content { position: relative; color: var(--ink) !important; }
+    }
+
+    /* ══════════════════════════════════════════
+       REACTIONS + VIEWS BAR
+    ══════════════════════════════════════════ */
+    .reactions-bar {
+      max-width: calc(var(--col-w) + 2 * var(--col-px));
+      margin: 0 auto 0;
+      padding: 0 var(--col-px);
+    }
+    .reactions-inner {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 14px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .reaction-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 20px; border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 600;
+      color: var(--ink-soft);
+      transition: all var(--transition); cursor: pointer;
+    }
+    .reaction-btn i { font-size: .85rem; }
+    .reaction-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(127,4,3,.05); }
+    .reaction-btn.active-love { border-color: #e74c3c; color: #e74c3c; background: rgba(231,76,60,.07); }
+    .reaction-btn.active-love i { color: #e74c3c; }
+    .reaction-btn.active-read { border-color: var(--primary); color: var(--primary); background: rgba(127,4,3,.07); }
+    .reaction-btn.active-read i { color: var(--primary); }
+    .reaction-count { font-variant-numeric: tabular-nums; }
+    .reactions-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+    .view-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: 'Poppins', sans-serif; font-size: 12px;
+      font-weight: 400; color: var(--ink-faint);
+    }
+    .view-pill i { font-size: .75rem; }
+    .reactions-spacer { flex: 1; }
+    .comment-jump-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 18px; border-radius: 999px;
+      border: 1.5px solid var(--gold-border);
+      background: var(--gold-pale);
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px; font-weight: 600; color: var(--gold-deep);
+      transition: all var(--transition); cursor: pointer; flex-shrink: 0;
+    }
+    .comment-jump-btn:hover { background: var(--gold-deep); color: white; border-color: var(--gold-deep); }
+    .comment-jump-btn i { font-size: .75rem; }
+
+    /* ══════════════════════════════════════════
+       COMMENTS SECTION
+    ══════════════════════════════════════════ */
+    .comments-section {
+      max-width: calc(var(--col-w) + 2 * var(--col-px));
+      margin: 52px auto 0;
+      padding: 0 var(--col-px) 80px;
+    }
+    .comments-header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .comments-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem; font-weight: 700;
+      color: var(--ink); display: flex; align-items: center; gap: 12px;
+    }
+    .comments-count-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 28px; height: 28px; padding: 0 8px;
+      border-radius: 999px;
+      background: var(--primary); color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11px; font-weight: 700;
+    }
+    .comments-sort {
+      padding: 8px 32px 8px 12px; border: 1px solid var(--border);
+      border-radius: 999px; background: var(--surface);
+      font-family: 'Poppins', sans-serif; font-size: 12px;
+      color: var(--ink-mid); outline: none; cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center;
+    }
+
+    /* Comment form */
+    .comment-form-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--card-radius); padding: 20px;
+      margin-bottom: 32px; box-shadow: var(--shadow-sm);
+    }
+    .comment-form-label {
+      font-family: 'Poppins', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: .22em;
+      text-transform: uppercase; color: var(--ink-faint); margin-bottom: 10px;
+    }
+    .comment-textarea {
+      width: 100%; min-height: 96px; resize: vertical;
+      padding: 12px 14px; border: 1.5px solid var(--border);
+      border-radius: 8px; background: var(--bg);
+      font-family: 'Poppins', sans-serif; font-size: 14px;
+      font-weight: 300; color: var(--ink); line-height: 1.6;
+      outline: none; transition: border-color var(--transition);
+    }
+    .comment-textarea:focus { border-color: var(--primary); background: var(--surface); }
+    .comment-textarea::placeholder { color: var(--ink-faint); }
+    .comment-form-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-top: 12px; flex-wrap: wrap;
+    }
+    .comment-form-note {
+      font-family: 'Poppins', sans-serif; font-size: 11px;
+      font-weight: 300; color: var(--ink-faint);
+    }
+    .comment-form-note a { color: var(--primary); text-decoration: underline; }
+    .comment-submit-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 24px; border-radius: 999px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white; border: none;
+      font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      box-shadow: 0 4px 14px rgba(127,4,3,.25);
+      transition: all var(--transition); cursor: pointer;
+    }
+    .comment-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(127,4,3,.35); }
+    .comment-submit-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    /* Login prompt */
+    .comment-login-prompt {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--card-radius); padding: 20px 24px;
+      margin-bottom: 32px; text-align: center;
+      box-shadow: var(--shadow-sm);
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .comment-login-prompt i { font-size: 1.4rem; color: var(--gold-deep); flex-shrink: 0; }
+    .comment-login-prompt-text { flex: 1; text-align: left; }
+    .comment-login-prompt-text strong { display: block; font-size: 14px; color: var(--ink); margin-bottom: 3px; }
+    .comment-login-prompt-text span { font-size: 12px; font-weight: 300; color: var(--ink-faint); }
+    .comment-login-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 22px; border-radius: 999px;
+      background: var(--primary); color: white; border: none;
+      font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600;
+      transition: all var(--transition); cursor: pointer; flex-shrink: 0;
+    }
+    .comment-login-btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+
+    /* Comment list */
+    .comments-list { display: flex; flex-direction: column; gap: 0; }
+
+    .comment-item {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      animation: fadeUp .35s ease both;
+    }
+    .comment-item:last-child { border-bottom: none; }
+
+    .comment-top { display: flex; align-items: flex-start; gap: 12px; }
+    .comment-avatar {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 14px; font-weight: 700; color: var(--gold);
+    }
+    .comment-meta { flex: 1; min-width: 0; }
+    .comment-author-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .comment-author-name {
+      font-family: 'Poppins', sans-serif; font-size: 13px;
+      font-weight: 600; color: var(--ink);
+    }
+    .comment-date {
+      font-family: 'Poppins', sans-serif; font-size: 11px;
+      font-weight: 300; color: var(--ink-faint);
+    }
+    .comment-hearted-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 999px;
+      background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.25);
+      font-size: 9px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: #e74c3c;
+    }
+    .comment-body {
+      font-family: 'Poppins', sans-serif; font-size: 14px;
+      font-weight: 300; color: var(--ink-mid);
+      line-height: 1.7; margin-top: 6px;
+    }
+
+    /* Admin reply */
+    .admin-reply {
+      margin-top: 12px; margin-left: 48px;
+      background: linear-gradient(135deg, rgba(127,4,3,.04), rgba(127,4,3,.02));
+      border: 1px solid rgba(127,4,3,.12);
+      border-left: 3px solid var(--primary);
+      border-radius: 0 var(--card-radius) var(--card-radius) 0;
+      padding: 12px 16px;
+    }
+    .admin-reply-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+    }
+    .admin-reply-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 2px 10px; border-radius: 999px;
+      background: var(--primary); color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    }
+    .admin-reply-badge i { font-size: .65rem; }
+    .admin-reply-date { font-size: 10px; color: var(--ink-faint); font-weight: 300; }
+    .admin-reply-body {
+      font-family: 'Poppins', sans-serif; font-size: 13px;
+      font-weight: 300; color: var(--ink-mid); line-height: 1.65;
+    }
+
+    /* Empty comments */
+    .comments-empty {
+      text-align: center; padding: 48px 24px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+    }
+    .comments-empty i { font-size: 2rem; color: var(--gold-deep); opacity: .5; margin-bottom: 12px; display: block; }
+    .comments-empty p { font-size: 14px; color: var(--ink-faint); font-weight: 300; }
+
+    /* Comments loading */
+    .comments-loading {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; padding: 40px; color: var(--ink-faint);
+      font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    }
+    .comments-loading i { animation: spin 1s linear infinite; color: var(--primary); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    @media (max-width: 600px) {
+      .reactions-inner { flex-wrap: wrap; gap: 8px; }
+      .reactions-spacer { display: none; }
+      .comment-jump-btn span { display: none; }
+      .admin-reply { margin-left: 0; }
     }
   </style>
 </head>
@@ -843,9 +1062,8 @@
   <article id="articleWrap" aria-label="Blog post">
 
     <!-- HERO -->
-    <header class="hero no-cover" id="articleHero" role="banner">
-      <img id="heroCover" class="hero-img" src="" alt="" loading="eager" />
-      <div class="hero-overlay" aria-hidden="true"></div>
+    <header class="hero" id="articleHero" role="banner">
+      <!-- ① Text block — always on parchment, above the image -->
       <div class="hero-content">
         <div>
           <span class="hero-category" id="heroCategory">
@@ -880,6 +1098,13 @@
         </div>
         <div class="hero-tags" id="heroTags" role="list" aria-label="Tags"></div>
       </div>
+
+      <!-- ② Cover image — shown as a real <img> below the text -->
+      <div class="hero-cover-wrap" id="heroCoverWrap">
+        <img id="heroCover" class="hero-img" src="" alt="" loading="eager" />
+      </div>
+      <!-- kept for JS compat -->
+      <div class="hero-overlay" aria-hidden="true"></div>
     </header>
 
     <!-- LAYOUT -->
@@ -941,6 +1166,74 @@
       </div>
 
     </footer>
+
+    <!-- REACTIONS + VIEWS BAR -->
+    <div class="reactions-bar" id="reactionsBar">
+      <div class="reactions-inner">
+        <button class="reaction-btn" id="btnLove" onclick="toggleReaction('love')" aria-label="Love this post">
+          <i class="fas fa-heart"></i>
+          <span class="reaction-count" id="countLove">0</span>
+        </button>
+        <button class="reaction-btn" id="btnRead" onclick="toggleReaction('read')" aria-label="Mark as read">
+          <i class="fas fa-book-open"></i>
+          <span class="reaction-count" id="countRead">0</span>
+        </button>
+        <div class="reactions-divider"></div>
+        <div class="view-pill">
+          <i class="fas fa-eye"></i>
+          <span id="viewCount">0</span> views
+        </div>
+        <div class="reactions-spacer"></div>
+        <button class="comment-jump-btn" onclick="document.getElementById('commentSection').scrollIntoView({behavior:'smooth'})">
+          <i class="fas fa-comments"></i>
+          <span id="commentCountJump">0</span> <span>Comments</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- COMMENTS SECTION -->
+    <section class="comments-section" id="commentSection" aria-label="Comments">
+      <div class="comments-header">
+        <h2 class="comments-title">
+          Discussion
+          <span class="comments-count-badge" id="commentsBadge">0</span>
+        </h2>
+        <select class="comments-sort" id="commentSort" onchange="renderComments()">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+        </select>
+      </div>
+
+      <!-- Write a comment (shown if logged in) -->
+      <div class="comment-form-wrap" id="commentFormWrap" style="display:none">
+        <div class="comment-form-label">Write a comment</div>
+        <textarea class="comment-textarea" id="commentInput" placeholder="Share your thoughts…" maxlength="2000"></textarea>
+        <div class="comment-form-footer">
+          <span class="comment-form-note">Be respectful &amp; constructive.</span>
+          <button class="comment-submit-btn" id="commentSubmitBtn" onclick="submitComment()">
+            <i class="fas fa-paper-plane"></i> Post Comment
+          </button>
+        </div>
+      </div>
+
+      <!-- Login prompt (shown if not logged in) -->
+      <div class="comment-login-prompt" id="commentLoginPrompt">
+        <i class="fas fa-lock"></i>
+        <div class="comment-login-prompt-text">
+          <strong>Join the conversation</strong>
+          <span>Sign in to leave a comment on this article.</span>
+        </div>
+        <button class="comment-login-btn" onclick="window.location.href='/login'">
+          <i class="fas fa-arrow-right"></i> Sign In
+        </button>
+      </div>
+
+      <!-- Comments list -->
+      <div class="comments-list" id="commentsList">
+        <div class="comments-loading"><i class="fas fa-spinner"></i> Loading comments…</div>
+      </div>
+    </section>
+
   </article>
 
   <!-- FLOATING BACK BUTTON -->
@@ -949,7 +1242,7 @@
   </button>
 
   <script>
-    const API_BASE    = 'http://localhost:5000/api/v1/blogs/69a788d37b6cb5c49b3b32f1';
+    const API_BASE    = 'http://localhost:5000/api/v1/blogs/69af6b4f6cd0b342dd434392';
     const FETCH_TIMEOUT = 10000;
     // Real API endpoint (no id/slug appended — the base IS the full URL)
     const DIRECT_URL  = API_BASE;
@@ -1139,14 +1432,14 @@
       document.getElementById('heroTitle').textContent    = post.title || '';
       document.getElementById('heroSubtitle').textContent = post.subtitle || '';
 
-      const hero  = document.getElementById('articleHero');
-      const cover = document.getElementById('heroCover');
+      const coverWrap = document.getElementById('heroCoverWrap');
+      const cover     = document.getElementById('heroCover');
       if (post.coverImage && post.coverImage.url) {
         cover.src = post.coverImage.url;
         cover.alt = post.coverImage.alt || post.title;
-        hero.classList.remove('no-cover');
+        coverWrap.classList.add('has-image');
         cover.addEventListener('load',  () => cover.classList.add('loaded'));
-        cover.addEventListener('error', () => { hero.classList.add('no-cover'); cover.style.display='none'; });
+        cover.addEventListener('error', () => { coverWrap.classList.remove('has-image'); });
       }
 
       const dateStr = post.publishDate
@@ -1293,6 +1586,7 @@
           : data;
         if (!post || !post.title) throw new Error('Post not found or invalid response.');
         populatePage(post);
+        initEngagement(post);
         showArticle();
       } catch (err) {
         console.error('[Sacred Flame] API error:', err);
@@ -1344,10 +1638,212 @@
       };
       await new Promise(r => setTimeout(r, 700));
       populatePage(demo);
+      initEngagement(demo);
       showArticle();
     }
 
     document.addEventListener('DOMContentLoaded', loadPost);
+
+    // ── CURRENT POST ID (set after load) ─────────────────────────
+    let currentPostId = null;
+    // Derive from API_BASE (last path segment)
+    const _idMatch = API_BASE.match(/\/([a-f0-9]{24})$/i);
+    if (_idMatch) currentPostId = _idMatch[1];
+
+    // ── USER AUTH STATE (reads cookie/localStorage — adjust to your auth setup) ──
+    function getAuthToken() {
+      return document.cookie.match(/(?:^|;\s*)jwt=([^;]+)/)?.[1] ||
+             localStorage.getItem('token') || null;
+    }
+    function isLoggedIn() { return !!getAuthToken(); }
+
+    function initAuthUI() {
+      if (isLoggedIn()) {
+        document.getElementById('commentFormWrap').style.display = 'block';
+        document.getElementById('commentLoginPrompt').style.display = 'none';
+      } else {
+        document.getElementById('commentFormWrap').style.display = 'none';
+        document.getElementById('commentLoginPrompt').style.display = 'flex';
+      }
+    }
+
+    // ── REACTIONS ─────────────────────────────────────────────────
+    let reactionState = { love: false, read: false };
+
+    async function loadReactions(postId) {
+      try {
+        const headers = {};
+        const tok = getAuthToken();
+        if (tok) headers['Authorization'] = `Bearer ${tok}`;
+        const res = await fetch(`${API_BASE.replace(/\/[^/]+$/, '')}/${postId}/reactions`, { headers });
+        if (!res.ok) return;
+        const data = await res.json();
+        const counts = data.data?.reactionCounts || data.reactionCounts || {};
+        document.getElementById('countLove').textContent = counts.love ?? 0;
+        document.getElementById('countRead').textContent = counts.read ?? 0;
+        // user's own reaction
+        const mine = data.data?.userReaction || data.userReaction || null;
+        if (mine === 'love') { reactionState.love = true; document.getElementById('btnLove').classList.add('active-love'); }
+        if (mine === 'read') { reactionState.read = true; document.getElementById('btnRead').classList.add('active-read'); }
+      } catch(e) { /* silent */ }
+    }
+
+    async function toggleReaction(type) {
+      if (!currentPostId) return;
+      const btn = document.getElementById(type === 'love' ? 'btnLove' : 'btnRead');
+      const countEl = document.getElementById(type === 'love' ? 'countLove' : 'countRead');
+      const wasActive = reactionState[type];
+      // Optimistic UI
+      reactionState[type] = !wasActive;
+      btn.classList.toggle(type === 'love' ? 'active-love' : 'active-read', !wasActive);
+      countEl.textContent = parseInt(countEl.textContent) + (wasActive ? -1 : 1);
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        const tok = getAuthToken();
+        if (tok) headers['Authorization'] = `Bearer ${tok}`;
+        const res = await fetch(
+          `${API_BASE.replace(/\/[^/]+$/, '')}/${currentPostId}/reactions`,
+          { method: 'POST', headers, body: JSON.stringify({ type }) }
+        );
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const counts = data.data?.reactionCounts || data.reactionCounts || {};
+        if (counts.love !== undefined) document.getElementById('countLove').textContent = counts.love;
+        if (counts.read !== undefined) document.getElementById('countRead').textContent = counts.read;
+      } catch(e) {
+        // Revert on error
+        reactionState[type] = wasActive;
+        btn.classList.toggle(type === 'love' ? 'active-love' : 'active-read', wasActive);
+        countEl.textContent = parseInt(countEl.textContent) + (wasActive ? 1 : -1);
+      }
+    }
+
+    // ── VIEW COUNT ────────────────────────────────────────────────
+    function setViewCount(post) {
+      document.getElementById('viewCount').textContent = post.viewCount ?? 0;
+    }
+
+    // ── COMMENTS ─────────────────────────────────────────────────
+    let allComments = [];
+
+    async function loadComments(postId) {
+      const list = document.getElementById('commentsList');
+      list.innerHTML = '<div class="comments-loading"><i class="fas fa-spinner"></i> Loading comments…</div>';
+      try {
+        const res = await fetch(`${API_BASE.replace(/\/[^/]+$/, '')}/${postId}/comments`);
+        const data = await res.json();
+        allComments = data.data?.comments || data.comments || [];
+        renderComments();
+      } catch(e) {
+        list.innerHTML = '<div class="comments-empty"><i class="fas fa-circle-exclamation"></i><p>Could not load comments.</p></div>';
+      }
+    }
+
+    function renderComments() {
+      const sort = document.getElementById('commentSort').value;
+      let sorted = [...allComments].filter(c => !c.isHidden);
+      sorted.sort((a,b) => sort === 'oldest'
+        ? new Date(a.createdAt) - new Date(b.createdAt)
+        : new Date(b.createdAt) - new Date(a.createdAt));
+
+      const count = sorted.length;
+      document.getElementById('commentsBadge').textContent = count;
+      document.getElementById('commentCountJump').textContent = count;
+
+      const list = document.getElementById('commentsList');
+      if (!count) {
+        list.innerHTML = '<div class="comments-empty"><i class="fas fa-comments"></i><p>No comments yet. Be the first to share your thoughts!</p></div>';
+        return;
+      }
+      list.innerHTML = '';
+      sorted.forEach((c, i) => {
+        const el = buildCommentEl(c, i);
+        list.appendChild(el);
+      });
+    }
+
+    function buildCommentEl(c, i) {
+      const wrap = document.createElement('div');
+      wrap.className = 'comment-item';
+      wrap.style.animationDelay = `${i * 0.04}s`;
+
+      const authorName = c.author?.name || c.author?.firstName
+        ? (c.author.firstName ? `${c.author.firstName} ${c.author.lastName || ''}`.trim() : c.author.name)
+        : (typeof c.author === 'string' ? c.author : 'Anonymous');
+      const initial = (authorName || 'A')[0].toUpperCase();
+      const dateStr = c.createdAt
+        ? new Date(c.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
+        : '';
+
+      const heartedBadge = c.adminHearted
+        ? `<span class="comment-hearted-badge"><i class="fas fa-heart"></i> Hearted</span>` : '';
+
+      const adminReplyHtml = c.adminReply?.body ? `
+        <div class="admin-reply">
+          <div class="admin-reply-header">
+            <span class="admin-reply-badge"><i class="fas fa-crown"></i> Sacred Flame</span>
+            <span class="admin-reply-date">${c.adminReply.repliedAt ? new Date(c.adminReply.repliedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : ''}</span>
+          </div>
+          <div class="admin-reply-body">${escHtml(c.adminReply.body)}</div>
+        </div>` : '';
+
+      wrap.innerHTML = `
+        <div class="comment-top">
+          <div class="comment-avatar">${initial}</div>
+          <div class="comment-meta">
+            <div class="comment-author-row">
+              <span class="comment-author-name">${escHtml(authorName)}</span>
+              <span class="comment-date">${dateStr}</span>
+              ${heartedBadge}
+            </div>
+            <div class="comment-body">${escHtml(c.body)}</div>
+          </div>
+        </div>
+        ${adminReplyHtml}`;
+      return wrap;
+    }
+
+    async function submitComment() {
+      if (!currentPostId) return;
+      const input = document.getElementById('commentInput');
+      const body = input.value.trim();
+      if (!body) { input.focus(); return; }
+      const btn = document.getElementById('commentSubmitBtn');
+      btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting…';
+      try {
+        const tok = getAuthToken();
+        const res = await fetch(`${API_BASE.replace(/\/[^/]+$/, '')}/${currentPostId}/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json', 'Authorization': tok ? `Bearer ${tok}` : '' },
+          body: JSON.stringify({ body })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Failed to post');
+        input.value = '';
+        // Add optimistically
+        const newComment = data.data?.comment || { body, createdAt: new Date().toISOString(), author: 'You' };
+        allComments.unshift(newComment);
+        renderComments();
+        showToast('Comment posted!');
+      } catch(e) {
+        showToast(e.message || 'Could not post comment');
+      } finally {
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Comment';
+      }
+    }
+
+    // Load reactions/views/comments after page is populated
+    function initEngagement(post) {
+      currentPostId = post._id || currentPostId;
+      setViewCount(post);
+      document.getElementById('countLove').textContent = post.reactionCounts?.love ?? 0;
+      document.getElementById('countRead').textContent = post.reactionCounts?.read ?? 0;
+      initAuthUI();
+      if (currentPostId) {
+        loadReactions(currentPostId);
+        loadComments(currentPostId);
+      }
+    }
   </script>
 </body>
 </html>

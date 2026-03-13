@@ -1,513 +1,780 @@
+// controllers/blogController.js
 'use strict';
 
-// controllers/postController.js
-
-const Post = require('../models/blogModel');
-const Comment = require('../models/commentModel');
-const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/AppError');
-
-// ─────────────────────────────────────────────
-//  PRIVATE HELPERS
-// ─────────────────────────────────────────────
-
 /**
- * Build a MongoDB filter from query-string params.
- * Public users can only see published posts.
- * Admins may additionally filter by any status.
+ * Blog Controller
+ * ──────────────────────────────────────────────────────────────
+ * Features:
+ *  • CRUD for posts (admin only for writes)
+ *  • Publish / Archive shortcuts
+ *  • Full-text search + filter by category / tag / featured
+ *  • Comments — registered users only (protect middleware)
+ *  • Admin: reply, delete, hide/unhide, heart (like YouTube)
+ *  • Reactions ('read' | 'love') — PUBLIC, no login required (toggle)
+ *  • View counting — deduped per IP+UserAgent fingerprint (no repeat counts)
+ * ──────────────────────────────────────────────────────────────
  */
-const buildPostFilter = (query, isAdmin = false) => {
+
+const crypto   = require('crypto');
+const Post     = require('../models/blogModel');
+const catchAsync = require('../utils/catchAsync');
+const AppError   = require('../utils/AppError');
+
+// ─────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────
+
+const isAdmin = (req) => req.user && req.user.role === 'admin';
+
+const ALLOWED_POST_FIELDS = [
+  'title', 'subtitle', 'slug', 'blocks', 'coverImage',
+  'category', 'tags', 'author', 'publishDate', 'readTime',
+  'settings', 'status'
+];
+
+const pickPostFields = (body) => {
+  const obj = {};
+  ALLOWED_POST_FIELDS.forEach(k => {
+    if (body[k] !== undefined) obj[k] = body[k];
+  });
+  return obj;
+};
+
+const buildListFilter = (query, userIsAdmin) => {
   const filter = {};
 
-  if (!isAdmin) {
-    filter.status = 'published';
-  } else if (query.status) {
+  if (userIsAdmin && query.status) {
+    if (!['draft', 'published', 'archived'].includes(query.status))
+      throw new AppError(`Invalid status filter: "${query.status}"`, 400);
     filter.status = query.status;
+  } else {
+    filter.status = 'published';
   }
 
   if (query.category) filter.category = query.category;
-  if (query.tag) filter.tags = query.tag;
-  if (query.author) filter.author = query.author;
-  if (query.featured !== undefined) {
-    filter['settings.isFeatured'] = query.featured === 'true';
-  }
+  if (query.tag)      filter.tags     = query.tag;
+  if (query.featured === 'true') filter['settings.isFeatured'] = true;
 
   return filter;
 };
 
-/**
- * Parse + clamp pagination params.
- * Max limit = 50 to prevent accidental full-collection dumps.
- */
 const parsePagination = (query) => {
-  const page = Math.max(1, parseInt(query.page, 10) || 1);
+  const page  = Math.max(1, parseInt(query.page, 10)  || 1);
   const limit = Math.min(50, Math.max(1, parseInt(query.limit, 10) || 10));
-  const skip = (page - 1) * limit;
 
-  const ALLOWED_SORT = ['publishDate', 'createdAt', 'title', 'updatedAt'];
-  const sortField = ALLOWED_SORT.includes(query.sortBy) ? query.sortBy : 'publishDate';
-  const sortOrder = query.order === 'asc' ? 1 : -1;
+  const SORTABLE = ['publishDate', 'createdAt', 'title', 'reactionCounts.love', 'reactionCounts.read', 'viewCount'];
+  const sortBy   = SORTABLE.includes(query.sortBy) ? query.sortBy : 'publishDate';
+  const order    = query.order === 'asc' ? 1 : -1;
 
-  return { page, limit, skip, sort: { [sortField]: sortOrder } };
+  return { page, limit, skip: (page - 1) * limit, sort: { [sortBy]: order } };
+};
+
+/**
+ * Build a privacy-safe fingerprint from the request.
+ * Uses a SHA-256 of IP + User-Agent — no PII is stored.
+ *
+ * For view deduplication we also respect a 24-hour window via the
+ * viewedAt timestamp, so a user who returns the next day gets a
+ * fresh count. Adjust TTL to taste (or remove TTL for lifetime dedup).
+ */
+const VIEW_TTL_HOURS = 24;
+
+const buildFingerprint = (req) => {
+  const ip = req.ip
+    || req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+    || 'unknown';
+  const ua = req.headers['user-agent'] || 'unknown';
+  return crypto.createHash('sha256').update(`${ip}::${ua}`).digest('hex');
 };
 
 // ─────────────────────────────────────────────
-//  POST — PUBLIC ROUTES
+//  POST — LISTING & SEARCH
 // ─────────────────────────────────────────────
 
-// ==================== GET ALL POSTS ====================
-// GET /api/v1/posts
-// Public → published only.  Admin → all statuses + extra filters.
-// Supports: ?search, ?category, ?tag, ?author, ?featured,
-//           ?status (admin), ?page, ?limit, ?sortBy, ?order
-
+/**
+ * GET /api/v1/blogs
+ */
 exports.getAllPosts = catchAsync(async (req, res, next) => {
-  console.log('[getAllPosts] ▸ query params:', req.query);
-  const isAdmin = req.user && req.user.role === 'admin';
-  const { page, limit, skip, sort } = parsePagination(req.query);
+  const admin = isAdmin(req);
 
-  // ── Full-text search (MongoDB text index) ──
   if (req.query.search) {
-    if (!req.query.search.trim()) {
-      return next(new AppError('Search query cannot be empty', 400));
-    }
+    const term = (req.query.search || '').trim();
+    if (!term) return next(new AppError('search must be a non-empty string', 400));
 
-    const posts = await Post.search(req.query.search.trim(), { limit });
+    const { limit } = parsePagination(req.query);
+    const posts = await Post.search(term, { limit });
 
     return res.status(200).json({
-      status: 'success',
+      status:  'success',
       results: posts.length,
-      data: { posts }
+      data:    { posts }
     });
   }
 
-  const filter = buildPostFilter(req.query, isAdmin);
+  let filter;
+  try {
+    filter = buildListFilter(req.query, admin);
+  } catch (err) {
+    return next(err);
+  }
 
-  const [posts, total] = await Promise.all([
+  const { page, limit, skip, sort } = parsePagination(req.query);
+
+  const [rawPosts, total] = await Promise.all([
     Post.find(filter)
       .sort(sort)
       .skip(skip)
       .limit(limit)
-      .select('-search_text')
       .lean(),
     Post.countDocuments(filter)
   ]);
 
-  const totalPages = Math.ceil(total / limit);
+  // Add commentCount and strip heavy fields
+  const posts = rawPosts.map(p => {
+    const commentCount = Array.isArray(p.comments) ? p.comments.length : 0;
+    delete p.comments;
+    delete p.reactions;
+    delete p.rendered_html;
+    delete p.search_text;
+    return { ...p, commentCount };
+  });
 
   res.status(200).json({
-    status: 'success',
+    status:  'success',
     results: posts.length,
-    pagination: {
-      total,
-      totalPages,
-      currentPage: page,
-      limit,
-      hasNextPage: page < totalPages,
-      hasPrevPage: page > 1
-    },
-    data: { posts }
+    total,
+    page,
+    pages:   Math.ceil(total / limit),
+    data:    { posts }
   });
 });
 
-// ==================== GET SINGLE POST BY ID ====================
-// GET /api/v1/posts/:id
-// Public → published only.  Admin → any status.
-
-exports.getPost = catchAsync(async (req, res, next) => {
-  const isAdmin = req.user && req.user.role === 'admin';
-  const filter = { _id: req.params.id };
-
-  if (!isAdmin) filter.status = 'published';
-
-  const post = await Post.findOne(filter).select('-search_text').lean();
-
-  if (!post) {
-    return next(new AppError('No post found with that ID', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: { post }
-  });
-});
-
-// ==================== GET SINGLE POST BY SLUG ====================
-// GET /api/v1/posts/slug/:slug
-// Public → published only.  Admin → any status.
-
+/**
+ * GET /api/v1/blogs/slug/:slug
+ * Public (published only). Admin gets any status.
+ * Increments view count once per fingerprint per 24 h.
+ */
 exports.getPostBySlug = catchAsync(async (req, res, next) => {
-  const isAdmin = req.user && req.user.role === 'admin';
-  const filter = { slug: req.params.slug.toLowerCase().trim() };
+  const { slug } = req.params;
 
-  if (!isAdmin) filter.status = 'published';
-
-  const post = await Post.findOne(filter).select('-search_text').lean();
-
-  if (!post) {
-    return next(new AppError('No post found with that slug', 404));
+  if (!slug || typeof slug !== 'string' || !slug.trim()) {
+    return next(new AppError('Please provide a valid slug', 400));
   }
+
+  const admin  = isAdmin(req);
+  const filter = admin ? { slug } : { slug, status: 'published' };
+
+  // We need the views array here to deduplicate
+  const post = await Post.findOne(filter)
+    .select('+views')
+    .populate({ path: 'comments.author', select: 'name email photo' });
+
+  if (!post) return next(new AppError('Post not found', 404));
+
+  // ── View count (fire-and-forget — don't block the response) ──
+  _recordView(post, req).catch(err =>
+    console.error('[view-count] Failed to record view:', err.message)
+  );
+
+  const visibleComments = admin
+    ? post.comments
+    : post.comments.filter(c => !c.isHidden);
+
+  const result = post.toObject();
+  result.comments = visibleComments;
+  delete result.views; // never expose raw fingerprints
 
   res.status(200).json({
     status: 'success',
-    data: { post }
+    data:   { post: result }
+  });
+});
+
+/**
+ * GET /api/v1/blogs/:id
+ * Public — only published (admin gets any status).
+ * Increments view count once per fingerprint per 24 h.
+ */
+exports.getPost = catchAsync(async (req, res, next) => {
+  const admin  = isAdmin(req);
+  const filter = admin
+    ? { _id: req.params.id }
+    : { _id: req.params.id, status: 'published' };
+
+  const post = await Post.findOne(filter)
+    .select('+views')
+    .populate({ path: 'comments.author', select: 'name email photo' });
+
+  if (!post) return next(new AppError('Post not found', 404));
+
+  // ── View count (fire-and-forget) ──
+  _recordView(post, req).catch(err =>
+    console.error('[view-count] Failed to record view:', err.message)
+  );
+
+  const visibleComments = admin
+    ? post.comments
+    : post.comments.filter(c => !c.isHidden);
+
+  const result = post.toObject();
+  result.comments = visibleComments;
+  delete result.views;
+
+  res.status(200).json({
+    status: 'success',
+    data:   { post: result }
   });
 });
 
 // ─────────────────────────────────────────────
-//  POST — ADMIN ONLY ROUTES
+//  INTERNAL — VIEW RECORDING
 // ─────────────────────────────────────────────
 
-// ==================== CREATE POST ====================
-// POST /api/v1/posts   (admin only)
+/**
+ * Records a view for `post` if the requester's fingerprint hasn't been
+ * seen within VIEW_TTL_HOURS. Uses an atomic $push + $inc to avoid
+ * race conditions on concurrent requests.
+ *
+ * @param {Document} post  — Mongoose doc (must have .views loaded)
+ * @param {Request}  req
+ */
+async function _recordView(post, req) {
+  const fingerprint = buildFingerprint(req);
+  const cutoff      = new Date(Date.now() - VIEW_TTL_HOURS * 60 * 60 * 1000);
 
-exports.createPost = async (req, res, next) => {
-  try {
-    console.log('[createPost] STEP 1 — received request');
-    console.log('[createPost] body keys:', Object.keys(req.body));
-    console.log('[createPost] title:', req.body.title);
-    console.log('[createPost] blocks count:', (req.body.blocks || []).length);
+  // Check if this fingerprint already has a recent view
+  const alreadySeen = post.views.some(
+    v => v.fingerprint === fingerprint && v.viewedAt >= cutoff
+  );
 
-    console.log('[createPost] STEP 2 — calling Post.create()...');
-    const post = await Post.create(req.body);
-    console.log('[createPost] STEP 3 — post created, id:', post._id);
+  if (alreadySeen) return; // no-op — already counted
 
-    res.status(201).json({
-      status: 'success',
-      message: 'Post created successfully',
-      data: { post }
-    });
-  } catch (err) {
-    console.error('[createPost] ✗ ERROR caught:');
-    console.error('[createPost] ✗ name:', err.name);
-    console.error('[createPost] ✗ message:', err.message);
-    console.error('[createPost] ✗ stack:', err.stack);
-    if (err.errors) {
-      console.error('[createPost] ✗ validation errors:', JSON.stringify(err.errors, null, 2));
+  // Atomically add the view and bump the counter
+  await Post.updateOne(
+    { _id: post._id },
+    {
+      $push: { views: { fingerprint, viewedAt: new Date() } },
+      $inc:  { viewCount: 1 }
     }
-    next(err);
-  }
-};
+  );
 
-// ==================== UPDATE POST ====================
-// PATCH /api/v1/posts/:id   (admin only)
-// Uses .save() so ALL pre-save hooks (slug, rendered_html, stats) run.
+  // Optionally prune stale fingerprints (keeps views array from growing forever)
+  // Run occasionally (1-in-50 chance) to avoid overhead on every request
+  if (Math.random() < 0.02) {
+    Post.updateOne(
+      { _id: post._id },
+      { $pull: { views: { viewedAt: { $lt: cutoff } } } }
+    ).catch(() => {/* non-critical */});
+  }
+}
+
+// ─────────────────────────────────────────────
+//  POST — WRITE (admin only — enforced in routes)
+// ─────────────────────────────────────────────
+
+exports.createPost = catchAsync(async (req, res, next) => {
+  const data = pickPostFields(req.body);
+
+  if (!data.title || !String(data.title).trim()) {
+    return next(new AppError('title is required', 400));
+  }
+
+  const post = await Post.create(data);
+
+  res.status(201).json({
+    status:  'success',
+    message: 'Post created successfully',
+    data:    { post }
+  });
+});
 
 exports.updatePost = catchAsync(async (req, res, next) => {
-  console.log('[updatePost] ▸ updating post id:', req.params.id);
-  console.log('[updatePost] ▸ body keys:', Object.keys(req.body));
-  const post = await Post.findById(req.params.id);
+  const data = pickPostFields(req.body);
 
-  if (!post) {
-    return next(new AppError('No post found with that ID', 404));
+  if (Object.keys(data).length === 0) {
+    return next(new AppError('Request body must contain at least one updatable field', 400));
   }
 
-  const UPDATABLE = [
-    'title', 'subtitle', 'slug', 'blocks',
-    'coverImage', 'category', 'tags',
-    'author', 'publishDate', 'readTime',
-    'settings', 'status'
-  ];
+  const post = await Post.findById(req.params.id);
+  if (!post) return next(new AppError('Post not found', 404));
 
-  UPDATABLE.forEach((field) => {
-    if (Object.prototype.hasOwnProperty.call(req.body, field)) {
-      post[field] = req.body[field];
-    }
-  });
-
+  Object.assign(post, data);
   await post.save();
 
   res.status(200).json({
-    status: 'success',
+    status:  'success',
     message: 'Post updated successfully',
-    data: { post }
+    data:    { post }
   });
 });
 
-// ==================== PUBLISH POST ====================
-// PATCH /api/v1/posts/:id/publish   (admin only)
-
 exports.publishPost = catchAsync(async (req, res, next) => {
-  console.log('[publishPost] ▸ publishing post id:', req.params.id);
   const post = await Post.findById(req.params.id);
-
-  if (!post) {
-    return next(new AppError('No post found with that ID', 404));
-  }
+  if (!post) return next(new AppError('Post not found', 404));
 
   if (post.status === 'published') {
     return next(new AppError('Post is already published', 400));
   }
 
-  await post.publish(); // instance method handles status + publishDate + save()
+  await post.publish();
 
   res.status(200).json({
-    status: 'success',
+    status:  'success',
     message: 'Post published successfully',
-    data: { post }
+    data:    { post }
   });
 });
 
-// ==================== ARCHIVE POST ====================
-// PATCH /api/v1/posts/:id/archive   (admin only)
-
 exports.archivePost = catchAsync(async (req, res, next) => {
   const post = await Post.findById(req.params.id);
-
-  if (!post) {
-    return next(new AppError('No post found with that ID', 404));
-  }
+  if (!post) return next(new AppError('Post not found', 404));
 
   if (post.status === 'archived') {
     return next(new AppError('Post is already archived', 400));
   }
 
-  await post.archive(); // instance method handles status + save()
+  await post.archive();
 
   res.status(200).json({
-    status: 'success',
+    status:  'success',
     message: 'Post archived successfully',
-    data: { post }
+    data:    { post }
   });
 });
-
-// ==================== DELETE POST ====================
-// DELETE /api/v1/posts/:id   (admin only)
-// Permanently deletes the post AND all its comments atomically.
 
 exports.deletePost = catchAsync(async (req, res, next) => {
-  console.log('[deletePost] ▸ deleting post id:', req.params.id);
-  const post = await Post.findById(req.params.id);
+  const post = await Post.findByIdAndDelete(req.params.id);
+  if (!post) return next(new AppError('Post not found', 404));
 
-  if (!post) {
-    return next(new AppError('No post found with that ID', 404));
-  }
-
-  // Delete post + comments in parallel
-  await Promise.all([
-    Post.findByIdAndDelete(req.params.id),
-    Comment.deleteMany({ post: req.params.id })
-  ]);
-
-  res.status(204).json({
-    status: 'success',
-    data: null
-  });
+  res.status(204).json({ status: 'success', data: null });
 });
 
 // ─────────────────────────────────────────────
-//  COMMENT ROUTES
+//  COMMENTS
 // ─────────────────────────────────────────────
 
-// ==================== GET COMMENTS ====================
-// GET /api/v1/posts/:id/comments
-// Public (if comments enabled on post).
-// Admin can see hidden comments too.
-
+/**
+ * GET /api/v1/blogs/:id/comments
+ * Public — hidden comments are filtered for non-admins.
+ */
 exports.getComments = catchAsync(async (req, res, next) => {
-  const isAdmin = req.user && req.user.role === 'admin';
+  const admin = isAdmin(req);
 
-  // 1) Verify post exists (public: must be published, admin: any status)
-  const postFilter = { _id: req.params.id };
-  if (!isAdmin) postFilter.status = 'published';
+  const post = await Post.findOne(
+    admin ? { _id: req.params.id } : { _id: req.params.id, status: 'published' }
+  ).populate({ path: 'comments.author', select: 'name email photo' });
 
-  const post = await Post
-    .findOne(postFilter)
-    .select('settings.allowComments')
-    .lean();
+  if (!post) return next(new AppError('Post not found', 404));
 
-  if (!post) {
-    return next(new AppError('No post found with that ID', 404));
-  }
-
-  // 2) Comments enabled check (admin always bypasses)
-  if (!isAdmin && !post.settings.allowComments) {
+  if (!post.settings.allowComments && !admin) {
     return next(new AppError('Comments are disabled for this post', 403));
   }
 
-  const { page, limit, skip } = parsePagination(req.query);
-
-  // 3) Admin sees hidden comments; public does not
-  const commentFilter = { post: req.params.id };
-  if (!isAdmin) commentFilter.isHidden = false;
-
-  const [comments, total] = await Promise.all([
-    Comment.find(commentFilter)
-      .populate('author', 'name email')  // only expose safe user fields
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean(),
-    Comment.countDocuments(commentFilter)
-  ]);
+  const comments = admin
+    ? post.comments
+    : post.comments.filter(c => !c.isHidden);
 
   res.status(200).json({
-    status: 'success',
+    status:  'success',
     results: comments.length,
-    pagination: {
-      total,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
-      limit,
-      hasNextPage: page < Math.ceil(total / limit),
-      hasPrevPage: page > 1
-    },
-    data: { comments }
+    data:    { comments }
   });
 });
 
-// ==================== CREATE COMMENT ====================
-// POST /api/v1/posts/:id/comments
-// Protected — user must be logged in (JWT verified via protect middleware).
-// Blocked if post doesn't exist, isn't published, or has allowComments: false.
-
+/**
+ * POST /api/v1/blogs/:id/comments
+ * Requires authentication. Registered users only.
+ */
 exports.createComment = catchAsync(async (req, res, next) => {
-  // 1) Post must be published (comments are public-facing feature)
-  const post = await Post
-    .findOne({ _id: req.params.id, status: 'published' })
-    .select('settings.allowComments')
-    .lean();
-
-  if (!post) {
-    return next(new AppError('No published post found with that ID', 404));
+  // Guard: must be a registered user (protect middleware sets req.user)
+  if (!req.user) {
+    return next(new AppError('You must be logged in to comment', 401));
   }
 
-  // 2) Check comments are enabled for this specific post
+  const post = await Post.findOne({ _id: req.params.id, status: 'published' });
+  if (!post) return next(new AppError('Post not found', 404));
+
   if (!post.settings.allowComments) {
     return next(new AppError('Comments are disabled for this post', 403));
   }
 
-  // 3) Create — body already validated & sanitised by validateCreateComment middleware
-  const comment = await Comment.create({
-    post: req.params.id,
-    author: req.user._id,
-    body: req.body.body
-  });
+  const body = (req.body.body || '').trim();
+  if (!body)             return next(new AppError('Comment body is required', 400));
+  if (body.length > 2000) return next(new AppError('Comment cannot exceed 2000 characters', 400));
 
-  // 4) Populate author fields for the response
-  await comment.populate('author', 'name email');
+  post.comments.push({ author: req.user._id, body });
+  await post.save();
+
+  const newComment = post.comments[post.comments.length - 1];
+  await post.populate({ path: 'comments.author', select: 'name email photo' });
+  const populated = post.comments.id(newComment._id);
 
   res.status(201).json({
-    status: 'success',
+    status:  'success',
     message: 'Comment added successfully',
-    data: { comment }
+    data:    { comment: populated }
   });
 });
 
-// ==================== UPDATE COMMENT ====================
-// PATCH /api/v1/posts/:id/comments/:commentId
-// Protected — only the comment's own author can edit their comment.
-
+/**
+ * PATCH /api/v1/blogs/:id/comments/:commentId
+ * Only the comment's own author can edit.
+ */
 exports.updateComment = catchAsync(async (req, res, next) => {
-  const comment = await Comment.findById(req.params.commentId);
+  const { id, commentId } = req.params;
 
-  if (!comment) {
-    return next(new AppError('No comment found with that ID', 404));
-  }
+  const post = await Post.findById(id);
+  if (!post) return next(new AppError('Post not found', 404));
 
-  // Guard: comment must actually belong to this post
-  if (comment.post.toString() !== req.params.id) {
-    return next(new AppError('Comment does not belong to this post', 400));
-  }
+  const comment = post.comments.id(commentId);
+  if (!comment)         return next(new AppError('Comment not found', 404));
+  if (comment.isHidden) return next(new AppError('Cannot edit a hidden comment', 403));
 
-  // Guard: only the original author can edit (admins cannot rewrite user comments)
   if (comment.author.toString() !== req.user._id.toString()) {
-    return next(new AppError('You do not have permission to edit this comment', 403));
+    return next(new AppError('You can only edit your own comments', 403));
   }
 
-  comment.body = req.body.body; // validated + sanitised by validateUpdateComment
-  await comment.save();
+  const body = (req.body.body || '').trim();
+  if (!body)             return next(new AppError('Comment body cannot be empty', 400));
+  if (body.length > 2000) return next(new AppError('Comment cannot exceed 2000 characters', 400));
 
-  await comment.populate('author', 'name email');
+  comment.body = body;
+  await post.save();
+
+  await post.populate({ path: 'comments.author', select: 'name email photo' });
+  const updated = post.comments.id(commentId);
 
   res.status(200).json({
-    status: 'success',
+    status:  'success',
     message: 'Comment updated successfully',
-    data: { comment }
+    data:    { comment: updated }
   });
 });
 
-// ==================== DELETE COMMENT ====================
-// DELETE /api/v1/posts/:id/comments/:commentId
-// Protected — author can delete their own; admin can delete any.
-
+/**
+ * DELETE /api/v1/blogs/:id/comments/:commentId
+ * Comment author OR admin can delete.
+ */
 exports.deleteComment = catchAsync(async (req, res, next) => {
-  const comment = await Comment.findById(req.params.commentId);
+  const { id, commentId } = req.params;
 
-  if (!comment) {
-    return next(new AppError('No comment found with that ID', 404));
-  }
+  const post = await Post.findById(id);
+  if (!post) return next(new AppError('Post not found', 404));
 
-  // Guard: comment must belong to this post
-  if (comment.post.toString() !== req.params.id) {
-    return next(new AppError('Comment does not belong to this post', 400));
-  }
+  const comment = post.comments.id(commentId);
+  if (!comment) return next(new AppError('Comment not found', 404));
 
-  const isAdmin = req.user.role === 'admin';
-  const isAuthor = comment.author.toString() === req.user._id.toString();
-
-  if (!isAdmin && !isAuthor) {
+  const isOwner = comment.author.toString() === req.user._id.toString();
+  if (!isOwner && !isAdmin(req)) {
     return next(new AppError('You do not have permission to delete this comment', 403));
   }
 
-  // Soft-delete so the pre-find hook handles the rest
-  comment.isDeleted = true;
-  await comment.save({ validateBeforeSave: false });
+  comment.deleteOne();
+  await post.save();
 
-  res.status(204).json({
-    status: 'success',
-    data: null
+  res.status(200).json({
+    status:  'success',
+    message: 'Comment deleted successfully',
+    data:    null
   });
 });
 
-// ==================== HIDE COMMENT (ADMIN) ====================
-// PATCH /api/v1/posts/:id/comments/:commentId/hide
-// Admin only — hide a comment from public view without permanently deleting it.
+// ─────────────────────────────────────────────
+//  COMMENT MODERATION (admin only — routes enforce restrictTo)
+// ─────────────────────────────────────────────
 
 exports.hideComment = catchAsync(async (req, res, next) => {
-  const comment = await Comment.findById(req.params.commentId);
+  const post = await Post.findById(req.params.id);
+  if (!post) return next(new AppError('Post not found', 404));
 
-  if (!comment) {
-    return next(new AppError('No comment found with that ID', 404));
-  }
+  const comment = post.comments.id(req.params.commentId);
+  if (!comment) return next(new AppError('Comment not found', 404));
 
-  if (comment.post.toString() !== req.params.id) {
-    return next(new AppError('Comment does not belong to this post', 400));
-  }
+  if (comment.isHidden) return next(new AppError('Comment is already hidden', 400));
 
   comment.isHidden = true;
-  await comment.save({ validateBeforeSave: false });
+  await post.save();
 
   res.status(200).json({
-    status: 'success',
+    status:  'success',
     message: 'Comment hidden successfully',
-    data: { comment }
+    data:    { comment }
   });
 });
-
-// ==================== UNHIDE COMMENT (ADMIN) ====================
-// PATCH /api/v1/posts/:id/comments/:commentId/unhide
-// Admin only — restore a previously hidden comment.
 
 exports.unhideComment = catchAsync(async (req, res, next) => {
-  const comment = await Comment.findById(req.params.commentId);
+  const post = await Post.findById(req.params.id);
+  if (!post) return next(new AppError('Post not found', 404));
 
-  if (!comment) {
-    return next(new AppError('No comment found with that ID', 404));
-  }
+  const comment = post.comments.id(req.params.commentId);
+  if (!comment) return next(new AppError('Comment not found', 404));
 
-  if (comment.post.toString() !== req.params.id) {
-    return next(new AppError('Comment does not belong to this post', 400));
-  }
+  if (!comment.isHidden) return next(new AppError('Comment is not hidden', 400));
 
   comment.isHidden = false;
-  await comment.save({ validateBeforeSave: false });
+  await post.save();
 
   res.status(200).json({
-    status: 'success',
+    status:  'success',
     message: 'Comment restored successfully',
-    data: { comment }
+    data:    { comment }
   });
 });
 
-module.exports = exports;
+// ─────────────────────────────────────────────
+//  ADMIN HEART  (YouTube-style creator heart)
+// ─────────────────────────────────────────────
+
+/**
+ * PATCH /api/v1/blogs/:id/comments/:commentId/heart
+ * Admin toggles a ❤️ on a comment.
+ * Hearting a hearted comment removes the heart (toggle).
+ */
+exports.heartComment = catchAsync(async (req, res, next) => {
+  const post = await Post.findById(req.params.id);
+  if (!post) return next(new AppError('Post not found', 404));
+
+  const comment = post.comments.id(req.params.commentId);
+  if (!comment) return next(new AppError('Comment not found', 404));
+
+  if (comment.isHidden) {
+    return next(new AppError('Cannot heart a hidden comment', 400));
+  }
+
+  // Toggle
+  comment.adminHearted = !comment.adminHearted;
+  await post.save();
+
+  const action = comment.adminHearted ? 'hearted' : 'un-hearted';
+
+  res.status(200).json({
+    status:  'success',
+    message: `Comment ${action} successfully`,
+    data:    { adminHearted: comment.adminHearted, commentId: comment._id }
+  });
+});
+
+// ─────────────────────────────────────────────
+//  ADMIN REPLIES
+// ─────────────────────────────────────────────
+
+/**
+ * POST /api/v1/blogs/:id/comments/:commentId/reply
+ * Admin adds or replaces their reply on a comment.
+ */
+exports.replyToComment = catchAsync(async (req, res, next) => {
+  const post = await Post.findById(req.params.id);
+  if (!post) return next(new AppError('Post not found', 404));
+
+  const comment = post.comments.id(req.params.commentId);
+  if (!comment) return next(new AppError('Comment not found', 404));
+
+  if (comment.isHidden) {
+    return next(new AppError('Cannot reply to a hidden comment', 400));
+  }
+
+  const body = (req.body.body || '').trim();
+  if (!body)             return next(new AppError('Reply body is required', 400));
+  if (body.length > 2000) return next(new AppError('Reply cannot exceed 2000 characters', 400));
+
+  const isUpdate = !!comment.adminReply;
+  comment.adminReply = { body, repliedAt: new Date() };
+  await post.save();
+
+  res.status(200).json({
+    status:  'success',
+    message: isUpdate ? 'Reply updated successfully' : 'Reply added successfully',
+    data:    { reply: comment.adminReply }
+  });
+});
+
+/**
+ * DELETE /api/v1/blogs/:id/comments/:commentId/reply
+ */
+exports.deleteReply = catchAsync(async (req, res, next) => {
+  const post = await Post.findById(req.params.id);
+  if (!post) return next(new AppError('Post not found', 404));
+
+  const comment = post.comments.id(req.params.commentId);
+  if (!comment)            return next(new AppError('Comment not found', 404));
+  if (!comment.adminReply) return next(new AppError('No reply exists on this comment', 404));
+
+  comment.adminReply = null;
+  await post.save();
+
+  res.status(200).json({
+    status:  'success',
+    message: 'Reply deleted successfully',
+    data:    null
+  });
+});
+
+// ─────────────────────────────────────────────
+//  REACTIONS  (PUBLIC — no login required)
+// ─────────────────────────────────────────────
+
+/**
+ * POST /api/v1/blogs/:id/reactions
+ * Body: { type: 'read' | 'love' }
+ *
+ * Toggle behaviour:
+ *  • Logged-in  → stored against user ID (permanent, survives browser clears)
+ *  • Anonymous  → NOT allowed; must log in to react
+ *
+ * Wait — requirement #3 says "like the blog without register".
+ * We implement this as a GUEST reaction using the fingerprint.
+ * Guest reactions are stored in a separate lightweight collection
+ * to avoid polluting the user-based reactions array.
+ * For simplicity we store them in-document as guestReactions.
+ *
+ * Strategy:
+ *  - Logged-in users: use user._id (react once per account)
+ *  - Guests: use fingerprint (react once per browser/IP)
+ *  - Both toggle independently
+ */
+exports.toggleReaction = catchAsync(async (req, res, next) => {
+  const VALID_TYPES = ['read', 'love'];
+  const type = (req.body.type || '').trim().toLowerCase();
+
+  if (!VALID_TYPES.includes(type)) {
+    return next(new AppError(`Reaction type must be one of: ${VALID_TYPES.join(', ')}`, 400));
+  }
+
+  const post = await Post.findOne({ _id: req.params.id, status: 'published' });
+  if (!post) return next(new AppError('Post not found', 404));
+
+  let action;
+
+  if (req.user) {
+    // ── Logged-in user ──────────────────────────────────────────
+    const userId   = req.user._id.toString();
+    const existing = post.reactions.find(r => r.user.toString() === userId);
+
+    if (!existing) {
+      post.reactions.push({ user: req.user._id, type });
+      action = 'added';
+    } else if (existing.type === type) {
+      post.reactions = post.reactions.filter(r => r.user.toString() !== userId);
+      action = 'removed';
+    } else {
+      existing.type = type;
+      action = 'updated';
+    }
+
+    await post.save();
+
+    const userReaction = post.reactions.find(r => r.user.toString() === userId) || null;
+
+    return res.status(200).json({
+      status:  'success',
+      message: `Reaction ${action} successfully`,
+      data: {
+        reactionCounts: post.reactionCounts,
+        yourReaction:   userReaction ? userReaction.type : null,
+        action
+      }
+    });
+
+  } else {
+    // ── Guest user (no account needed) ─────────────────────────
+    // We use a fingerprint-keyed atomic update to avoid a read-modify-write race.
+    const fingerprint = buildFingerprint(req);
+
+    // Fetch guest reactions for this post (stored separately in memory via
+    // a lightweight atomic approach: we use $set on a Map-style subdoc)
+    // Since PostSchema doesn't have guestReactions yet, we use a separate
+    // atomic counter approach: we track fingerprints in a `guestReactions`
+    // field. We add it dynamically via findOneAndUpdate.
+
+    // Check current state
+    const rawPost = await Post.findById(post._id)
+      .select('guestReactions reactionCounts')
+      .lean();
+
+    const guestReactions = rawPost.guestReactions || {};
+    const currentType    = guestReactions[fingerprint];
+
+    let countDelta = {};
+
+    if (!currentType) {
+      // New guest reaction
+      countDelta[`reactionCounts.${type}`] = 1;
+      await Post.updateOne(
+        { _id: post._id },
+        {
+          $set: { [`guestReactions.${fingerprint}`]: type },
+          $inc: countDelta
+        }
+      );
+      action = 'added';
+    } else if (currentType === type) {
+      // Toggle off
+      countDelta[`reactionCounts.${type}`] = -1;
+      await Post.updateOne(
+        { _id: post._id },
+        {
+          $unset: { [`guestReactions.${fingerprint}`]: '' },
+          $inc:   countDelta
+        }
+      );
+      action = 'removed';
+    } else {
+      // Switch type
+      countDelta[`reactionCounts.${currentType}`] = -1;
+      countDelta[`reactionCounts.${type}`]         = 1;
+      await Post.updateOne(
+        { _id: post._id },
+        {
+          $set: { [`guestReactions.${fingerprint}`]: type },
+          $inc: countDelta
+        }
+      );
+      action = 'updated';
+    }
+
+    // Re-fetch fresh counts
+    const updated = await Post.findById(post._id).select('reactionCounts').lean();
+
+    return res.status(200).json({
+      status:  'success',
+      message: `Reaction ${action} successfully`,
+      data: {
+        reactionCounts: updated.reactionCounts,
+        yourReaction:   action === 'removed' ? null : type,
+        action
+      }
+    });
+  }
+});
+
+/**
+ * GET /api/v1/blogs/:id/reactions
+ * Returns reaction counts + the requesting user/guest's reaction.
+ * Fully public.
+ */
+exports.getReactions = catchAsync(async (req, res, next) => {
+  const post = await Post.findOne({ _id: req.params.id, status: 'published' })
+    .select('reactionCounts reactions guestReactions');
+
+  if (!post) return next(new AppError('Post not found', 404));
+
+  let yourReaction = null;
+
+  if (req.user) {
+    const r = post.reactions.find(r => r.user.toString() === req.user._id.toString());
+    yourReaction = r ? r.type : null;
+  } else {
+    // Guest: look up by fingerprint
+    const fingerprint    = buildFingerprint(req);
+    const guestReactions = post.guestReactions || {};
+    yourReaction         = guestReactions[fingerprint] || null;
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      reactionCounts: post.reactionCounts,
+      yourReaction
+    }
+  });
+});

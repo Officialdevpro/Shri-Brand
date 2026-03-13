@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="./css/product.css" />
   <link rel="stylesheet" href="./css/message.css" />
   <link rel="stylesheet" href="./css/user.css" />
+  <link rel="stylesheet" href="./css/blog.css" />
   <style>
     /* ── Pack Manager (uses product.css variables) ──────────── */
     .pack-row {
@@ -1565,14 +1566,47 @@
           <div class="page-top">
             <div>
               <div class="page-eyebrow">Shri Brand Admin</div>
-              <h1 class="page-title">Blog & Content</h1>
+              <h1 class="page-title">Blog &amp; Content</h1>
               <p class="page-subtitle">Share your stories and insights with the world</p>
             </div>
+            <div class="page-top-right">
+              <button class="blog-new-btn" onclick="blogOpenEditor()">
+                <i class="fa-solid fa-plus"></i> New Blog
+              </button>
+              <div class="blog-count-pill">
+                <span class="blog-count-pill-num" id="blogTotalCount">&mdash;</span>
+                <span class="blog-count-pill-label">Total<br>Blogs</span>
+              </div>
+              <div class="blog-count-pill">
+                <span class="blog-count-pill-num" id="blogFutureCount">&mdash;</span>
+                <span class="blog-count-pill-label">Future<br>Blogs</span>
+              </div>
+            </div>
           </div>
-          <div class="empty-state">
-            <div class="empty-icon"><i class="fas fa-pen-nib"></i></div>
-            <h3>Blog Page Placeholder</h3>
-            <p>This section is currently under development.</p>
+
+          <div class="blog-toolbar">
+            <div class="blog-search-wrap">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="blogSearchInput" placeholder="Search by title, author, tag, category…" oninput="blogHandleSearch(this)"/>
+              <button class="blog-search-clear" id="blogSearchClear" onclick="blogClearSearch()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <select class="blog-filter-sel" id="blogSortSel" onchange="blogSortCards(this.value)">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="title">Title A–Z</option>
+              <option value="words">Most Words</option>
+            </select>
+          </div>
+
+          <div class="blog-grid" id="blogGrid">
+            <div class="blog-loading-wrap">
+              <div class="blog-loading-orn">
+                <div class="blog-loading-orn-dot"></div>
+                <div class="blog-loading-orn-dot"></div>
+                <div class="blog-loading-orn-dot"></div>
+              </div>
+              <p style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-faint,#aa9988)">Awaiting navigation…</p>
+            </div>
           </div>
         </div>
       </div>
@@ -1584,6 +1618,7 @@
   <script src="./js/product.js"></script>
   <script src="./js/message.js"></script>
   <script src="./js/user.js"></script>
+  <script src="./js/blog.js"></script>
 
   <!-- ═════════ MESSAGES: Detail Modal ═════════ -->
   <div class="msg-modal-backdrop" id="msgModalOverlay">
@@ -1798,6 +1833,81 @@
 
   <!-- ═════════ USERS: Toast ═════════ -->
   <div id="userToastWrap"></div>
+
+  <!-- ═════════ BLOG: Notification ═════════ -->
+  <div id="blogNotif" class="blog-notif" role="alert">
+    <i id="blogNotifIcon" class="fa-solid fa-circle-info"></i>
+    <span id="blogNotifMsg"></span>
+  </div>
+
+  <!-- ═════════ BLOG: Delete Post Modal ═════════ -->
+  <div class="blog-modal-back" id="blogModalBack">
+    <div class="blog-modal">
+      <div class="blog-modal-body">
+        <div class="blog-modal-ico"><i class="fa-solid fa-trash-can"></i></div>
+        <h3>Delete Post?</h3>
+        <p id="blogModalMsg">This post will be permanently deleted.</p>
+      </div>
+      <div class="blog-modal-foot">
+        <button class="blog-modal-cancel" onclick="blogCloseModal()">Cancel</button>
+        <button class="blog-modal-del" id="blogModalDelBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════ BLOG: Comment Drawer ═════════ -->
+  <div class="cm-overlay" id="cmOverlay">
+    <div class="cm-panel">
+      <div class="cm-header">
+        <div class="cm-header-top">
+          <div>
+            <div class="cm-blog-cat" id="cmBlogCat">General</div>
+            <div class="cm-blog-title" id="cmBlogTitle">—</div>
+          </div>
+          <button class="cm-close" onclick="blogCloseComments()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="cm-stats">
+          <div class="cm-stat">
+            <div class="cm-stat-num" id="cmCmtCount">0</div>
+            <div class="cm-stat-lbl"><i class="fa-regular fa-comment-dots"></i> Comments</div>
+          </div>
+          <div class="cm-stat">
+            <div class="cm-stat-num" id="cmLikes">0</div>
+            <div class="cm-stat-lbl"><i class="fa-regular fa-heart"></i> Likes</div>
+          </div>
+          <div class="cm-stat">
+            <div class="cm-stat-num" id="cmViews">0</div>
+            <div class="cm-stat-lbl"><i class="fa-regular fa-eye"></i> Views</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cm-tabs">
+        <button class="cm-tab active" onclick="blogSetFilter('all',this)">All</button>
+        <button class="cm-tab" onclick="blogSetFilter('visible',this)">Visible</button>
+        <button class="cm-tab" onclick="blogSetFilter('hidden',this)">Hidden</button>
+        <button class="cm-tab" onclick="blogSetFilter('replied',this)">Replied</button>
+      </div>
+
+      <div class="cm-compose">
+        <div class="cm-compose-label"><i class="fa-solid fa-shield-halved"></i> Post as Admin</div>
+        <div class="cm-compose-row">
+          <textarea class="cm-compose-input" id="cmComposeInput" placeholder="Write a comment…"
+            oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+          <button class="cm-send-btn" onclick="blogPostAdminComment()">
+            <i class="fa-solid fa-paper-plane" style="font-size:11px"></i> Post
+          </button>
+        </div>
+      </div>
+
+      <div class="cm-list" id="cmList"></div>
+    </div>
+  </div>
+
+  <!-- ═════════ BLOG: Editor Modal (iframe) ═════════ -->
+  <div class="blog-editor-overlay" id="blogEditorOverlay">
+    <iframe class="blog-editor-iframe" id="blogEditorIframe"></iframe>
+  </div>
 
   <script>
     const navItems = document.querySelectorAll(".nav-item[data-page]");

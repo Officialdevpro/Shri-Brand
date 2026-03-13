@@ -176,6 +176,18 @@ document.addEventListener("DOMContentLoaded", () => {
       text: "Skilled artisans hand-roll each 9-inch stick. The final agarbathi retains temple purity and gives 45 minutes of continuous divine fragrance.",
       design:"../assets/images/Florals/5.png"
     },
+    {
+      number: "05",
+      title: "Rolled into 'Shri' Agarbathi",
+      text: "Skilled artisans hand-roll each 9-inch stick. The final agarbathi retains temple purity and gives 45 minutes of continuous divine fragrance.",
+      design:"../assets/images/Florals/7.png"
+    },
+    {
+      number: "06",
+      title: "Rolled into 'Shri' Agarbathi",
+      text: "Skilled artisans hand-roll each 9-inch stick. The final agarbathi retains temple purity and gives 45 minutes of continuous divine fragrance.",
+      design:"../assets/images/Florals/8.png"
+    },
   ];
 
   const summaryText =

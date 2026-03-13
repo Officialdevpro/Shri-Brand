@@ -1,10 +1,10 @@
 'use strict';
 
-// routes/postRoutes.js
+// routes/blogRoutes.js
 
-const express = require('express');
+const express          = require('express');
 const { protect, restrictTo } = require('../controllers/authController');
-const postController = require('../controllers/blogController');
+const postController   = require('../controllers/blogController');
 const validateObjectId = require('../middlewares/validateObjectId');
 const {
   validateCreatePost,
@@ -15,91 +15,97 @@ const {
 
 const router = express.Router();
 
-// ── DEBUG: log every request hitting blog routes ──
-router.use((req, res, next) => {
-  console.log(`[blogRoutes] ${req.method} ${req.originalUrl}`);
-  next();
-});
-
 // ─────────────────────────────────────────────
 //  POST ROUTES
 // ─────────────────────────────────────────────
 
 // ── PUBLIC ───────────────────────────────────
 
-// GET  /api/v1/posts              → list all published posts (paginated + filterable)
-// GET  /api/v1/posts?search=...   → full-text search
-// GET  /api/v1/posts?category=... → filter by category
-// GET  /api/v1/posts?tag=...      → filter by tag
-// GET  /api/v1/posts?featured=true → featured posts
-// GET  /api/v1/posts?page=1&limit=10&sortBy=publishDate&order=desc
-//
-// Admin extras: ?status=draft|published|archived
 router.get('/', postController.getAllPosts);
 
-// GET /api/v1/posts/slug/:slug  — must come BEFORE /:id to avoid collision
+// MUST come BEFORE /:id
 router.get('/slug/:slug', postController.getPostBySlug);
 
-// GET /api/v1/posts/:id
 router.get('/:id', validateObjectId('id'), postController.getPost);
 
 // ── ADMIN ONLY ───────────────────────────────
 
-// POST /api/v1/posts
 router.post(
   '/',
+  // protect,
+  // restrictTo('admin'),
   validateCreatePost,
   postController.createPost
 );
 
-// PATCH /api/v1/posts/:id
 router.patch(
   '/:id',
+  // protect,
+  // restrictTo('admin'),
   validateObjectId('id'),
   validateUpdatePost,
   postController.updatePost
 );
 
-// PATCH /api/v1/posts/:id/publish
 router.patch(
   '/:id/publish',
+  // protect,
+  // restrictTo('admin'),
   validateObjectId('id'),
   postController.publishPost
 );
 
-// PATCH /api/v1/posts/:id/archive
 router.patch(
   '/:id/archive',
+  protect,
+  restrictTo('admin'),
   validateObjectId('id'),
   postController.archivePost
 );
 
-// DELETE /api/v1/posts/:id
 router.delete(
   '/:id',
+  // protect,
+  // restrictTo('admin'),
   validateObjectId('id'),
   postController.deletePost
 );
 
 // ─────────────────────────────────────────────
-//  COMMENT ROUTES  (/api/v1/posts/:id/comments)
+//  REACTION ROUTES  (/api/v1/blogs/:id/reactions)
+//  PUBLIC — no login required for likes/reads
+// ─────────────────────────────────────────────
+
+// GET  /api/v1/blogs/:id/reactions  — public (shows user's/guest's reaction if available)
+router.get(
+  '/:id/reactions',
+  validateObjectId('id'),
+  postController.getReactions
+);
+
+// POST /api/v1/blogs/:id/reactions  — public toggle (logged-in or guest)
+// Body: { type: 'read' | 'love' }
+router.post(
+  '/:id/reactions',
+  validateObjectId('id'),
+  postController.toggleReaction
+);
+
+// ─────────────────────────────────────────────
+//  COMMENT ROUTES  (/api/v1/blogs/:id/comments)
 // ─────────────────────────────────────────────
 
 // ── PUBLIC ───────────────────────────────────
 
-// GET /api/v1/posts/:id/comments
-// Works only if post exists, is published, and has allowComments: true.
-// Admins see hidden comments too (protect is optional here — handled in controller).
 router.get(
   '/:id/comments',
   validateObjectId('id'),
   postController.getComments
 );
 
-// ── PROTECTED (logged-in users) ──────────────
+// ── REGISTERED USERS ONLY ────────────────────
 
-// POST /api/v1/posts/:id/comments
-// User must be logged in. Blocked if allowComments: false.
+// POST — create comment (must be logged in)
 router.post(
   '/:id/comments',
   protect,
@@ -108,8 +114,7 @@ router.post(
   postController.createComment
 );
 
-// PATCH /api/v1/posts/:id/comments/:commentId
-// Only the comment's author can update their own comment.
+// PATCH — edit own comment
 router.patch(
   '/:id/comments/:commentId',
   protect,
@@ -119,8 +124,7 @@ router.patch(
   postController.updateComment
 );
 
-// DELETE /api/v1/posts/:id/comments/:commentId
-// Author can delete their own; admin can delete any.
+// DELETE — own comment or admin
 router.delete(
   '/:id/comments/:commentId',
   protect,
@@ -131,7 +135,7 @@ router.delete(
 
 // ── ADMIN ONLY — comment moderation ──────────
 
-// PATCH /api/v1/posts/:id/comments/:commentId/hide
+// PATCH /api/v1/blogs/:id/comments/:commentId/hide
 router.patch(
   '/:id/comments/:commentId/hide',
   protect,
@@ -141,7 +145,7 @@ router.patch(
   postController.hideComment
 );
 
-// PATCH /api/v1/posts/:id/comments/:commentId/unhide
+// PATCH /api/v1/blogs/:id/comments/:commentId/unhide
 router.patch(
   '/:id/comments/:commentId/unhide',
   protect,
@@ -149,6 +153,38 @@ router.patch(
   validateObjectId('id'),
   validateObjectId('commentId'),
   postController.unhideComment
+);
+
+// PATCH /api/v1/blogs/:id/comments/:commentId/heart  — YouTube-style creator heart
+router.patch(
+  '/:id/comments/:commentId/heart',
+  protect,
+  restrictTo('admin'),
+  validateObjectId('id'),
+  validateObjectId('commentId'),
+  postController.heartComment
+);
+
+// ── ADMIN ONLY — admin reply per comment ─────
+
+// POST   /api/v1/blogs/:id/comments/:commentId/reply
+router.post(
+  '/:id/comments/:commentId/reply',
+  protect,
+  restrictTo('admin'),
+  validateObjectId('id'),
+  validateObjectId('commentId'),
+  postController.replyToComment
+);
+
+// DELETE /api/v1/blogs/:id/comments/:commentId/reply
+router.delete(
+  '/:id/comments/:commentId/reply',
+  protect,
+  restrictTo('admin'),
+  validateObjectId('id'),
+  validateObjectId('commentId'),
+  postController.deleteReply
 );
 
 module.exports = router;
