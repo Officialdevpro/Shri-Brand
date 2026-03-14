@@ -469,9 +469,11 @@
     padding: 20px;
   }
 
-  .story-section {
-    padding: 10px;
+  .story-container {
+    padding: 0px 20px;
   }
+
+ 
 
   .story-section h2 {
     font-size: 1.8rem;

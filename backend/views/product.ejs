@@ -16,6 +16,9 @@
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+   <link rel="stylesheet" href="/css/mediaquery.css" />
+   <link rel="stylesheet" href="/css/products.css" />
 
   <style>
     * {
@@ -38,6 +41,14 @@
       --whatsapp-green: #25d366;
       --whatsapp-dark: #128c7e;
     }
+    .site-header .container{
+      padding: 0px 16px;
+      max-width:1200px;
+    margin: 0 auto;
+    }
+    #desktop-nav,#desktop-nav .nav-link {
+      visibility: hidden;
+    }
 
     body {
       font-family: "Poppins", -apple-system, BlinkMacSystemFont, sans-serif;
@@ -51,6 +62,209 @@
       max-width: 1400px;
       margin: 0 auto;
       padding: 40px 20px;
+    }
+    #card {
+      width: 35%;
+      height: calc(100vh - 60px);
+      /* ✅ IMPORTANT */
+      background-color: #ffffff;
+      position: fixed;
+      top: 60px;
+      right: 0;
+      z-index: 20;
+
+      display: flex;
+      flex-direction: column;
+
+      overflow-y: auto;
+      /* ✅ use auto, not scroll */
+      transform: translateX(100%);
+      transition: transform 0.5s ease-in-out;
+    }
+
+    /* Mobile: Cart takes 100% width */
+    @media (max-width: 767px) {
+      #card {
+        width: 100%;
+        top: 50px;
+        height: calc(100vh - 50px);
+      }
+    }
+
+    /* When active */
+    #card.active {
+      transform: translateX(0);
+    }
+
+    /* Prevent page scroll when card is open */
+    body.no-scroll {
+      overflow: hidden;
+    }
+
+    /* Cart Backdrop Overlay */
+    .cart-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+      z-index: 15;
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+    }
+
+    .cart-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* ── Cart item: nested structure (.product-details > .selecteditems) ── */
+    .product-details {
+      text-align: center;
+      font-size: 16px;
+      width: 100% !important;
+    }
+
+    .product-details .selecteditems {
+      display: flex;
+      justify-content: start;
+      align-items: center;
+      text-align: left;
+      padding: 10px 10px;
+      border-bottom: 1px solid #818181;
+      width: 100%;
+    }
+
+    .product-details .selecteditems .card-img img {
+      width: 120px;
+      height: 120px;
+      -o-object-fit: cover;
+      object-fit: cover;
+      -o-object-position: center;
+      object-position: center;
+      border-radius: 10%;
+    }
+
+    .product-details .selecteditems .product-d {
+      margin-left: 10px;
+    }
+
+    .product-details .selecteditems .product-d p,
+    .product-details .selecteditems .product-d span {
+      font-size: 12px !important;
+      color: #666666;
+    }
+
+    .product-details .selecteditems .product-d .btns {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      border: none;
+      border-radius: 3px;
+    }
+
+    /* ── Cart item: flat structure (.selecteditems.product-details on same div) ── */
+    .selecteditems.product-details {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      text-align: left;
+      padding: 10px 10px;
+      border-bottom: 1px solid #818181;
+      width: 100%;
+    }
+
+    .selecteditems.product-details .card-img img {
+      width: 120px !important;
+      height: 120px !important;
+      -o-object-fit: cover;
+      object-fit: cover;
+      -o-object-position: center;
+      object-position: center;
+      border-radius: 10% !important;
+    }
+
+    .selecteditems.product-details .product-d {
+      margin-left: 10px;
+      flex: 1;
+    }
+
+    .selecteditems.product-details .product-d h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 4px 0;
+    }
+
+    .selecteditems.product-details .product-d p,
+    .selecteditems.product-details .product-d span {
+      font-size: 12px !important;
+      color: #666666;
+    }
+
+    .selecteditems.product-details .product-d .btns {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      border: none;
+      border-radius: 3px;
+    }
+
+    .btns {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    /* Quantity box */
+    .qty-control {
+      display: flex;
+      align-items: center;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    /* + and - buttons */
+    .qty-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: #f5f5f5;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .qty-btn:hover {
+      background: #ddd;
+    }
+
+    /* Quantity number */
+    .qty-value {
+      width: 40px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      background: #fff;
+    }
+
+    /* Remove button */
+    .remove {
+      background: #ffb703;
+      border: none;
+      padding: 9px 30px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
     }
 
     /* ── LAYOUT ── */
@@ -659,9 +873,7 @@
     }
 
     @media (max-width: 768px) {
-      .container {
-        padding: 20px 16px;
-      }
+      
       .product-section {
         grid-template-columns: 1fr;
         gap: 32px;
@@ -724,6 +936,72 @@
 </head>
 
 <body>
+  <div class="cart-backdrop" id="cart-backdrop" onclick="toggleCard()"></div>
+
+    <div id="card">
+      <!-- Cart Header -->
+      <div class="cart-header">
+        <div class="cart-header-left" onclick="toggleCard()">
+          <i class="fas fa-arrow-left"></i>
+          <h3>Your Cart</h3>
+        </div>
+        <span id="cart-item-count">0 items</span>
+      </div>
+
+      <!-- Cart Items Container - Dynamically populated -->
+      <div id="cart-items-container">
+        <!-- Cart items will be loaded dynamically via JavaScript -->
+        <div class="empty-cart-message" id="empty-cart-msg">
+          <i class="fas fa-shopping-cart" style="font-size: 48px; color: #ccc; margin-bottom: 10px"></i>
+          <p>Your cart is empty</p>
+          <small>Add products to see them here</small>
+        </div>
+      </div>
+
+      <!-- Cart Summary -->
+      <div class="cart-summary" id="cart-summary">
+        <div class="summary-row total">
+          <span>Total:</span>
+          <span id="cart-total">₹0</span>
+        </div>
+        <button class="checkout-btn" id="checkout-btn">
+          Proceed to Checkout
+        </button>
+      </div>
+    </div>
+  <header class="site-header" role="banner">
+    <nav class="container" aria-label="Main navigation">
+      <div class="nav-row">
+        <div class="logo-wrap">
+          <img id="site-logo" class="logo" src="/assets/images/logo/Logo.png" alt="Shri Brand" />
+          <!-- <h2 style="color: #7f0403; margin-left: .5rem;">Shri Brand</h2> -->
+        </div>
+
+       
+
+        <!-- Right side icons group (Profile, Cart, Hamburger) -->
+        <div class="nav-right-group">
+          <div class="user-info">
+            <!-- <a class="user-btn profile-btn" href="/profile" role="menuitem" title="Profile">
+              <i class="fas fa-user"></i>
+              <span>Profile</span>
+            </a> -->
+            <a class="user-btn cart-btn" role="menuitem" onclick="toggleCard()">
+              <i class="fas fa-shopping-cart"></i>
+              <span class="cart-count" id="nav-cart-count">0</span>
+            </a>
+          </div>
+
+          
+        </div>
+      </div>
+
+      <!-- Mobile Overlay -->
+      <div class="mobile-overlay" id="mobile-overlay"></div>
+
+     
+    </nav>
+  </header>
 
   <% if (!product) { %>
     <div class="container" style="text-align:center; padding:100px 20px;">
@@ -1327,6 +1605,22 @@
     })(); // ✅ IIFE closes correctly
   </script>
   <% } %>
+  <script src="/js/product.js"></script>
+  <script>
+     function toggleCard() {
+      const card = document.getElementById("card");
+      const backdrop = document.getElementById("cart-backdrop");
+      const menuCheckbox = document.getElementById("menu-toggle");
 
+      // Close mobile menu if open (uncheck the checkbox)
+      if (menuCheckbox && menuCheckbox.checked) {
+        menuCheckbox.checked = false;
+      }
+
+      document.body.classList.toggle("no-scroll");
+      card.classList.toggle("active");
+      backdrop.classList.toggle("active");
+    }
+  </script>
 </body>
 </html>

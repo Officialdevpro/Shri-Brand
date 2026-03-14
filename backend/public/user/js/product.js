@@ -4,6 +4,8 @@
  * API Base: /api/v1/cart  (protected by JWT cookie via authController.protect)
  */
 
+console.log(document.getElementsByClassName(".cart-btn"))
+
 const CART_API = "/api/v1/cart";
 
 // ─────────────────────────────────────────────────────────────────────────────

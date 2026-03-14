@@ -11,6 +11,7 @@
 
 /* Scoped Container */
 .ourstory-container {
+    
     max-width: 1400px;
     margin: 0 auto;
     background: white;
@@ -19,6 +20,7 @@
     position: relative;
     /* Ensure z-index works */
     z-index: 10;
+    margin-top: 30px;
 }
 
 /* Header */
@@ -555,9 +557,9 @@
 }
 
 @media (max-width: 768px) {
-    .ourstory-header {
-        padding: 40px 20px;
-    }
+     .ourstory-header {
+    padding: 20px 12px;
+  }
 
     .tab-navigation {
         justify-content: flex-start;
