@@ -612,28 +612,33 @@ document.querySelectorAll("[data-erp-sort]").forEach((th) => {
   erpCreateSortIndicator(th);
 });
 
-
 async function loadOrderHistory() {
   try {
-    erpTbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;">Loading orders...</td></tr>';
+    erpTbody.innerHTML =
+      '<tr><td colspan="6" style="text-align:center;padding:20px;">Loading orders...</td></tr>';
     erpEmptyState.style.display = "none";
 
-   const response = await fetch("http://localhost:5000/api/v1/orders?limit=1000");
+    const response = await fetch(
+      "https://shri-brand.onrender.com/api/v1/orders?limit=1000",
+    );
     const result = await response.json();
 
     if (result.status === "success") {
       const dbOrders = result.data.orders;
-      erpSampleData = dbOrders.map(order => {
+      erpSampleData = dbOrders.map((order) => {
         return {
           id: order._id,
           orderNumber: order.orderNumber,
-          n: order.userId?.name || order.shippingAddress?.fullName || 'Unknown User',
-          email: order.userId?.email || order.shippingAddress?.email || 'N/A',
+          n:
+            order.userId?.name ||
+            order.shippingAddress?.fullName ||
+            "Unknown User",
+          email: order.userId?.email || order.shippingAddress?.email || "N/A",
           i: String(order.items?.length || 0),
           t: order.pricing?.total || 0,
-          p: order.payment?.method === 'razorpay' ? 'upi' : 'cash',
+          p: order.payment?.method === "razorpay" ? "upi" : "cash",
           d: order.createdAt,
-          timestamp: new Date(order.createdAt).getTime()
+          timestamp: new Date(order.createdAt).getTime(),
         };
       });
 

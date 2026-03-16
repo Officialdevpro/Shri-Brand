@@ -25,6 +25,7 @@ const cloudinary = require('../config/cloudinary');   // adjust path if needed
 const AppError   = require('../utils/AppError');       // adjust path if needed
 
 const router = express.Router();
+const { protect, restrictTo } = require('../controllers/authController');
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -201,6 +202,8 @@ function makeUploadHandler(folder) {
  */
 router.post(
   '/cover',
+  protect,
+  restrictTo('admin'),
   upload.single('image'),
   handleMulterError,
   makeUploadHandler('shri-brand/blog/cover')
@@ -213,6 +216,8 @@ router.post(
  */
 router.post(
   '/content',
+  protect,
+  restrictTo('admin'),
   upload.single('image'),
   handleMulterError,
   makeUploadHandler('shri-brand/blog/content')

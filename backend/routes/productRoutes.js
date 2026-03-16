@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const authController = require("../controllers/authController");
 const validateObjectId = require("../middlewares/validateObjectId");
 const {
   uploadProductImages,
@@ -31,7 +32,7 @@ router.get("/", getAllProducts);
 router.get("/:identifier", getProduct);
 
 // ===== Protected/Admin Routes =====
-// TODO: Add authentication middleware later
+router.use(authController.protect, authController.restrictTo("admin"));
 
 // Create new product with image upload
 router.post("/", uploadProductImages, handleMulterError, createProduct);

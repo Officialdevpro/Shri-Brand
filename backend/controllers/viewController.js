@@ -1,9 +1,34 @@
+const jwt = require("jsonwebtoken");
+const { promisify } = require("util");
 const Product = require("../models/productModel");
 const Category = require("../models/categoryModel");
+const Order = require("../models/orderModel");
+const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 
 // Render Home Page with SSR products grouped by dynamic categories
 exports.renderHomePage = catchAsync(async (req, res, next) => {
+    // ── Admin check: if logged-in user is admin, render admin dashboard ──
+    if (req.cookies.jwt && req.cookies.jwt !== "loggedout") {
+        try {
+            const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+            const user = await User.findById(decoded.id);
+            if (user && user.role === "admin" && !user.isPasswordChangedAfter(decoded.iat)) {
+                const pendingOrders = await Order.countDocuments({ orderStatus: "placed" });
+                const nameParts = (user.name || "").trim().split(/\s+/);
+                const firstName = nameParts[0] || "";
+                const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+                return res.status(200).render("admin/index", {
+                    user: { firstName, lastName, email: user.email, role: user.role },
+                    pendingOrders
+                });
+            }
+        } catch {
+            // Token invalid — fall through to normal home page
+        }
+    }
+
     // 1. Fetch ALL active products
     const products = await Product.find({ isActive: true })
         .sort("createdAt")

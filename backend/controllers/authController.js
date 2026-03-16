@@ -284,7 +284,40 @@ exports.login = catchAsync(async (req, res, next) => {
 
   logger.auth(`User logged in: ${email}`);
 
-  // 8) Send token response
+  // 8) If admin, set cookies and redirect to admin dashboard
+  if (user.role === "admin") {
+    const accessToken = signAccessToken(user._id);
+    const refreshToken = signRefreshToken(user._id);
+
+    await user.saveRefreshToken(refreshToken);
+
+    res.cookie("jwt", accessToken, {
+      expires: new Date(
+        Date.now() + (process.env.JWT_COOKIE_EXPIRES_IN || 1) * 24 * 60 * 60 * 1000
+      ),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict"
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      expires: new Date(
+        Date.now() + (process.env.JWT_REFRESH_COOKIE_EXPIRES_IN || 7) * 24 * 60 * 60 * 1000
+      ),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/api/v1/auth/refresh-token"
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Logged in successfully!",
+      redirect: "/"
+    });
+  }
+
+  // 9) Send token response for regular users
   await createSendToken(user, 200, res, "Logged in successfully!");
 });
 

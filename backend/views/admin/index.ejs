@@ -4,21 +4,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shri Brand — Admin</title>
+  <title>Shri Brand — Admin · <%= user.firstName %></title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="./css/order-history.css" />
-  <link rel="stylesheet" href="./css/recentOrder.css" />
-  <link rel="stylesheet" href="./css/index.css" />
-  <link rel="stylesheet" href="./css/product.css" />
-  <link rel="stylesheet" href="./css/message.css" />
-  <link rel="stylesheet" href="./css/user.css" />
-  <link rel="stylesheet" href="./css/blog.css" />
-  <link rel="stylesheet" href="./css/dashboard.css" />
-  <link rel="stylesheet" href="./css/inventory.css" />
+  <link rel="stylesheet" href="/admin/css/order-history.css" />
+  <link rel="stylesheet" href="/admin/css/recentOrder.css" />
+  <link rel="stylesheet" href="/admin/css/index.css" />
+  <link rel="stylesheet" href="/admin/css/product.css" />
+  <link rel="stylesheet" href="/admin/css/message.css" />
+  <link rel="stylesheet" href="/admin/css/user.css" />
+  <link rel="stylesheet" href="/admin/css/blog.css" />
+  <link rel="stylesheet" href="/admin/css/dashboard.css" />
+  <link rel="stylesheet" href="/admin/css/inventory.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     /* ── Pack Manager (uses product.css variables) ──────────── */
@@ -633,7 +633,7 @@
 
         <div class="h-divider"></div>
 
-        <div class="h-avatar" title="Admin">AD</div>
+        <div class="h-avatar" title="Admin"><%= user.firstName.charAt(0) %><%= user.lastName.charAt(0) %></div>
 
         <button class="hamburger" id="hamburger" aria-label="Toggle menu">
           <span></span><span></span><span></span>
@@ -710,7 +710,7 @@
             </svg>
           </div>
           Recent Orders
-          <span class="nav-badge">0</span>
+          <span class="nav-badge"><%= pendingOrders %></span>
         </button>
 
         <button class="nav-item" data-page="order-history">
@@ -739,7 +739,7 @@
             </svg>
           </div>
           Messages
-          <span class="nav-badge">0</span>
+          <span class="nav-badge"><%= pendingOrders %></span>
         </button>
 
         <button class="nav-item" data-page="blog">
@@ -2296,13 +2296,13 @@
       <div class="page" id="page-settings"></div>
     </main>
   </div>
-  <script src="./js/orderHistory.js"></script>
-  <script src="./js/product.js"></script>
-  <script src="./js/message.js"></script>
-  <script src="./js/user.js"></script>
-  <script src="./js/blog.js"></script>
-  <script src="./js/recentOrder.js"></script>
-  <script src="./js/inventory.js"></script>
+  <script src="/admin/js/orderHistory.js"></script>
+  <script src="/admin/js/product.js"></script>
+  <script src="/admin/js/message.js"></script>
+  <script src="/admin/js/user.js"></script>
+  <script src="/admin/js/blog.js"></script>
+  <script src="/admin/js/recentOrder.js"></script>
+  <script src="/admin/js/inventory.js"></script>
 
   <!-- ═════════ MESSAGES: Detail Modal ═════════ -->
   <div class="msg-modal-backdrop" id="msgModalOverlay">
@@ -2593,7 +2593,7 @@
     <iframe class="blog-editor-iframe" id="blogEditorIframe"></iframe>
   </div>
 
-  <script src="./js/dashboard.js"></script>
+  <script src="/admin/js/dashboard.js"></script>
   <script>
     const navItems = document.querySelectorAll(".nav-item[data-page]");
     const pages = document.querySelectorAll(".page");

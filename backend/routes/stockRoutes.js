@@ -6,8 +6,8 @@ const productionController = require("../controllers/stockController");
 const validateObjectId     = require("../middlewares/validateObjectId");
 
 // ── All production routes require a valid session + admin role ─────────────────
-// router.use(authController.protect);
-// router.use(authController.restrictTo("admin"));
+router.use(authController.protect);
+router.use(authController.restrictTo("admin"));
 
 // ══════════════════════════════════════════════════════════════════════════════
 //  INVENTORY

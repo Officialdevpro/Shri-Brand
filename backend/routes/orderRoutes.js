@@ -14,26 +14,26 @@ router.get("/:orderId",           authController.protect, orderController.getOrd
 
 // ── Admin routes ───────────────────────────────────────────────
 router.get("/",
-  // authController.protect,
-  // authController.restrictTo("admin"),
+  authController.protect,
+  authController.restrictTo("admin"),
   orderController.getAllOrders
 );
 
 router.patch("/:orderId/status",
-  // authController.protect,
-  // authController.restrictTo("admin"),
+  authController.protect,
+  authController.restrictTo("admin"),
   orderController.updateOrderStatus
 );
 
 router.patch("/:orderId/payment-status",
-  // authController.protect,
-  // authController.restrictTo("admin"),
+  authController.protect,
+  authController.restrictTo("admin"),
   orderController.updatePaymentStatus
 );
 
 router.delete("/:orderId",
-  // authController.protect,
-  // authController.restrictTo("admin"),
+  authController.protect,
+  authController.restrictTo("admin"),
   orderController.deleteOrder
 );
 

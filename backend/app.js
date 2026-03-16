@@ -53,6 +53,7 @@ app.use(hpp({ whitelist: ["price", "rating", "category"] }));
 app.use(compression());
 
 app.use(express.static(path.join(__dirname, "public/user")));
+app.use("/admin", express.static(path.join(__dirname, "public/admin")));
 
 app.use("/api", apiLimiter);
 

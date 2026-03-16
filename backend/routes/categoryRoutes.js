@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const authController = require("../controllers/authController");
 const {
     getAllCategories,
     createCategory,
@@ -11,7 +12,7 @@ const {
 router.get("/", getAllCategories);
 
 // ===== Protected/Admin Routes =====
-// TODO: Add authentication middleware later (matching product routes pattern)
+router.use(authController.protect, authController.restrictTo("admin"));
 router.post("/", createCategory);
 router.patch("/:id", updateCategory);
 router.delete("/:id", deleteCategory);

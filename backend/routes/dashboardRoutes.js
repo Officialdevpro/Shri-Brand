@@ -5,8 +5,7 @@ const express = require("express");
 const path    = require("path");
 const router  = express.Router();
 
-// TODO: swap with your real auth middleware once ready
-// const { protect, restrictTo } = require("../middlewares/authMiddleware");
+const { protect, restrictTo } = require("../controllers/authController");
 
 const {
   getRevenueDashboard,
@@ -15,9 +14,9 @@ const {
   getAllDashboard,
 } = require("../controllers/dashboardController");
 
-// ── Protect all dashboard routes (uncomment when auth is wired up) ───────────
-// router.use(protect);
-// router.use(restrictTo("admin"));
+// ── Protect all dashboard routes ─────────────────────────────────────────────
+router.use(protect);
+router.use(restrictTo("admin"));
 
 // ── Serve the dashboard HTML ─────────────────────────────────────────────────
 // Visit: GET /api/dashboard  →  serves dashboard.html

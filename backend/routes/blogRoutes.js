@@ -32,16 +32,16 @@ router.get('/:id', validateObjectId('id'), postController.getPost);
 
 router.post(
   '/',
-  // protect,
-  // restrictTo('admin'),
+  protect,
+  restrictTo('admin'),
   validateCreatePost,
   postController.createPost
 );
 
 router.patch(
   '/:id',
-  // protect,
-  // restrictTo('admin'),
+  protect,
+  restrictTo('admin'),
   validateObjectId('id'),
   validateUpdatePost,
   postController.updatePost
@@ -49,8 +49,8 @@ router.patch(
 
 router.patch(
   '/:id/publish',
-  // protect,
-  // restrictTo('admin'),
+  protect,
+  restrictTo('admin'),
   validateObjectId('id'),
   postController.publishPost
 );
@@ -65,8 +65,8 @@ router.patch(
 
 router.delete(
   '/:id',
-  // protect,
-  // restrictTo('admin'),
+  protect,
+  restrictTo('admin'),
   validateObjectId('id'),
   postController.deletePost
 );

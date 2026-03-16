@@ -9,25 +9,29 @@
 
   /* ── STATE ── */
   const RO = {
-    orders        : [],
-    filtered      : [],
-    currentPage   : 1,
-    PER           : 10,
-    viewingId     : null,
-    deleteTarget  : null,
-    activeStatusTab : "",
-    activeDrawerTab : "items",
+    orders: [],
+    filtered: [],
+    currentPage: 1,
+    PER: 10,
+    viewingId: null,
+    deleteTarget: null,
+    activeStatusTab: "",
+    activeDrawerTab: "items",
   };
 
   /* ── API HELPERS ── */
   async function roApiFetch(url, options = {}) {
     const res = await fetch(url, {
-      credentials : "include",
-      headers     : { "Content-Type": "application/json", ...(options.headers || {}) },
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
       ...options,
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || `Request failed (${res.status})`);
+    if (!res.ok)
+      throw new Error(data.message || `Request failed (${res.status})`);
     return data;
   }
 
@@ -35,9 +39,13 @@
   window.loadRecentOrders = async function () {
     roShowLoadingState(true);
     try {
-      let allOrders = [], page = 1, pages = 1;
+      let allOrders = [],
+        page = 1,
+        pages = 1;
       do {
-        const data = await roApiFetch(`http://localhost:5000/api/v1/orders?page=${page}&limit=100`);
+        const data = await roApiFetch(
+          `https://shri-brand.onrender.com/api/v1/orders?page=${page}&limit=100`,
+        );
         allOrders = allOrders.concat(data.data.orders);
         pages = data.pages || 1;
         page++;
@@ -76,33 +84,89 @@
   }
 
   /* ── HELPERS ── */
-  const roFmtDate = d => new Date(d).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" });
-  const roFmtTime = d => new Date(d).toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit" });
-  const roFmtCur  = n => "₹" + Number(n).toLocaleString("en-IN");
-  const roInitials= n => n.split(" ").map(p => p[0]).join("").slice(0, 2).toUpperCase();
+  const roFmtDate = (d) =>
+    new Date(d).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  const roFmtTime = (d) =>
+    new Date(d).toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  const roFmtCur = (n) => "₹" + Number(n).toLocaleString("en-IN");
+  const roInitials = (n) =>
+    n
+      .split(" ")
+      .map((p) => p[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
 
-  const RO_OS_ICON = { placed:"fa-clock", processing:"fa-gear", shipped:"fa-truck", delivered:"fa-circle-check", cancelled:"fa-circle-xmark" };
-  const RO_PS_ICON = { paid:"fa-check",  pending:"fa-hourglass-half", failed:"fa-xmark", refunded:"fa-rotate-left" };
-  const RO_OS_CLS  = { placed:"ro-bs-placed", processing:"ro-bs-processing", shipped:"ro-bs-shipped", delivered:"ro-bs-delivered", cancelled:"ro-bs-cancelled" };
-  const RO_PS_CLS  = { paid:"ro-bp-paid", pending:"ro-bp-pending", failed:"ro-bp-failed", refunded:"ro-bp-refunded" };
-  const RO_STATUSES     = ["placed","processing","shipped","delivered","cancelled"];
-  const RO_PAY_STATUSES = ["pending","paid","failed","refunded"];
+  const RO_OS_ICON = {
+    placed: "fa-clock",
+    processing: "fa-gear",
+    shipped: "fa-truck",
+    delivered: "fa-circle-check",
+    cancelled: "fa-circle-xmark",
+  };
+  const RO_PS_ICON = {
+    paid: "fa-check",
+    pending: "fa-hourglass-half",
+    failed: "fa-xmark",
+    refunded: "fa-rotate-left",
+  };
+  const RO_OS_CLS = {
+    placed: "ro-bs-placed",
+    processing: "ro-bs-processing",
+    shipped: "ro-bs-shipped",
+    delivered: "ro-bs-delivered",
+    cancelled: "ro-bs-cancelled",
+  };
+  const RO_PS_CLS = {
+    paid: "ro-bp-paid",
+    pending: "ro-bp-pending",
+    failed: "ro-bp-failed",
+    refunded: "ro-bp-refunded",
+  };
+  const RO_STATUSES = [
+    "placed",
+    "processing",
+    "shipped",
+    "delivered",
+    "cancelled",
+  ];
+  const RO_PAY_STATUSES = ["pending", "paid", "failed", "refunded"];
 
-  function roOsBadge(s) { return `<span class="ro-badge ${RO_OS_CLS[s]||"ro-bs-placed"}"><i class="fa-solid ${RO_OS_ICON[s]||"fa-clock"}"></i>${s}</span>`; }
-  function roPsBadge(s) { return `<span class="ro-badge ${RO_PS_CLS[s]||"ro-bp-pending"}"><i class="fa-solid ${RO_PS_ICON[s]||"fa-hourglass-half"}"></i>${s}</span>`; }
+  function roOsBadge(s) {
+    return `<span class="ro-badge ${RO_OS_CLS[s] || "ro-bs-placed"}"><i class="fa-solid ${RO_OS_ICON[s] || "fa-clock"}"></i>${s}</span>`;
+  }
+  function roPsBadge(s) {
+    return `<span class="ro-badge ${RO_PS_CLS[s] || "ro-bp-pending"}"><i class="fa-solid ${RO_PS_ICON[s] || "fa-hourglass-half"}"></i>${s}</span>`;
+  }
 
   /* ── STAT PILLS ── */
   function roRenderStats() {
-    const total     = RO.orders.length;
-    const revenue   = RO.orders.filter(o => o.payment.status === "paid").reduce((s, o) => s + o.pricing.total, 0);
-    const placed    = RO.orders.filter(o => o.orderStatus === "placed").length;
-    const processing= RO.orders.filter(o => o.orderStatus === "processing").length;
-    const shipped   = RO.orders.filter(o => o.orderStatus === "shipped").length;
-    const delivered = RO.orders.filter(o => o.orderStatus === "delivered").length;
-    const cancelled = RO.orders.filter(o => o.orderStatus === "cancelled").length;
+    const total = RO.orders.length;
+    const revenue = RO.orders
+      .filter((o) => o.payment.status === "paid")
+      .reduce((s, o) => s + o.pricing.total, 0);
+    const placed = RO.orders.filter((o) => o.orderStatus === "placed").length;
+    const processing = RO.orders.filter(
+      (o) => o.orderStatus === "processing",
+    ).length;
+    const shipped = RO.orders.filter((o) => o.orderStatus === "shipped").length;
+    const delivered = RO.orders.filter(
+      (o) => o.orderStatus === "delivered",
+    ).length;
+    const cancelled = RO.orders.filter(
+      (o) => o.orderStatus === "cancelled",
+    ).length;
 
     const sp = document.getElementById("ro-statPills");
-    if (sp) sp.innerHTML = `
+    if (sp)
+      sp.innerHTML = `
       <div class="ro-stat-pill ro-sp-total">
         <div><div class="ro-sp-num">${total}</div><div class="ro-sp-lbl">Total Orders</div></div>
       </div>
@@ -110,14 +174,20 @@
         <div><div class="ro-sp-num">${roFmtCur(revenue)}</div><div class="ro-sp-lbl">Revenue</div></div>
       </div>`;
 
-    const sc = id => { const el = document.getElementById(id); if (el) el.textContent = 0; };
-    const sv = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-    sv("ro-sc-all",        total);
-    sv("ro-sc-placed",     placed);
+    const sc = (id) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = 0;
+    };
+    const sv = (id, v) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = v;
+    };
+    sv("ro-sc-all", total);
+    sv("ro-sc-placed", placed);
     sv("ro-sc-processing", processing);
-    sv("ro-sc-shipped",    shipped);
-    sv("ro-sc-delivered",  delivered);
-    sv("ro-sc-cancelled",  cancelled);
+    sv("ro-sc-shipped", shipped);
+    sv("ro-sc-delivered", delivered);
+    sv("ro-sc-cancelled", cancelled);
   }
 
   /* ── TABLE RENDER ── */
@@ -126,7 +196,10 @@
     const empty = document.getElementById("ro-emptyState");
     if (!tbody) return;
 
-    const page = RO.filtered.slice((RO.currentPage - 1) * RO.PER, RO.currentPage * RO.PER);
+    const page = RO.filtered.slice(
+      (RO.currentPage - 1) * RO.PER,
+      RO.currentPage * RO.PER,
+    );
     roRenderStats();
 
     if (!RO.filtered.length) {
@@ -134,11 +207,12 @@
       empty.style.display = "block";
     } else {
       empty.style.display = "none";
-      tbody.innerHTML = page.map((o, i) => {
-        const firstItem = o.items[0];
-        const moreCount = o.items.length - 1;
-        return `
-        <tr style="animation-delay:${i * .04}s" onclick="RO_openView('${o._id}')">
+      tbody.innerHTML = page
+        .map((o, i) => {
+          const firstItem = o.items[0];
+          const moreCount = o.items.length - 1;
+          return `
+        <tr style="animation-delay:${i * 0.04}s" onclick="RO_openView('${o._id}')">
           <td>
             <div class="ro-on-num">${o.orderNumber}</div>
             <div class="ro-on-date">${roFmtDate(o.createdAt)}</div>
@@ -170,7 +244,8 @@
             </div>
           </td>
         </tr>`;
-      }).join("");
+        })
+        .join("");
     }
     roRenderPg();
   }
@@ -196,12 +271,17 @@
   }
 
   /* ── PUBLIC pagination (called from inline onclick) ── */
-  window.RO_goP = function (p) { RO.currentPage = p; roRender(); };
+  window.RO_goP = function (p) {
+    RO.currentPage = p;
+    roRender();
+  };
 
   /* ── FILTERS ── */
   window.RO_setStatusTab = function (status, el) {
     RO.activeStatusTab = status;
-    document.querySelectorAll(".ro-stab").forEach(b => b.classList.remove("active"));
+    document
+      .querySelectorAll(".ro-stab")
+      .forEach((b) => b.classList.remove("active"));
     el.classList.add("active");
     RO.currentPage = 1;
     roApplyFilters();
@@ -210,23 +290,34 @@
   window.RO_applyFilters = roApplyFilters;
 
   function roApplyFilters() {
-    const q      = (document.getElementById("ro-searchInput")?.value || "").toLowerCase();
-    const pay    = document.getElementById("ro-payFilter")?.value    || "";
+    const q = (
+      document.getElementById("ro-searchInput")?.value || ""
+    ).toLowerCase();
+    const pay = document.getElementById("ro-payFilter")?.value || "";
     const method = document.getElementById("ro-methodFilter")?.value || "";
-    const sort   = document.getElementById("ro-sortFilter")?.value   || "newest";
+    const sort = document.getElementById("ro-sortFilter")?.value || "newest";
 
-    RO.filtered = RO.orders.filter(o => {
-      const matchQ = !q || o.orderNumber.toLowerCase().includes(q) || o.userId.name.toLowerCase().includes(q) || o.userId.email.toLowerCase().includes(q);
-      const matchS = !RO.activeStatusTab || o.orderStatus === RO.activeStatusTab;
-      const matchP = !pay    || o.payment.status  === pay;
-      const matchM = !method || o.payment.method  === method;
+    RO.filtered = RO.orders.filter((o) => {
+      const matchQ =
+        !q ||
+        o.orderNumber.toLowerCase().includes(q) ||
+        o.userId.name.toLowerCase().includes(q) ||
+        o.userId.email.toLowerCase().includes(q);
+      const matchS =
+        !RO.activeStatusTab || o.orderStatus === RO.activeStatusTab;
+      const matchP = !pay || o.payment.status === pay;
+      const matchM = !method || o.payment.method === method;
       return matchQ && matchS && matchP && matchM;
     });
 
-    if (sort === "oldest")       RO.filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    else if (sort === "amount_desc") RO.filtered.sort((a, b) => b.pricing.total - a.pricing.total);
-    else if (sort === "amount_asc")  RO.filtered.sort((a, b) => a.pricing.total - b.pricing.total);
-    else                         RO.filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    if (sort === "oldest")
+      RO.filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    else if (sort === "amount_desc")
+      RO.filtered.sort((a, b) => b.pricing.total - a.pricing.total);
+    else if (sort === "amount_asc")
+      RO.filtered.sort((a, b) => a.pricing.total - b.pricing.total);
+    else
+      RO.filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     RO.currentPage = 1;
     roRender();
@@ -234,15 +325,17 @@
 
   /* ── VIEW DRAWER ── */
   window.RO_openView = function (id) {
-    RO.viewingId     = id;
+    RO.viewingId = id;
     RO.activeDrawerTab = "items";
-    const o = RO.orders.find(x => x._id === id);
+    const o = RO.orders.find((x) => x._id === id);
     if (!o) return;
     const title = document.getElementById("ro-vd_title");
     if (title) title.textContent = o.orderNumber;
     roBuildHero(o);
     roBuildDrawerTab(o, "items");
-    document.querySelectorAll(".ro-tab-btn").forEach((b, i) => b.classList.toggle("active", i === 0));
+    document
+      .querySelectorAll(".ro-tab-btn")
+      .forEach((b, i) => b.classList.toggle("active", i === 0));
     roOpenDrawer();
   };
 
@@ -279,23 +372,27 @@
 
   window.RO_switchTab = function (tab, el) {
     RO.activeDrawerTab = tab;
-    document.querySelectorAll(".ro-tab-btn").forEach(b => b.classList.remove("active"));
+    document
+      .querySelectorAll(".ro-tab-btn")
+      .forEach((b) => b.classList.remove("active"));
     el.classList.add("active");
-    const o = RO.orders.find(x => x._id === RO.viewingId);
+    const o = RO.orders.find((x) => x._id === RO.viewingId);
     if (o) roBuildDrawerTab(o, tab);
   };
 
   function roBuildDrawerTab(o, tab) {
     const body = document.getElementById("ro-vd_body");
     if (!body) return;
-    if (tab === "items")        body.innerHTML = roItemsTab(o);
+    if (tab === "items") body.innerHTML = roItemsTab(o);
     else if (tab === "shipping") body.innerHTML = roShippingTab(o);
-    else                         body.innerHTML = roManageTab(o);
+    else body.innerHTML = roManageTab(o);
   }
 
   /* ITEMS & PRICING TAB */
   function roItemsTab(o) {
-    const itemsHtml = o.items.map(it => `
+    const itemsHtml = o.items
+      .map(
+        (it) => `
       <div class="ro-oi-card">
         <div class="ro-oi-img"><i class="fa-solid fa-shirt"></i></div>
         <div class="ro-oi-info">
@@ -307,7 +404,9 @@
           <div class="ro-oi-qty">× ${it.quantity}</div>
           <div class="ro-oi-total">${roFmtCur(it.itemTotal)}</div>
         </div>
-      </div>`).join("");
+      </div>`,
+      )
+      .join("");
 
     return `
       <div>
@@ -319,7 +418,7 @@
         <div class="ro-price-breakdown">
           <div class="ro-pb-row"><span class="ro-pb-lbl">Subtotal</span><span class="ro-pb-val">${roFmtCur(o.pricing.subtotal)}</span></div>
           ${o.pricing.totalDiscount ? `<div class="ro-pb-row"><span class="ro-pb-lbl">Discount</span><span class="ro-pb-val ro-disc">− ${roFmtCur(o.pricing.totalDiscount)}</span></div>` : ""}
-          ${o.pricing.shippingCost  ? `<div class="ro-pb-row"><span class="ro-pb-lbl">Shipping</span><span class="ro-pb-val">+ ${roFmtCur(o.pricing.shippingCost)}</span></div>` : `<div class="ro-pb-row"><span class="ro-pb-lbl">Shipping</span><span class="ro-pb-val ro-disc">Free</span></div>`}
+          ${o.pricing.shippingCost ? `<div class="ro-pb-row"><span class="ro-pb-lbl">Shipping</span><span class="ro-pb-val">+ ${roFmtCur(o.pricing.shippingCost)}</span></div>` : `<div class="ro-pb-row"><span class="ro-pb-lbl">Shipping</span><span class="ro-pb-val ro-disc">Free</span></div>`}
           <div class="ro-pb-row ro-total-row"><span class="ro-pb-lbl" style="font-weight:600;color:#1c1410;">Total</span><span class="ro-pb-val ro-total">${roFmtCur(o.pricing.total)}</span></div>
         </div>
       </div>
@@ -329,22 +428,24 @@
   /* SHIPPING TAB */
   function roShippingTab(o) {
     const a = o.shippingAddress;
-    const tl = ["placed","processing","shipped","delivered"];
+    const tl = ["placed", "processing", "shipped", "delivered"];
     const curIdx = tl.indexOf(o.orderStatus);
-    const tlHtml = tl.map((s, i) => {
-      const done = curIdx >= i && o.orderStatus !== "cancelled";
-      const cur  = i === curIdx && o.orderStatus !== "cancelled";
-      return `<div class="ro-tl-step ${done ? "done" : ""} ${cur ? "current" : ""}">
+    const tlHtml = tl
+      .map((s, i) => {
+        const done = curIdx >= i && o.orderStatus !== "cancelled";
+        const cur = i === curIdx && o.orderStatus !== "cancelled";
+        return `<div class="ro-tl-step ${done ? "done" : ""} ${cur ? "current" : ""}">
         <div class="ro-tl-dot"><i class="fa-solid ${RO_OS_ICON[s]}"></i></div>
         <div class="ro-tl-label">${s}</div>
       </div>`;
-    }).join("");
+      })
+      .join("");
 
     const payHtml = `
       <div class="ro-info-card-body">
         <div class="ro-ic-row"><span class="ro-ic-lbl">Method</span><span class="ro-ic-val">${o.payment.method === "cod" ? "Cash on Delivery" : "Razorpay"}</span></div>
         <div class="ro-ic-row"><span class="ro-ic-lbl">Status</span><span class="ro-ic-val">${roPsBadge(o.payment.status)}</span></div>
-        ${o.payment.razorpayOrderId   ? `<div class="ro-ic-row"><span class="ro-ic-lbl">Order ID</span><span class="ro-ic-val" style="font-size:11px;word-break:break-all;">${o.payment.razorpayOrderId}</span></div>` : ""}
+        ${o.payment.razorpayOrderId ? `<div class="ro-ic-row"><span class="ro-ic-lbl">Order ID</span><span class="ro-ic-val" style="font-size:11px;word-break:break-all;">${o.payment.razorpayOrderId}</span></div>` : ""}
         ${o.payment.razorpayPaymentId ? `<div class="ro-ic-row"><span class="ro-ic-lbl">Pay ID</span><span class="ro-ic-val" style="font-size:11px;word-break:break-all;">${o.payment.razorpayPaymentId}</span></div>` : ""}
         ${o.payment.paidAt ? `<div class="ro-ic-row"><span class="ro-ic-lbl">Paid At</span><span class="ro-ic-val">${roFmtDate(o.payment.paidAt)} ${roFmtTime(o.payment.paidAt)}</span></div>` : ""}
       </div>`;
@@ -352,9 +453,11 @@
     return `
       <div>
         <div class="ro-sec-hd">Fulfilment Timeline</div>
-        ${o.orderStatus === "cancelled"
-          ? `<div style="text-align:center;padding:14px;border:1px solid rgba(127,4,3,.2);background:rgba(127,4,3,.05);"><span class="ro-badge ro-bs-cancelled" style="font-size:11px;padding:6px 16px;"><i class="fa-solid fa-circle-xmark"></i> Order Cancelled</span></div>`
-          : `<div class="ro-timeline">${tlHtml}</div>`}
+        ${
+          o.orderStatus === "cancelled"
+            ? `<div style="text-align:center;padding:14px;border:1px solid rgba(127,4,3,.2);background:rgba(127,4,3,.05);"><span class="ro-badge ro-bs-cancelled" style="font-size:11px;padding:6px 16px;"><i class="fa-solid fa-circle-xmark"></i> Order Cancelled</span></div>`
+            : `<div class="ro-timeline">${tlHtml}</div>`
+        }
       </div>
       <div class="ro-info-grid">
         <div class="ro-info-card" style="grid-column:1/-1;">
@@ -376,11 +479,13 @@
 
   /* MANAGE TAB */
   function roManageTab(o) {
-    const osOptions = RO_STATUSES.map(s =>
-      `<option value="${s}" ${o.orderStatus === s ? "selected" : ""}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`
+    const osOptions = RO_STATUSES.map(
+      (s) =>
+        `<option value="${s}" ${o.orderStatus === s ? "selected" : ""}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`,
     ).join("");
-    const psOptions = RO_PAY_STATUSES.map(s =>
-      `<option value="${s}" ${o.payment.status === s ? "selected" : ""}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`
+    const psOptions = RO_PAY_STATUSES.map(
+      (s) =>
+        `<option value="${s}" ${o.payment.status === s ? "selected" : ""}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`,
     ).join("");
 
     return `
@@ -425,41 +530,51 @@
   }
 
   window.RO_updateOrderStatus = async function () {
-    const o = RO.orders.find(x => x._id === RO.viewingId);
+    const o = RO.orders.find((x) => x._id === RO.viewingId);
     const newStatus = document.getElementById("ro-mgr_os").value;
     try {
-      await roApiFetch(`http://localhost:5000/api/v1/orders/${o._id}/status`, {
-        method : "PATCH",
-        body   : JSON.stringify({ orderStatus: newStatus }),
-      });
+      await roApiFetch(
+        `https://shri-brand.onrender.com/api/v1/orders/${o._id}/status`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({ orderStatus: newStatus }),
+        },
+      );
       o.orderStatus = newStatus;
       roBuildHero(o);
       roBuildDrawerTab(o, "manage");
       roRender();
       roToast(`Order status updated to "${newStatus}"`, "success");
-    } catch (err) { roToast(err.message, "error"); }
+    } catch (err) {
+      roToast(err.message, "error");
+    }
   };
 
   window.RO_updatePayStatus = async function () {
-    const o = RO.orders.find(x => x._id === RO.viewingId);
+    const o = RO.orders.find((x) => x._id === RO.viewingId);
     const newStatus = document.getElementById("ro-mgr_ps").value;
     try {
-      await roApiFetch(`http://localhost:5000/api/v1/orders/${o._id}/payment-status`, {
-        method : "PATCH",
-        body   : JSON.stringify({ paymentStatus: newStatus }),
-      });
+      await roApiFetch(
+        `https://shri-brand.onrender.com/api/v1/orders/${o._id}/payment-status`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({ paymentStatus: newStatus }),
+        },
+      );
       o.payment.status = newStatus;
       roBuildHero(o);
       roBuildDrawerTab(o, "manage");
       roRender();
       roToast(`Payment status updated to "${newStatus}"`, "info");
-    } catch (err) { roToast(err.message, "error"); }
+    } catch (err) {
+      roToast(err.message, "error");
+    }
   };
 
   /* ── DELETE ── */
   window.RO_openDel = function (id) {
     RO.deleteTarget = id;
-    const o = RO.orders.find(x => x._id === id);
+    const o = RO.orders.find((x) => x._id === id);
     const el = document.getElementById("ro-delOrderNum");
     if (el) el.textContent = o.orderNumber;
     const modal = document.getElementById("ro-delModal");
@@ -467,7 +582,9 @@
     document.body.style.overflow = "hidden";
   };
 
-  window.RO_openDelFromDrawer = function () { RO_openDel(RO.viewingId); };
+  window.RO_openDelFromDrawer = function () {
+    RO_openDel(RO.viewingId);
+  };
 
   window.RO_closeDel = function () {
     const modal = document.getElementById("ro-delModal");
@@ -478,8 +595,11 @@
 
   window.RO_confirmDelete = async function () {
     try {
-      await roApiFetch(`http://localhost:5000/api/v1/orders/${RO.deleteTarget}`, { method: "DELETE" });
-      RO.orders = RO.orders.filter(x => x._id !== RO.deleteTarget);
+      await roApiFetch(
+        `https://shri-brand.onrender.com/api/v1/orders/${RO.deleteTarget}`,
+        { method: "DELETE" },
+      );
+      RO.orders = RO.orders.filter((x) => x._id !== RO.deleteTarget);
       RO_closeDel();
       roCloseAll();
       roApplyFilters();
@@ -514,7 +634,12 @@
     if (!w) return;
     const el = document.createElement("div");
     el.className = `ro-toast ${type}`;
-    const ico = type === "success" ? "fa-circle-check" : type === "error" ? "fa-circle-xmark" : "fa-circle-info";
+    const ico =
+      type === "success"
+        ? "fa-circle-check"
+        : type === "error"
+          ? "fa-circle-xmark"
+          : "fa-circle-info";
     el.innerHTML = `<i class="fa-solid ${ico}"></i>${msg}`;
     w.appendChild(el);
     setTimeout(() => {
@@ -523,5 +648,4 @@
       setTimeout(() => el.remove(), 300);
     }, 2800);
   }
-
 })();

@@ -1,0 +1,5297 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Blog Editor — Shri Brand</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <style>
+      /* ══════════════════════════════════════════════════
+   DESIGN TOKENS — exact Shri Brand system
+══════════════════════════════════════════════════ */
+      :root {
+        /* Brand colours */
+        --primary-color: #7f0403;
+        --primary-light: #a01e1d;
+        --primary-dark: #580202;
+        --accent-gold: #b8860b;
+        --accent-gold-light: #d4a520;
+        --accent-gold-dim: rgba(184, 134, 11, 0.12);
+        --gold-pale: rgba(184, 134, 11, 0.11);
+        --gold-border: rgba(184, 134, 11, 0.25);
+
+        /* Surfaces */
+        --bg: #f7f4f0;
+        --surface: #ffffff;
+        --border: #e2ddd6;
+        --border-gold: rgba(184, 134, 11, 0.18);
+
+        /* Text */
+        --text-dark: #1a1a1a;
+        --text-gray: #666666;
+        --text-muted: #888888;
+        --ink-faint: #aa9988;
+
+        /* Layout */
+        --header-h: 60px;
+        --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+        /* Editor-pane tokens (UNTOUCHED) */
+        --e-primary: #7f0403;
+        --e-gold: #ffc406;
+        --e-gold-pale: #fff8d6;
+        --e-gold-muted: #c89a00;
+        --e-border: #e4ddd0;
+        --e-border-warm: #d9cdb8;
+        --e-text-dark: #1a1208;
+        --e-text-mid: #5a4f3e;
+        --e-text-light: #8c7e6a;
+        --e-cream: #faf6ee;
+        --e-cream-deep: #f0e8d5;
+        --e-bg-dark: #1c0d0d;
+      }
+
+      /* ══════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════ */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        font-family: "Jost", sans-serif;
+        background: var(--bg);
+        color: var(--text-dark);
+        font-size: 14px;
+        line-height: 1.6;
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      button {
+        cursor: pointer;
+        font-family: "Jost", sans-serif;
+      }
+
+      input,
+      select,
+      textarea {
+        font-family: "Jost", sans-serif;
+      }
+
+      /* ══════════════════════════════════════════════════
+   SHELL LAYOUT — full width (no sidebar)
+══════════════════════════════════════════════════ */
+      .shell {
+        display: grid;
+        grid-template-rows: var(--header-h) 1fr;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "header"
+          "main";
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* ══════════════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════════════ */
+      header {
+        grid-area: header;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 12px 0 24px;
+        background: var(--primary-color);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 20px rgba(95, 2, 2, 0.35);
+        height: var(--header-h);
+      }
+
+      header::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-gold),
+          var(--accent-gold-light),
+          var(--accent-gold)
+        );
+      }
+
+      /* Brand block — inline in header now */
+      .header-brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-shrink: 0;
+      }
+
+      .emblem {
+        width: 38px;
+        height: 38px;
+        position: relative;
+        flex-shrink: 0;
+      }
+
+      .emblem-outer {
+        position: absolute;
+        inset: 0;
+        border: 1.5px solid var(--accent-gold);
+        transform: rotate(45deg);
+      }
+
+      .emblem-inner {
+        position: absolute;
+        inset: 6px;
+        border: 1px solid rgba(184, 134, 11, 0.45);
+        transform: rotate(45deg);
+      }
+
+      .emblem-letter {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Cormorant Garamond", serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--accent-gold);
+      }
+
+      .brand-info {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .brand-name {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: 0.08em;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
+      .brand-name span {
+        color: var(--accent-gold);
+      }
+
+      .brand-tagline {
+        font-size: 9px;
+        font-weight: 300;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.42);
+        margin-top: 4px;
+      }
+
+      /* Header right */
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .h-icon {
+        width: 38px;
+        height: 38px;
+        border: 1px solid rgba(184, 134, 11, 0.22);
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
+      }
+
+      .h-icon:hover {
+        border-color: var(--accent-gold);
+        color: var(--accent-gold);
+        background: rgba(184, 134, 11, 0.08);
+      }
+
+      .h-icon-notif::after {
+        content: "";
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent-gold);
+        border: 1.5px solid var(--primary-color);
+      }
+
+      .h-divider {
+        width: 1px;
+        height: 28px;
+        background: rgba(184, 134, 11, 0.2);
+        margin: 0 8px;
+      }
+
+      .h-avatar {
+        width: 38px;
+        height: 38px;
+        border: 1.5px solid var(--accent-gold);
+        background: rgba(184, 134, 11, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Cormorant Garamond", serif;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--accent-gold);
+        letter-spacing: 0.06em;
+        cursor: pointer;
+      }
+
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        padding: 6px;
+        margin-left: 8px;
+      }
+
+      .hamburger span {
+        display: block;
+        width: 20px;
+        height: 1.5px;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 2px;
+        transition: var(--transition);
+      }
+
+      /* Breadcrumb in header */
+      .header-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        font-weight: 400;
+        letter-spacing: 0.06em;
+        color: rgba(255, 255, 255, 0.42);
+        padding-left: 24px;
+      }
+
+      .header-breadcrumb i {
+        font-size: 0.55rem;
+        color: rgba(184, 134, 11, 0.55);
+      }
+
+      .header-breadcrumb strong {
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-size: 11px;
+      }
+
+      /* Status pill */
+      .h-status {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border: 1px solid rgba(184, 134, 11, 0.2);
+        background: rgba(0, 0, 0, 0.15);
+        font-size: 10px;
+        font-weight: 300;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.48);
+      }
+
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #4caf82;
+        animation: pulse-dot 2s infinite;
+        box-shadow: 0 0 5px rgba(76, 175, 130, 0.5);
+      }
+
+      @keyframes pulse-dot {
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      /* Header buttons */
+      .h-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 0 16px;
+        height: 36px;
+        font-family: "Jost", sans-serif;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border: 1px solid;
+        transition: background var(--transition);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .h-btn::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.06),
+          transparent
+        );
+        pointer-events: none;
+      }
+
+      .h-btn-ghost {
+        background: transparent;
+        border-color: rgba(184, 134, 11, 0.28);
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      .h-btn-ghost:hover {
+        border-color: rgba(184, 134, 11, 0.55);
+        color: rgba(255, 255, 255, 0.85);
+        background: rgba(184, 134, 11, 0.08);
+      }
+
+      .h-btn-reset {
+        background: transparent;
+        border-color: rgba(220, 80, 80, 0.3);
+        color: rgba(220, 120, 120, 0.7);
+      }
+
+      .h-btn-reset:hover {
+        border-color: rgba(220, 80, 80, 0.6);
+        color: #e08080;
+        background: rgba(220, 60, 60, 0.07);
+      }
+
+      .h-btn-outline {
+        background: transparent;
+        border-color: rgba(184, 134, 11, 0.38);
+        color: rgba(184, 134, 11, 0.85);
+      }
+
+      .h-btn-outline:hover {
+        background: rgba(184, 134, 11, 0.1);
+        border-color: var(--accent-gold);
+        color: var(--accent-gold);
+      }
+
+      .h-btn-publish {
+        background: var(--accent-gold);
+        border-color: var(--accent-gold-light);
+        color: var(--primary-dark);
+        font-weight: 600;
+        box-shadow: 0 3px 14px rgba(184, 134, 11, 0.28);
+      }
+
+      .h-btn-publish::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1.5px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-gold-light),
+          var(--accent-gold),
+          var(--accent-gold-light)
+        );
+      }
+
+      .h-btn-publish:hover {
+        background: var(--accent-gold-light);
+        transform: translateY(-1px);
+      }
+
+      /* ══════════════════════════════════════════════════
+   HEADER MOBILE MENU
+══════════════════════════════════════════════════ */
+      .h-mobile-menu-btn {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(184, 134, 11, 0.25);
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 13px;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition:
+          background 0.2s,
+          border-color 0.2s;
+      }
+
+      .h-mobile-menu-btn:hover {
+        background: rgba(184, 134, 11, 0.12);
+        border-color: var(--accent-gold);
+        color: var(--accent-gold);
+      }
+
+      .h-mobile-menu-btn.open {
+        background: rgba(184, 134, 11, 0.15);
+        border-color: var(--accent-gold);
+        color: var(--accent-gold);
+      }
+
+      .h-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(var(--header-h) - 2px);
+        right: 0;
+        background: #2a0808;
+        border: 1px solid rgba(184, 134, 11, 0.22);
+        border-top: 2px solid var(--accent-gold);
+        min-width: 200px;
+        z-index: 999;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+        flex-direction: column;
+        padding: 6px 0;
+      }
+
+      .h-dropdown.open {
+        display: flex;
+      }
+
+      .h-dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 18px;
+        font-family: "Jost", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        color: rgba(255, 255, 255, 0.75);
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        width: 100%;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+
+      .h-dropdown-item:hover {
+        background: rgba(184, 134, 11, 0.1);
+        color: var(--accent-gold);
+      }
+
+      .h-dropdown-item i {
+        width: 16px;
+        text-align: center;
+        font-size: 12px;
+        opacity: 0.8;
+      }
+
+      .h-dropdown-item.danger {
+        color: rgba(220, 120, 120, 0.85);
+      }
+
+      .h-dropdown-item.danger:hover {
+        background: rgba(220, 60, 60, 0.08);
+        color: #e08080;
+      }
+
+      .h-dropdown-divider {
+        height: 1px;
+        background: rgba(184, 134, 11, 0.15);
+        margin: 5px 0;
+      }
+
+      .h-dropdown-back {
+        border-top: 1px solid rgba(184, 134, 11, 0.15);
+        margin-top: 4px;
+        padding-top: 4px;
+        color: rgba(220, 120, 120, 0.75);
+      }
+
+      .h-dropdown-back:hover {
+        background: rgba(220, 60, 60, 0.07);
+        color: rgba(220, 120, 120, 1);
+      }
+
+      /* ══════════════════════════════════════════════════
+══════════════════════════════════════════════════ */
+      main {
+        grid-area: main;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        height: calc(100vh - var(--header-h));
+        background: var(--bg);
+        background-image:
+          repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 39px,
+            rgba(184, 134, 11, 0.03) 40px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 39px,
+            rgba(184, 134, 11, 0.02) 40px
+          );
+      }
+
+      .editor-wrap {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 310px;
+        overflow: hidden;
+        min-height: 0;
+      }
+
+      .editor-col {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-right: 1px solid var(--border-gold);
+        background: var(--surface);
+      }
+
+      /* ══════════════════════════════════════════════════
+   CUSTOM SCROLLBARS — slim & styled
+══════════════════════════════════════════════════ */
+
+      /* Editor scroll area */
+      .editor-col-scroll {
+        scrollbar-width: 3px;
+        scrollbar-color: rgba(184, 134, 11, 0.35) transparent;
+      }
+
+      .editor-col-scroll::-webkit-scrollbar {
+        width: 3px;
+      }
+
+      .editor-col-scroll::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .editor-col-scroll::-webkit-scrollbar-thumb {
+        background: linear-gradient(
+          to bottom,
+          var(--accent-gold-light),
+          var(--accent-gold),
+          rgba(184, 134, 11, 0.3)
+        );
+        border-radius: 0;
+      }
+
+      .editor-col-scroll::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(
+          to bottom,
+          var(--accent-gold),
+          var(--primary-color)
+        );
+      }
+
+      /* Settings panel scroll */
+      .s-panel {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(184, 134, 11, 0.25) transparent;
+      }
+
+      .s-panel::-webkit-scrollbar {
+        width: 3px;
+      }
+
+      .s-panel::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .s-panel::-webkit-scrollbar-thumb {
+        background: rgba(184, 134, 11, 0.3);
+        border-radius: 0;
+      }
+
+      .s-panel::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-gold);
+      }
+
+      /* Global fallback scrollbar styling */
+      ::-webkit-scrollbar {
+        width: 3px;
+        height: 3px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(184, 134, 11, 0.28);
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-gold);
+      }
+
+      /* ══════════════════════════════════════════════════
+   BLOCK TOOLBAR
+══════════════════════════════════════════════════ */
+      .block-toolbar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 2px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border-gold);
+        padding: 5px 10px;
+        flex-shrink: 0;
+        position: relative;
+      }
+
+      .block-toolbar::after {
+        content: "";
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 80px;
+        height: 1px;
+        background: linear-gradient(90deg, var(--accent-gold), transparent);
+      }
+
+      .bt-group {
+        display: flex;
+        align-items: center;
+        gap: 1px;
+        padding-right: 6px;
+        margin-right: 4px;
+        border-right: 1px solid var(--border-gold);
+      }
+
+      .bt-group:last-child {
+        border-right: none;
+        padding-right: 0;
+        margin-right: 0;
+      }
+
+      .bt-btn-tool {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        cursor: pointer;
+        transition: all var(--transition);
+        flex-shrink: 0;
+      }
+
+      .bt-btn-tool:hover {
+        background: var(--gold-pale);
+        border-color: var(--border-gold);
+        color: var(--accent-gold);
+      }
+
+      .bt-btn-tool.on {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+      }
+
+      .bt-select {
+        height: 28px;
+        padding: 0 22px 0 8px;
+        border: 1px solid var(--border-gold);
+        background: var(--gold-pale);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23b8860b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 5px center;
+        font-family: "Jost", sans-serif;
+        font-size: 11px;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        color: var(--text-gray);
+        cursor: pointer;
+        outline: none;
+        appearance: none;
+      }
+
+      .bt-select:focus {
+        border-color: var(--accent-gold);
+      }
+
+      .bt-slash-hint {
+        margin-left: auto;
+        font-size: 9.5px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        white-space: nowrap;
+        padding-left: 4px;
+      }
+
+      .bt-slash-hint kbd {
+        background: var(--gold-pale);
+        border: 1px solid var(--border-gold);
+        padding: 1px 6px;
+        font-family: "Jost", sans-serif;
+        font-size: 9px;
+        color: var(--accent-gold);
+        letter-spacing: 0.06em;
+      }
+
+      /* ══════════════════════════════════════════════════
+   EDITOR PANE INTERNALS — UNTOUCHED
+══════════════════════════════════════════════════ */
+      .editor-col-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 28px 32px 48px;
+      }
+
+      .input-label {
+        font-size: 0.61rem;
+        font-weight: 700;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        color: var(--e-text-light);
+        margin-bottom: 5px;
+        display: block;
+      }
+
+      .title-input {
+        width: 100%;
+        font-family: "Playfair Display", serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--e-text-dark);
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid var(--e-border);
+        padding: 4px 0 9px;
+        outline: none;
+        resize: none;
+        line-height: 1.28;
+        display: block;
+        transition: border-color 0.2s;
+      }
+
+      .title-input:focus {
+        border-bottom-color: var(--e-primary);
+      }
+
+      .title-input::placeholder {
+        color: var(--e-border-warm);
+      }
+
+      .subtitle-input {
+        width: 100%;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.95rem;
+        color: var(--e-text-mid);
+        background: transparent;
+        border: none;
+        border-bottom: 1.5px solid var(--e-border);
+        padding: 4px 0 8px;
+        outline: none;
+        resize: none;
+        line-height: 1.58;
+        margin-top: 9px;
+        display: block;
+        transition: border-color 0.2s;
+      }
+
+      .subtitle-input:focus {
+        border-bottom-color: var(--e-gold);
+      }
+
+      .subtitle-input::placeholder {
+        color: #ccc8be;
+      }
+
+      .content-area {
+        min-height: 420px;
+        outline: none;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.96rem;
+        font-weight: 400;
+        line-height: 1.9;
+        color: var(--e-text-dark);
+        caret-color: var(--e-primary);
+        margin-top: 20px;
+      }
+
+      .content-area:empty::before {
+        content: "Start writing your story…   type  /  for block options";
+        color: #cdc5b8;
+        pointer-events: none;
+      }
+
+      .content-area h1,
+      .content-area h2,
+      .content-area h3 {
+        font-family: "Playfair Display", serif;
+      }
+
+      .content-area h1 {
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: var(--e-text-dark);
+        margin: 20px 0 7px;
+        line-height: 1.28;
+      }
+
+      .content-area h2 {
+        font-size: 1.28rem;
+        font-weight: 700;
+        color: var(--e-text-dark);
+        margin: 17px 0 5px;
+        line-height: 1.34;
+      }
+
+      .content-area h3 {
+        font-size: 1.04rem;
+        font-weight: 600;
+        color: var(--e-text-dark);
+        margin: 13px 0 4px;
+      }
+
+      .content-area p,
+      .content-area div,
+      .content-area li {
+        margin-bottom: 11px;
+      }
+
+      .content-area strong {
+        color: #5a0000;
+      }
+
+      .content-area em {
+        font-style: italic;
+      }
+
+      .content-area a {
+        color: var(--e-primary);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .content-area ul,
+      .content-area ol {
+        padding-left: 22px;
+        margin-bottom: 11px;
+      }
+
+      .content-area code {
+        font-family: "DM Mono", monospace;
+        font-size: 0.83rem;
+        background: var(--e-cream-deep);
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: var(--e-primary);
+      }
+
+      .content-area pre {
+        background: var(--e-bg-dark);
+        color: #e8dfc8;
+        padding: 16px 18px;
+        border-radius: 8px;
+        font-family: "DM Mono", monospace;
+        font-size: 0.82rem;
+        line-height: 1.7;
+        margin: 15px 0;
+        overflow-x: auto;
+      }
+
+      .content-area blockquote {
+        border-left: 4px solid var(--e-gold);
+        background: var(--e-gold-pale);
+        margin: 18px 0;
+        padding: 14px 18px;
+        border-radius: 0 8px 8px 0;
+        font-family: "Playfair Display", serif;
+        font-style: italic;
+        font-size: 1.01rem;
+        color: var(--e-text-mid);
+      }
+
+      /* Word bar */
+      .word-bar {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 6px 32px;
+        background: #f4f0ea;
+        border-top: 1px solid var(--border-gold);
+        flex-shrink: 0;
+      }
+
+      .word-bar-icon {
+        color: var(--accent-gold);
+        font-size: 0.73rem;
+      }
+
+      .word-bar-text {
+        font-size: 10px;
+        font-weight: 300;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      .word-bar-chars {
+        margin-left: auto;
+        font-size: 10px;
+        color: var(--ink-faint);
+        letter-spacing: 0.08em;
+      }
+
+      /* ══════════════════════════════════════════════════
+   BLOCK WRAPPERS
+══════════════════════════════════════════════════ */
+      .block-wrapper {
+        position: relative;
+        margin: 6px 0;
+      }
+
+      .block-wrapper .block-delete-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 22px;
+        height: 22px;
+        border: 1px solid var(--border-gold);
+        background: var(--gold-pale);
+        color: var(--accent-gold);
+        font-size: 0.6rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition:
+          opacity var(--transition),
+          background var(--transition);
+        z-index: 10;
+      }
+
+      .block-wrapper:hover .block-delete-btn {
+        opacity: 1;
+      }
+
+      .block-wrapper .block-delete-btn:hover {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+      }
+
+      /* Special blocks (editor-pane – UNTOUCHED) */
+      .editor-pullquote {
+        text-align: center;
+        margin: 4px 0;
+        padding: 20px 14px;
+      }
+
+      .editor-pullquote::before,
+      .editor-pullquote::after {
+        font-family: "Playfair Display", serif;
+        font-size: 3.8rem;
+        color: var(--e-gold);
+        line-height: 0;
+        vertical-align: -0.4em;
+        display: inline;
+      }
+
+      .editor-pullquote::before {
+        content: "\201C";
+      }
+
+      .editor-pullquote::after {
+        content: "\201D";
+      }
+
+      .editor-pullquote-text {
+        font-family: "Playfair Display", serif;
+        font-style: italic;
+        font-size: 1.18rem;
+        color: var(--e-text-dark);
+        line-height: 1.58;
+        display: inline;
+        outline: none;
+        min-width: 40px;
+      }
+
+      .editor-pullquote-text:empty::before {
+        content: "Write your pull quote…";
+        color: #c8a040;
+      }
+
+      .editor-idea {
+        background: linear-gradient(135deg, #fff8e6, #fff3d6);
+        border: 1.5px solid var(--e-gold);
+        border-radius: 10px;
+        padding: 13px 15px;
+        margin: 4px 0;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+
+      .editor-idea .idea-icon {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .editor-idea-content {
+        flex: 1;
+        outline: none;
+        font-size: 0.91rem;
+        color: var(--e-text-dark);
+        line-height: 1.68;
+        min-height: 22px;
+      }
+
+      .editor-idea-content:empty::before {
+        content: "Write your idea or tip here…";
+        color: #c8a040;
+        pointer-events: none;
+      }
+
+      .editor-warning {
+        background: #fff5f5;
+        border: 1.5px solid #e57373;
+        border-radius: 10px;
+        padding: 13px 15px;
+        margin: 4px 0;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+
+      .editor-warning .warn-icon {
+        font-size: 1rem;
+        color: #c0392b;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      .editor-warning-content {
+        flex: 1;
+        outline: none;
+        font-size: 0.91rem;
+        color: #6b2323;
+        line-height: 1.68;
+        min-height: 22px;
+      }
+
+      .editor-warning-content:empty::before {
+        content: "Write a warning or note here…";
+        color: #e57373;
+        pointer-events: none;
+      }
+
+      .editor-info {
+        background: #f0f6ff;
+        border: 1.5px solid #90b8e8;
+        border-radius: 10px;
+        padding: 13px 15px;
+        margin: 4px 0;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+
+      .editor-info .info-icon {
+        font-size: 1rem;
+        color: #2980b9;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      .editor-info-content {
+        flex: 1;
+        outline: none;
+        font-size: 0.91rem;
+        color: #1a3a5c;
+        line-height: 1.68;
+        min-height: 22px;
+      }
+
+      .editor-info-content:empty::before {
+        content: "Write an info note here…";
+        color: #90b8e8;
+        pointer-events: none;
+      }
+
+      .editor-divider {
+        margin: 4px 0;
+        user-select: none;
+      }
+
+      .editor-divider.d-diamond,
+      .editor-divider.d-flame {
+        display: flex;
+        align-items: center;
+      }
+
+      .d-line {
+        flex: 1;
+        height: 1.5px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--e-gold) 30%,
+          var(--e-gold-muted) 50%,
+          var(--e-gold) 70%,
+          transparent
+        );
+      }
+
+      .d-gem {
+        color: var(--e-gold);
+        font-size: 0.82rem;
+        padding: 0 10px;
+        flex-shrink: 0;
+      }
+
+      .editor-divider.d-stars {
+        text-align: center;
+        letter-spacing: 8px;
+        color: var(--e-gold);
+        font-size: 0.9rem;
+        opacity: 0.85;
+      }
+
+      .editor-divider.d-flame .d-line {
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--e-primary) 40%,
+          #a00505 50%,
+          var(--e-primary) 60%,
+          transparent
+        );
+      }
+
+      .editor-divider.d-flame .d-gem {
+        color: var(--e-primary);
+      }
+
+      .editor-divider.d-plain {
+        border-top: 2px solid var(--e-border);
+      }
+
+      .editor-divider.d-wave svg {
+        display: block;
+        width: 100%;
+      }
+
+      .editor-img-block {
+        margin: 15px 0;
+        position: relative;
+        display: block;
+      }
+
+      .editor-img-block img {
+        width: 100%;
+        display: block;
+      }
+
+      .img-caption-input {
+        width: 100%;
+        border: none;
+        border-bottom: 1px dashed var(--e-border);
+        background: transparent;
+        text-align: center;
+        font-size: 0.74rem;
+        color: var(--e-text-light);
+        font-style: italic;
+        padding: 4px 0;
+        outline: none;
+        font-family: "DM Sans", sans-serif;
+      }
+
+      .img-caption-input::placeholder {
+        color: var(--e-border-warm);
+      }
+
+      .img-remove {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 24px;
+        height: 24px;
+        background: rgba(0, 0, 0, 0.54);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 0.6rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.18s;
+      }
+
+      .editor-img-block:hover .img-remove {
+        opacity: 1;
+      }
+
+      /* ══════════════════════════════════════════════════
+   SETTINGS COLUMN (right panel)
+══════════════════════════════════════════════════ */
+      .settings-col {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: var(--surface);
+        border-left: 1px solid var(--border-gold);
+        position: relative;
+      }
+
+      .settings-col::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1px;
+        height: 100%;
+        background: linear-gradient(
+          to bottom,
+          var(--accent-gold),
+          rgba(184, 134, 11, 0.2) 40%,
+          rgba(184, 134, 11, 0.05) 70%,
+          transparent
+        );
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .settings-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border-gold);
+        background: #f4f0ea;
+        flex-shrink: 0;
+      }
+
+      .s-tab {
+        flex: 1;
+        padding: 13px 6px;
+        text-align: center;
+        font-family: "Jost", sans-serif;
+        font-size: 9.5px;
+        font-weight: 500;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        cursor: pointer;
+        border: none;
+        border-bottom: 2px solid transparent;
+        background: transparent;
+        transition: all var(--transition);
+      }
+
+      .s-tab:hover {
+        color: var(--text-dark);
+      }
+
+      .s-tab.active {
+        color: var(--primary-color);
+        border-bottom-color: var(--accent-gold);
+        background: var(--surface);
+      }
+
+      .s-panel {
+        display: none;
+        flex-direction: column;
+        gap: 14px;
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px 15px 32px;
+      }
+
+      .s-panel.active {
+        display: flex;
+      }
+
+      .s-field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      /* Label */
+      .s-label {
+        font-family: "Jost", sans-serif;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--accent-gold);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .s-label::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border-gold);
+      }
+
+      /* Inputs */
+      .s-input {
+        width: 100%;
+        padding: 9px 12px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        font-family: "Jost", sans-serif;
+        font-size: 13px;
+        font-weight: 300;
+        letter-spacing: 0.04em;
+        color: var(--text-dark);
+        outline: none;
+        transition:
+          border-color var(--transition),
+          box-shadow var(--transition);
+      }
+
+      .s-input:focus {
+        border-color: var(--accent-gold);
+        box-shadow: 0 0 0 3px var(--gold-pale);
+      }
+
+      .s-input::placeholder {
+        color: var(--ink-faint);
+        font-size: 12px;
+      }
+
+      .s-select {
+        width: 100%;
+        padding: 9px 32px 9px 12px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23b8860b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        font-family: "Jost", sans-serif;
+        font-size: 13px;
+        font-weight: 300;
+        letter-spacing: 0.04em;
+        color: var(--text-gray);
+        cursor: pointer;
+        outline: none;
+        appearance: none;
+        transition: border-color var(--transition);
+      }
+
+      .s-select:focus {
+        border-color: var(--accent-gold);
+        box-shadow: 0 0 0 3px var(--gold-pale);
+      }
+
+      .s-divider {
+        border: none;
+        border-top: 1px solid var(--border-gold);
+        margin: 2px 0;
+        position: relative;
+      }
+
+      .s-divider::before {
+        content: "";
+        position: absolute;
+        top: -1px;
+        left: 0;
+        width: 40px;
+        height: 1px;
+        background: linear-gradient(90deg, var(--accent-gold), transparent);
+      }
+
+      /* Cover drop */
+      .sidebar-cover-drop {
+        border: 1px dashed rgba(184, 134, 11, 0.38);
+        background: rgba(184, 134, 11, 0.04);
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all var(--transition);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .sidebar-cover-drop:hover,
+      .sidebar-cover-drop.drag-over {
+        border-color: var(--accent-gold);
+        background: rgba(184, 134, 11, 0.08);
+      }
+
+      .drop-icon {
+        font-size: 1.4rem;
+        color: rgba(184, 134, 11, 0.35);
+        transition: color var(--transition);
+      }
+
+      .sidebar-cover-drop:hover .drop-icon {
+        color: var(--accent-gold);
+      }
+
+      .sidebar-cover-drop p {
+        font-family: "Jost", sans-serif;
+        font-size: 11.5px;
+        font-weight: 300;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+      }
+
+      .sidebar-cover-drop p strong {
+        color: var(--accent-gold);
+        font-weight: 500;
+      }
+
+      .cover-preview {
+        position: absolute;
+        inset: 0;
+      }
+
+      .cover-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .cover-preview-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s;
+        gap: 6px;
+      }
+
+      .cover-preview:hover .cover-preview-overlay {
+        opacity: 1;
+      }
+
+      .cover-preview-overlay button {
+        background: rgba(255, 255, 255, 0.92);
+        border: none;
+        padding: 6px 13px;
+        font-family: "Jost", sans-serif;
+        font-size: 10.5px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--primary-color);
+        cursor: pointer;
+      }
+
+      input[type="file"] {
+        display: none;
+      }
+
+      /* Tags */
+      .tags-input-wrap {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        padding: 5px 6px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        cursor: text;
+        transition: border-color var(--transition);
+        min-height: 38px;
+      }
+
+      .tags-input-wrap:focus-within {
+        border-color: var(--accent-gold);
+        box-shadow: 0 0 0 3px var(--gold-pale);
+      }
+
+      .tag-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: var(--gold-pale);
+        color: var(--primary-color);
+        border: 1px solid var(--gold-border);
+        font-family: "Jost", sans-serif;
+        font-size: 9.5px;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        padding: 2px 8px;
+      }
+
+      .tag-chip button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: rgba(184, 134, 11, 0.6);
+        font-size: 0.6rem;
+        padding: 0;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+      }
+
+      .tag-chip button:hover {
+        color: var(--primary-color);
+      }
+
+      .tags-actual-input {
+        border: none;
+        outline: none;
+        flex: 1;
+        min-width: 58px;
+        font-family: "Jost", sans-serif;
+        font-size: 12.5px;
+        font-weight: 300;
+        color: var(--text-dark);
+        background: transparent;
+        padding: 2px 4px;
+      }
+
+      .tags-actual-input::placeholder {
+        color: var(--ink-faint);
+        font-size: 11px;
+      }
+
+      /* Toggles */
+      .toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2px 0;
+      }
+
+      .toggle-row span {
+        font-family: "Jost", sans-serif;
+        font-size: 12.5px;
+        font-weight: 300;
+        letter-spacing: 0.04em;
+        color: var(--text-gray);
+      }
+
+      .toggle-input {
+        opacity: 0;
+        position: absolute;
+        width: 0;
+        height: 0;
+      }
+
+      .toggle-label {
+        display: block;
+        width: 36px;
+        height: 20px;
+        background: var(--border);
+        cursor: pointer;
+        transition: background var(--transition);
+        position: relative;
+      }
+
+      .toggle-label::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 16px;
+        height: 16px;
+        background: white;
+        transition: transform var(--transition);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+      }
+
+      .toggle-input:checked + .toggle-label {
+        background: var(--primary-color);
+      }
+
+      .toggle-input:checked + .toggle-label::after {
+        transform: translateX(16px);
+      }
+
+      /* Read stats */
+      .read-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+
+      .read-stat {
+        background: var(--gold-pale);
+        border: 1px solid var(--border-gold);
+        padding: 10px 8px;
+        text-align: center;
+      }
+
+      .rs-val {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        line-height: 1;
+      }
+
+      .rs-lbl {
+        font-family: "Jost", sans-serif;
+        font-size: 8.5px;
+        font-weight: 400;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-top: 3px;
+      }
+
+      /* ══════════════════════════════════════════════════
+   RESET MODAL
+══════════════════════════════════════════════════ */
+      .reset-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 900;
+        background: rgba(10, 2, 2, 0.7);
+        backdrop-filter: blur(6px);
+        align-items: center;
+        justify-content: center;
+      }
+
+      .reset-modal-overlay.show {
+        display: flex;
+      }
+
+      .reset-modal-box {
+        background: var(--surface);
+        border: 1px solid var(--border-gold);
+        padding: 32px 28px;
+        width: 380px;
+        max-width: 95vw;
+        box-shadow: 0 16px 56px rgba(127, 4, 3, 0.18);
+        text-align: center;
+        position: relative;
+      }
+
+      .reset-modal-box::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-gold),
+          var(--accent-gold-light),
+          var(--accent-gold)
+        );
+      }
+
+      .rm-icon {
+        width: 52px;
+        height: 52px;
+        border: 1.5px solid rgba(220, 80, 80, 0.3);
+        background: rgba(220, 60, 60, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        color: #c0392b;
+        font-size: 1.2rem;
+      }
+
+      .reset-modal-box h3 {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+        letter-spacing: 0.03em;
+      }
+
+      .reset-modal-box p {
+        font-size: 12.5px;
+        font-weight: 300;
+        letter-spacing: 0.04em;
+        color: var(--text-muted);
+        line-height: 1.65;
+        margin-bottom: 24px;
+      }
+
+      .reset-modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+
+      .rm-btn {
+        padding: 10px 26px;
+        font-family: "Jost", sans-serif;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border: 1px solid;
+        transition: all var(--transition);
+      }
+
+      .rm-btn-cancel {
+        background: transparent;
+        border-color: var(--border);
+        color: var(--text-muted);
+      }
+
+      .rm-btn-cancel:hover {
+        background: var(--gold-pale);
+        border-color: var(--border-gold);
+        color: var(--text-gray);
+      }
+
+      .rm-btn-confirm {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+      }
+
+      .rm-btn-confirm:hover {
+        background: var(--primary-light);
+      }
+
+      /* ══════════════════════════════════════════════════
+   SLASH BLOCK MENU
+══════════════════════════════════════════════════ */
+      .block-menu {
+        position: fixed;
+        z-index: 9999;
+        background: var(--surface);
+        border: 1px solid var(--border-gold);
+        box-shadow: 0 16px 56px rgba(127, 4, 3, 0.13);
+        border-top: 2px solid var(--accent-gold);
+        padding: 6px;
+        min-width: 220px;
+        display: none;
+        animation: menuIn 0.13s ease;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .block-menu.show {
+        display: block;
+      }
+
+      @keyframes menuIn {
+        from {
+          opacity: 0;
+          transform: translateY(-5px) scale(0.97);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .bm-label {
+        font-family: "Jost", sans-serif;
+        font-size: 8.5px;
+        font-weight: 500;
+        letter-spacing: 0.26em;
+        text-transform: uppercase;
+        color: var(--accent-gold);
+        padding: 5px 8px 3px;
+      }
+
+      .bm-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 7px 8px;
+        cursor: pointer;
+        transition: background var(--transition);
+      }
+
+      .bm-item:hover {
+        background: var(--gold-pale);
+      }
+
+      .bm-icon {
+        width: 28px;
+        height: 28px;
+        border: 1px solid var(--border-gold);
+        background: var(--gold-pale);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.72rem;
+        color: var(--accent-gold);
+        flex-shrink: 0;
+      }
+
+      .bm-item-text strong {
+        display: block;
+        font-family: "Jost", sans-serif;
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--text-dark);
+        letter-spacing: 0.02em;
+      }
+
+      .bm-item-text span {
+        font-family: "Jost", sans-serif;
+        font-size: 10.5px;
+        font-weight: 300;
+        color: var(--text-muted);
+      }
+
+      /* ══════════════════════════════════════════════════
+   IMAGE MODAL
+══════════════════════════════════════════════════ */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 800;
+        background: rgba(10, 2, 2, 0.65);
+        backdrop-filter: blur(5px);
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-overlay.show {
+        display: flex;
+      }
+
+      .modal-box {
+        background: var(--surface);
+        border: 1px solid var(--border-gold);
+        padding: 24px;
+        width: 440px;
+        max-width: 95vw;
+        box-shadow: 0 16px 56px rgba(127, 4, 3, 0.18);
+        position: relative;
+      }
+
+      .modal-box::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-gold),
+          var(--accent-gold-light),
+          var(--accent-gold)
+        );
+      }
+
+      .modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+
+      .modal-head h3 {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        letter-spacing: 0.03em;
+      }
+
+      .modal-close {
+        background: none;
+        border: 1px solid var(--border);
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all var(--transition);
+      }
+
+      .modal-close:hover {
+        border-color: rgba(220, 80, 80, 0.4);
+        color: #c0392b;
+        background: rgba(220, 60, 60, 0.05);
+      }
+
+      .img-tab-row {
+        display: flex;
+        margin-bottom: 14px;
+        border: 1px solid var(--border-gold);
+        overflow: hidden;
+      }
+
+      .img-tab {
+        flex: 1;
+        padding: 9px;
+        border: none;
+        background: transparent;
+        font-family: "Jost", sans-serif;
+        font-size: 10.5px;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all var(--transition);
+      }
+
+      .img-tab.active {
+        background: var(--gold-pale);
+        color: var(--primary-color);
+      }
+
+      .img-tab + .img-tab {
+        border-left: 1px solid var(--border-gold);
+      }
+
+      .mini-drop {
+        border: 1px dashed rgba(184, 134, 11, 0.38);
+        background: rgba(184, 134, 11, 0.04);
+        min-height: 90px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        padding: 14px;
+      }
+
+      .mini-drop:hover {
+        border-color: var(--accent-gold);
+        background: rgba(184, 134, 11, 0.08);
+      }
+
+      .mini-drop p {
+        font-family: "Jost", sans-serif;
+        font-size: 11.5px;
+        font-weight: 300;
+        color: var(--text-muted);
+        letter-spacing: 0.04em;
+      }
+
+      .img-url-row {
+        display: flex;
+        gap: 8px;
+      }
+
+      .img-url-row .s-input {
+        flex: 1;
+      }
+
+      .img-url-row button {
+        padding: 0 18px;
+        height: 40px;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        font-family: "Jost", sans-serif;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background var(--transition);
+        position: relative;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .img-url-row button::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1.5px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-gold-light),
+          var(--accent-gold),
+          var(--accent-gold-light)
+        );
+      }
+
+      .img-url-row button:hover {
+        background: var(--primary-light);
+      }
+
+      /* ══════════════════════════════════════════════════
+   PREVIEW PANEL — UNTOUCHED
+══════════════════════════════════════════════════ */
+      .preview-panel {
+        position: fixed;
+        inset: 0;
+        z-index: 500;
+        background: #f7f4f0;
+        display: none;
+        flex-direction: column;
+        animation: slideIn 0.26s ease;
+      }
+
+      .preview-panel.show {
+        display: flex;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .preview-topbar {
+        background: var(--primary-color);
+        padding: 0 22px;
+        height: var(--header-h);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        position: relative;
+      }
+
+      .preview-topbar::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-gold),
+          var(--accent-gold-light),
+          var(--accent-gold)
+        );
+      }
+
+      .preview-topbar span {
+        color: rgba(255, 255, 255, 0.5);
+        font-family: "Jost", sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+      }
+
+      .preview-topbar strong {
+        color: var(--accent-gold);
+        font-family: "Jost", sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .preview-close {
+        margin-left: auto;
+        background: none;
+        border: 1px solid rgba(184, 134, 11, 0.3);
+        color: rgba(255, 255, 255, 0.65);
+        padding: 5px 14px;
+        font-family: "Jost", sans-serif;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all var(--transition);
+      }
+
+      .preview-close:hover {
+        background: rgba(184, 134, 11, 0.1);
+        border-color: var(--accent-gold);
+        color: var(--accent-gold);
+      }
+
+      .preview-content {
+        flex: 1;
+        overflow-y: auto;
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 38px 22px 68px;
+        width: 100%;
+      }
+
+      .preview-cover {
+        width: 100%;
+        margin-bottom: 22px;
+        max-height: 320px;
+        object-fit: cover;
+      }
+
+      .preview-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 10px;
+      }
+
+      .preview-tag {
+        background: var(--gold-pale);
+        color: var(--primary-color);
+        border: 1px solid var(--border-gold);
+        font-family: "Jost", sans-serif;
+        font-size: 8.5px;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        padding: 3px 9px;
+      }
+
+      .preview-content h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.95rem;
+        font-weight: 700;
+        color: var(--e-text-dark);
+        line-height: 1.24;
+        margin-bottom: 9px;
+      }
+
+      .preview-subtitle {
+        font-size: 0.97rem;
+        color: var(--e-text-mid);
+        line-height: 1.66;
+        margin-bottom: 16px;
+        font-family: "DM Sans", sans-serif;
+      }
+
+      .preview-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-gold);
+        margin-bottom: 22px;
+        font-family: "Jost", sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+      }
+
+      .preview-meta i {
+        font-size: 0.65rem;
+        color: var(--accent-gold);
+      }
+
+      .preview-body {
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.94rem;
+        line-height: 1.85;
+        color: var(--e-text-dark);
+      }
+
+      .preview-body p {
+        margin-bottom: 11px;
+      }
+
+      .preview-body h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--e-text-dark);
+        margin: 20px 0 7px;
+      }
+
+      .preview-body h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.06rem;
+        font-weight: 600;
+        color: var(--e-text-dark);
+        margin: 15px 0 4px;
+      }
+
+      .preview-body blockquote {
+        border-left: 4px solid var(--e-gold);
+        background: var(--e-gold-pale);
+        margin: 16px 0;
+        padding: 13px 16px;
+        border-radius: 0 8px 8px 0;
+        font-family: "Playfair Display", serif;
+        font-style: italic;
+        font-size: 0.97rem;
+        color: var(--e-text-mid);
+      }
+
+      .preview-body img {
+        width: 100%;
+        margin: 13px 0;
+      }
+
+      .preview-body .editor-idea {
+        background: linear-gradient(135deg, #fff8e6, #fff3d6);
+        border: 1.5px solid var(--e-gold);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin: 13px 0;
+        display: flex;
+        gap: 9px;
+      }
+
+      .preview-body .editor-warning {
+        background: #fff5f5;
+        border: 1.5px solid #e57373;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin: 13px 0;
+        display: flex;
+        gap: 9px;
+      }
+
+      .preview-body .editor-info {
+        background: #f0f6ff;
+        border: 1.5px solid #90b8e8;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin: 13px 0;
+        display: flex;
+        gap: 9px;
+      }
+
+      .preview-body .d-diamond {
+        display: flex;
+        align-items: center;
+        margin: 20px 0;
+      }
+
+      .preview-body .d-diamond .d-line {
+        flex: 1;
+        height: 1.5px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--e-gold) 30%,
+          #c89a00 50%,
+          var(--e-gold) 70%,
+          transparent
+        );
+      }
+
+      .preview-body .d-diamond .d-gem {
+        color: var(--e-gold);
+        font-size: 0.82rem;
+        padding: 0 9px;
+      }
+
+      /* ══════════════════════════════════════════════════
+   FLOATING SELECTION TOOLBAR
+══════════════════════════════════════════════════ */
+      .float-toolbar {
+        position: fixed;
+        z-index: 300;
+        background: var(--primary-dark);
+        border: 1px solid rgba(184, 134, 11, 0.25);
+        padding: 4px 5px;
+        display: none;
+        align-items: center;
+        gap: 2px;
+        box-shadow: 0 8px 28px rgba(95, 2, 2, 0.35);
+        animation: menuIn 0.1s ease;
+      }
+
+      .float-toolbar.show {
+        display: flex;
+      }
+
+      .float-toolbar button {
+        width: 27px;
+        height: 27px;
+        border: none;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.6);
+        cursor: pointer;
+        font-size: 0.69rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition);
+      }
+
+      .float-toolbar button:hover {
+        background: rgba(184, 134, 11, 0.15);
+        color: var(--accent-gold);
+      }
+
+      .ft-sep {
+        width: 1px;
+        height: 16px;
+        background: rgba(184, 134, 11, 0.2);
+        margin: 0 2px;
+      }
+
+      /* ══════════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════════ */
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--primary-dark);
+        border: 1px solid rgba(184, 134, 11, 0.3);
+        border-top: 2px solid var(--accent-gold);
+        color: rgba(255, 255, 255, 0.85);
+        padding: 9px 20px;
+        font-family: "Jost", sans-serif;
+        font-size: 11px;
+        font-weight: 300;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 8px 32px rgba(95, 2, 2, 0.35);
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.28s;
+        pointer-events: none;
+      }
+
+      .toast.show {
+        opacity: 1;
+      }
+
+      .toast i {
+        color: var(--accent-gold);
+      }
+
+      /* ══════════════════════════════════════════════════
+   OVERLAYS & FAB
+══════════════════════════════════════════════════ */
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 50;
+        backdrop-filter: blur(2px);
+      }
+
+      .sidebar-overlay.show {
+        display: block;
+      }
+
+      .drawer-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 240;
+        backdrop-filter: blur(2px);
+      }
+
+      .drawer-overlay.show {
+        display: block;
+      }
+
+      .post-settings-fab {
+        display: none;
+      }
+
+      /* ══════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════ */
+      @media (max-width: 1280px) {
+        .editor-wrap {
+          grid-template-columns: 1fr 290px;
+        }
+
+        .editor-col-scroll {
+          padding: 22px 26px 36px;
+        }
+
+        .title-input {
+          font-size: 1.5rem;
+        }
+
+        .s-panel {
+          padding: 12px 12px 28px;
+          gap: 12px;
+        }
+      }
+
+      @media (max-width: 1024px) {
+        .editor-wrap {
+          grid-template-columns: 1fr 260px;
+        }
+
+        .header-breadcrumb {
+          display: none;
+        }
+
+        .bt-btn-tool {
+          width: 25px;
+          height: 25px;
+          font-size: 0.66rem;
+        }
+
+        .editor-col-scroll {
+          padding: 18px 20px 28px;
+        }
+
+        .title-input {
+          font-size: 1.35rem;
+        }
+
+        .s-panel {
+          padding: 10px 10px 24px;
+          gap: 11px;
+        }
+
+        .s-input,
+        .s-select {
+          font-size: 12px;
+          padding: 8px 10px;
+        }
+      }
+
+      @media (max-width: 820px) {
+        main {
+          height: calc(100vh - var(--header-h));
+        }
+
+        .editor-wrap {
+          grid-template-columns: 1fr;
+        }
+
+        /* Hide individual header action buttons — moved to dropdown */
+        .h-btn-outline,
+        .h-btn-reset,
+        .h-btn-ghost:not(#blogEditorCloseBtn),
+        .h-status,
+        .h-divider {
+          display: none !important;
+        }
+
+        /* Show mobile menu button */
+        .h-mobile-menu-btn {
+          display: flex;
+        }
+
+        /* Keep publish button always visible */
+        #headerPublishBtn {
+          display: inline-flex !important;
+          font-size: 11px;
+          padding: 0 12px;
+        }
+
+        .header-breadcrumb {
+          display: none;
+        }
+
+        .settings-col {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 250;
+          height: auto;
+          max-height: 80vh;
+          border-top: 2px solid var(--accent-gold);
+          box-shadow: 0 -8px 40px rgba(95, 2, 2, 0.18);
+          transform: translateY(100%);
+          transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+        }
+
+        .settings-col.drawer-open {
+          transform: translateY(0);
+        }
+
+        .settings-tabs::before {
+          content: "";
+          display: block;
+          width: 36px;
+          height: 3px;
+          background: rgba(184, 134, 11, 0.4);
+          margin: 10px auto 4px;
+        }
+
+        .post-settings-fab {
+          display: flex;
+          position: fixed;
+          bottom: 18px;
+          right: 18px;
+          z-index: 260;
+          width: 48px;
+          height: 48px;
+          background: var(--primary-color);
+          color: white;
+          border: 1px solid rgba(184, 134, 11, 0.3);
+          border-top: 2px solid var(--accent-gold);
+          align-items: center;
+          justify-content: center;
+          font-size: 1rem;
+          box-shadow: 0 4px 20px rgba(95, 2, 2, 0.35);
+          cursor: pointer;
+          transition: background var(--transition);
+        }
+
+        .post-settings-fab:hover,
+        .post-settings-fab.active {
+          background: var(--primary-light);
+        }
+
+        .editor-col-scroll {
+          padding: 16px 16px 90px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .h-btn {
+          padding: 0 10px;
+          font-size: 10px;
+        }
+
+        .bt-group:nth-child(3),
+        .bt-group:nth-child(7) {
+          display: none;
+        }
+
+        .bt-btn-tool {
+          width: 24px;
+          height: 24px;
+          font-size: 0.63rem;
+        }
+
+        .bt-select {
+          height: 26px;
+          font-size: 10.5px;
+        }
+
+        .title-input {
+          font-size: 1.15rem;
+        }
+
+        .block-wrapper .block-delete-btn {
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 360px) {
+        #headerPublishBtn {
+          padding: 0 9px;
+          font-size: 10px;
+        }
+
+        .title-input {
+          font-size: 1.05rem;
+        }
+
+        .bt-btn-tool {
+          width: 22px;
+          height: 22px;
+          font-size: 0.6rem;
+        }
+
+        .bt-group:nth-child(4),
+        .bt-group:nth-child(5) {
+          display: none;
+        }
+
+        .word-bar-chars {
+          display: none;
+        }
+      }
+
+      body {
+        padding: 10px;
+      }
+
+      /* ══════════════════════════════════════════════════
+       POSTS DRAWER
+    ══════════════════════════════════════════════════ */
+      .posts-drawer-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 2, 2, 0.55);
+        backdrop-filter: blur(4px);
+        z-index: 600;
+      }
+
+      .posts-drawer-overlay.show {
+        display: block;
+      }
+
+      .posts-drawer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 380px;
+        max-width: 90vw;
+        background: var(--surface);
+        z-index: 610;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 8px 0 40px rgba(95, 2, 2, 0.2);
+        transform: translateX(-100%);
+        transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+      }
+
+      .posts-drawer.open {
+        transform: translateX(0);
+      }
+
+      .pd-header {
+        background: var(--primary-color);
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+        position: relative;
+      }
+
+      .pd-header::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-gold),
+          var(--accent-gold-light),
+          var(--accent-gold)
+        );
+      }
+
+      .pd-header h3 {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: 0.06em;
+        flex: 1;
+      }
+
+      .pd-header h3 i {
+        color: var(--accent-gold);
+        margin-right: 8px;
+        font-size: 0.9rem;
+      }
+
+      .pd-close {
+        width: 32px;
+        height: 32px;
+        border: 1px solid rgba(184, 134, 11, 0.3);
+        background: transparent;
+        color: rgba(255, 255, 255, 0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: all var(--transition);
+      }
+
+      .pd-close:hover {
+        border-color: var(--accent-gold);
+        color: var(--accent-gold);
+        background: rgba(184, 134, 11, 0.1);
+      }
+
+      .pd-new-btn {
+        margin: 14px 16px 0;
+        padding: 11px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: var(--accent-gold);
+        border: none;
+        color: var(--primary-dark);
+        font-family: "Jost", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition:
+          background var(--transition),
+          transform var(--transition);
+        box-shadow: 0 3px 14px rgba(184, 134, 11, 0.25);
+      }
+
+      .pd-new-btn:hover {
+        background: var(--accent-gold-light);
+        transform: translateY(-1px);
+      }
+
+      .pd-new-btn i {
+        font-size: 0.75rem;
+      }
+
+      .pd-filters {
+        display: flex;
+        gap: 0;
+        margin: 14px 16px 0;
+        border: 1px solid var(--border-gold);
+        flex-shrink: 0;
+      }
+
+      .pd-filter {
+        flex: 1;
+        padding: 9px 4px;
+        border: none;
+        background: transparent;
+        font-family: "Jost", sans-serif;
+        font-size: 9.5px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all var(--transition);
+        text-align: center;
+      }
+
+      .pd-filter + .pd-filter {
+        border-left: 1px solid var(--border-gold);
+      }
+
+      .pd-filter:hover {
+        color: var(--text-dark);
+        background: var(--gold-pale);
+      }
+
+      .pd-filter.active {
+        background: var(--gold-pale);
+        color: var(--primary-color);
+        font-weight: 600;
+      }
+
+      .pd-count {
+        padding: 8px 18px 0;
+        font-family: "Jost", sans-serif;
+        font-size: 10px;
+        font-weight: 300;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+
+      .pd-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px 12px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(184, 134, 11, 0.25) transparent;
+      }
+
+      .pd-list::-webkit-scrollbar {
+        width: 3px;
+      }
+
+      .pd-list::-webkit-scrollbar-thumb {
+        background: rgba(184, 134, 11, 0.3);
+      }
+
+      .pd-item {
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        cursor: pointer;
+        transition: all var(--transition);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        position: relative;
+      }
+
+      .pd-item:hover {
+        border-color: var(--accent-gold);
+        background: var(--gold-pale);
+        box-shadow: 0 2px 12px rgba(184, 134, 11, 0.1);
+      }
+
+      .pd-item.active {
+        border-color: var(--primary-color);
+        border-left: 3px solid var(--primary-color);
+        background: rgba(127, 4, 3, 0.03);
+      }
+
+      .pd-item-title {
+        font-family: "Playfair Display", serif;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .pd-item-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .pd-status {
+        font-family: "Jost", sans-serif;
+        font-size: 8.5px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border-radius: 2px;
+      }
+
+      .pd-status.st-draft {
+        background: rgba(184, 134, 11, 0.12);
+        color: #b8860b;
+        border: 1px solid rgba(184, 134, 11, 0.25);
+      }
+
+      .pd-status.st-published {
+        background: rgba(76, 175, 130, 0.1);
+        color: #2e7d5f;
+        border: 1px solid rgba(76, 175, 130, 0.25);
+      }
+
+      .pd-status.st-archived {
+        background: rgba(150, 150, 150, 0.1);
+        color: #888;
+        border: 1px solid rgba(150, 150, 150, 0.25);
+      }
+
+      .pd-item-date {
+        font-family: "Jost", sans-serif;
+        font-size: 10px;
+        font-weight: 300;
+        color: var(--text-muted);
+        letter-spacing: 0.06em;
+      }
+
+      .pd-item-cat {
+        font-family: "Jost", sans-serif;
+        font-size: 9px;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent-gold);
+      }
+
+      .pd-empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-muted);
+      }
+
+      .pd-empty i {
+        font-size: 2rem;
+        color: var(--border);
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      .pd-empty p {
+        font-size: 12px;
+        font-weight: 300;
+        letter-spacing: 0.06em;
+      }
+
+      .pd-loading {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--ink-faint);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .pd-loading i {
+        margin-right: 6px;
+        color: var(--accent-gold);
+      }
+
+      @media (max-width: 480px) {
+        .posts-drawer {
+          width: 100%;
+          max-width: 100vw;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Overlays -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div
+      class="drawer-overlay"
+      id="drawerOverlay"
+      onclick="closeSettingsDrawer()"
+    ></div>
+    <button
+      class="post-settings-fab"
+      id="postSettingsFab"
+      onclick="toggleSettingsDrawer()"
+      title="Post Settings"
+    >
+      <i class="fas fa-sliders-h"></i>
+    </button>
+
+    <!-- POSTS DRAWER -->
+    <div
+      class="posts-drawer-overlay"
+      id="postsDrawerOverlay"
+      onclick="closePostsDrawer()"
+    ></div>
+    <div class="posts-drawer" id="postsDrawer">
+      <div class="pd-header">
+        <h3><i class="fas fa-feather-alt"></i> My Posts</h3>
+        <button class="pd-close" onclick="closePostsDrawer()" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <button class="pd-new-btn" onclick="startNewPost()">
+        <i class="fas fa-plus"></i> New Post
+      </button>
+      <div class="pd-filters">
+        <button
+          class="pd-filter active"
+          data-status=""
+          onclick="filterPosts('', this)"
+        >
+          All
+        </button>
+        <button
+          class="pd-filter"
+          data-status="draft"
+          onclick="filterPosts('draft', this)"
+        >
+          Drafts
+        </button>
+        <button
+          class="pd-filter"
+          data-status="published"
+          onclick="filterPosts('published', this)"
+        >
+          Published
+        </button>
+        <button
+          class="pd-filter"
+          data-status="archived"
+          onclick="filterPosts('archived', this)"
+        >
+          Archived
+        </button>
+      </div>
+      <div class="pd-count" id="pdCount"></div>
+      <div class="pd-list" id="pdList">
+        <div class="pd-loading">
+          <i class="fas fa-spinner fa-spin"></i> Loading posts…
+        </div>
+      </div>
+    </div>
+
+    <!-- RESET MODAL -->
+    <div class="reset-modal-overlay" id="resetModal">
+      <div class="reset-modal-box">
+        <div class="rm-icon"><i class="fas fa-rotate-left"></i></div>
+        <h3>Reset Everything?</h3>
+        <p>
+          This will clear your title, subtitle, content, cover image, tags, and
+          all post settings. This action cannot be undone.
+        </p>
+        <div class="reset-modal-actions">
+          <button class="rm-btn rm-btn-cancel" onclick="closeResetModal()">
+            Cancel
+          </button>
+          <button class="rm-btn rm-btn-confirm" onclick="confirmReset()">
+            <i class="fas fa-rotate-left"></i> Reset
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHELL -->
+    <div class="shell">
+      <!-- HEADER -->
+      <header>
+        <div
+          class="header-brand"
+          style="cursor: pointer"
+          onclick="openPostsDrawer()"
+          title="Browse all posts"
+        >
+          <div class="emblem">
+            <div class="emblem-outer"></div>
+            <div class="emblem-inner"></div>
+            <div class="emblem-letter">S</div>
+          </div>
+          <div class="brand-info">
+            <div class="brand-name">Sacred <span>Flame</span></div>
+            <div class="brand-tagline">Blog Editor</div>
+          </div>
+        </div>
+
+        <div class="header-breadcrumb">
+          <button
+            class="h-btn h-btn-ghost"
+            onclick="openPostsDrawer()"
+            title="View all posts"
+            style="margin-right: 4px"
+          >
+            <i class="fas fa-th-list"></i> Posts
+          </button>
+          <i class="fas fa-chevron-right"></i>
+          <strong>New Story</strong>
+        </div>
+
+        <div class="h-status" id="hStatus">
+          <div class="status-dot"></div>
+          Draft Saved
+        </div>
+
+        <div class="header-right">
+          <button class="h-btn h-btn-ghost" onclick="openPreview()">
+            <i class="fas fa-eye"></i> Preview
+          </button>
+          <button class="h-btn h-btn-reset" onclick="openResetModal()">
+            <i class="fas fa-rotate-left"></i> Reset
+          </button>
+          <button
+            class="h-btn h-btn-outline"
+            onclick="startNewPost()"
+            title="Create new post"
+          >
+            <i class="fas fa-plus"></i> New
+          </button>
+          <button
+            class="h-btn h-btn-reset"
+            onclick="deleteCurrentPost()"
+            title="Delete Post"
+          >
+            <i class="fas fa-trash-alt"></i> Delete
+          </button>
+          <button
+            class="h-btn h-btn-publish"
+            id="headerPublishBtn"
+            onclick="handlePublishOrUpdate()"
+          >
+            <i class="fas fa-paper-plane"></i> Publish
+          </button>
+          <div class="h-divider"></div>
+          <button
+            class="h-btn h-btn-ghost"
+            id="blogEditorCloseBtn"
+            style="
+              display: none;
+              border-color: rgba(220, 80, 80, 0.4);
+              color: rgba(220, 120, 120, 0.9);
+            "
+            onclick="
+              if (window.parent !== window) {
+                window.parent.postMessage({ type: 'blog-close-editor' }, '*');
+              }
+            "
+          >
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+
+          <!-- Mobile: always-visible publish + menu -->
+          <button
+            class="h-mobile-menu-btn"
+            id="hMobileMenuBtn"
+            onclick="toggleHeaderMenu()"
+            title="More options"
+          >
+            <i class="fas fa-ellipsis-v"></i>
+          </button>
+        </div>
+
+        <!-- Mobile dropdown menu -->
+        <div class="h-dropdown" id="hDropdown">
+          <button
+            class="h-dropdown-item"
+            onclick="
+              openPreview();
+              closeHeaderMenu();
+            "
+          >
+            <i class="fas fa-eye"></i> Preview
+          </button>
+          <button
+            class="h-dropdown-item"
+            onclick="
+              startNewPost();
+              closeHeaderMenu();
+            "
+          >
+            <i class="fas fa-plus"></i> New Post
+          </button>
+          <button
+            class="h-dropdown-item"
+            onclick="
+              openPostsDrawer();
+              closeHeaderMenu();
+            "
+          >
+            <i class="fas fa-th-list"></i> Browse Posts
+          </button>
+          <div class="h-dropdown-divider"></div>
+          <button
+            class="h-dropdown-item"
+            onclick="
+              openResetModal();
+              closeHeaderMenu();
+            "
+          >
+            <i class="fas fa-rotate-left"></i> Reset Editor
+          </button>
+          <button
+            class="h-dropdown-item danger"
+            onclick="
+              deleteCurrentPost();
+              closeHeaderMenu();
+            "
+          >
+            <i class="fas fa-trash-alt"></i> Delete Post
+          </button>
+          <div id="hDropdownBackWrap" style="display: none">
+            <div class="h-dropdown-divider"></div>
+            <button
+              class="h-dropdown-item h-dropdown-back"
+              onclick="
+                if (window.parent !== window) {
+                  window.parent.postMessage({ type: 'blog-close-editor' }, '*');
+                }
+                closeHeaderMenu();
+              "
+            >
+              <i class="fas fa-arrow-left"></i> Back to Admin
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN -->
+      <main>
+        <div class="editor-wrap">
+          <!-- EDITOR COLUMN -->
+          <div class="editor-col">
+            <div class="block-toolbar" id="blockToolbar">
+              <div class="bt-group">
+                <select
+                  class="bt-select"
+                  onchange="
+                    formatBlock(this.value);
+                    this.value = 'p';
+                  "
+                >
+                  <option value="p">Paragraph</option>
+                  <option value="h1">Heading 1</option>
+                  <option value="h2">Heading 2</option>
+                  <option value="h3">Heading 3</option>
+                  <option value="pre">Code Block</option>
+                </select>
+              </div>
+              <div class="bt-group">
+                <button class="bt-btn-tool" title="Bold" onclick="fmt('bold')">
+                  <i class="fas fa-bold"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Italic"
+                  onclick="fmt('italic')"
+                >
+                  <i class="fas fa-italic"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Underline"
+                  onclick="fmt('underline')"
+                >
+                  <i class="fas fa-underline"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Strikethrough"
+                  onclick="fmt('strikeThrough')"
+                >
+                  <i class="fas fa-strikethrough"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Highlight"
+                  onclick="fmt('hiliteColor', '#fff8d6')"
+                >
+                  <i class="fas fa-highlighter"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Inline Code"
+                  onclick="wrapCode()"
+                >
+                  <i class="fas fa-code"></i>
+                </button>
+              </div>
+              <div class="bt-group">
+                <button
+                  class="bt-btn-tool"
+                  title="Align Left"
+                  onclick="fmt('justifyLeft')"
+                >
+                  <i class="fas fa-align-left"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Center"
+                  onclick="fmt('justifyCenter')"
+                >
+                  <i class="fas fa-align-center"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Align Right"
+                  onclick="fmt('justifyRight')"
+                >
+                  <i class="fas fa-align-right"></i>
+                </button>
+              </div>
+              <div class="bt-group">
+                <button
+                  class="bt-btn-tool"
+                  title="Bullets"
+                  onclick="fmt('insertUnorderedList')"
+                >
+                  <i class="fas fa-list-ul"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Numbered"
+                  onclick="fmt('insertOrderedList')"
+                >
+                  <i class="fas fa-list-ol"></i>
+                </button>
+              </div>
+              <div class="bt-group">
+                <button
+                  class="bt-btn-tool"
+                  title="Blockquote"
+                  onclick="insertQuoteBlock()"
+                >
+                  <i class="fas fa-quote-left"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Pull Quote"
+                  onclick="insertSpecialBlock('pullquote')"
+                >
+                  <i class="fas fa-quote-right"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Idea Box"
+                  onclick="insertSpecialBlock('idea')"
+                  style="font-size: 0.82rem"
+                >
+                  💡
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Warning"
+                  onclick="insertSpecialBlock('warning')"
+                  style="font-size: 0.82rem"
+                >
+                  ⚠️
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Info Box"
+                  onclick="insertSpecialBlock('info')"
+                  style="font-size: 0.82rem"
+                >
+                  ℹ️
+                </button>
+              </div>
+              <div class="bt-group">
+                <button
+                  class="bt-btn-tool"
+                  title="Diamond Divider"
+                  onclick="insertDecorDiv('diamond')"
+                >
+                  <i class="fas fa-gem" style="color: var(--accent-gold)"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Flame Divider"
+                  onclick="insertDecorDiv('flame')"
+                >
+                  <i
+                    class="fas fa-fire"
+                    style="color: var(--primary-color)"
+                  ></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Stars Divider"
+                  onclick="insertDecorDiv('stars')"
+                >
+                  <i class="fas fa-star" style="color: var(--accent-gold)"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Wave Divider"
+                  onclick="insertDecorDiv('wave')"
+                >
+                  <i class="fas fa-water"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Line Divider"
+                  onclick="insertDecorDiv('plain')"
+                >
+                  <i class="fas fa-minus"></i>
+                </button>
+              </div>
+              <div class="bt-group">
+                <button
+                  class="bt-btn-tool"
+                  title="Insert Image"
+                  onclick="openImageModal()"
+                >
+                  <i class="fas fa-image"></i>
+                </button>
+                <button class="bt-btn-tool" title="Link" onclick="insertLink()">
+                  <i class="fas fa-link"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Remove Link"
+                  onclick="fmt('unlink')"
+                >
+                  <i class="fas fa-unlink"></i>
+                </button>
+              </div>
+              <div class="bt-group">
+                <button
+                  class="bt-btn-tool"
+                  title="Undo"
+                  onclick="document.execCommand('undo')"
+                >
+                  <i class="fas fa-undo"></i>
+                </button>
+                <button
+                  class="bt-btn-tool"
+                  title="Redo"
+                  onclick="document.execCommand('redo')"
+                >
+                  <i class="fas fa-redo"></i>
+                </button>
+              </div>
+              <span class="bt-slash-hint">Type <kbd>/</kbd></span>
+            </div>
+
+            <div class="editor-col-scroll" id="editorScroll">
+              <label class="input-label">Post Title</label>
+              <textarea
+                class="title-input"
+                id="titleInput"
+                rows="2"
+                placeholder="Write a compelling title…"
+                oninput="
+                  autoResize(this);
+                  updateStats();
+                "
+              ></textarea>
+              <textarea
+                class="subtitle-input"
+                id="subtitleInput"
+                rows="2"
+                placeholder="Add a short subtitle or teaser…"
+                oninput="autoResize(this)"
+              ></textarea>
+              <div
+                class="content-area"
+                id="contentArea"
+                contenteditable="true"
+                oninput="updateStats()"
+                onkeydown="handleKeydown(event)"
+                onmouseup="showFloatToolbar()"
+                onkeyup="handleKeyup(event)"
+              ></div>
+            </div>
+
+            <div class="word-bar">
+              <i class="fas fa-feather-alt word-bar-icon"></i>
+              <span class="word-bar-text" id="wordCountBar"
+                >0 words · ~0 min read</span
+              >
+              <span class="word-bar-chars" id="charCount">0 chars</span>
+            </div>
+          </div>
+
+          <!-- SETTINGS COLUMN -->
+          <div class="settings-col">
+            <div class="settings-tabs">
+              <button class="s-tab active" onclick="switchTab('post', this)">
+                Post Settings
+              </button>
+            </div>
+
+            <div class="s-panel active" id="tab-post">
+              <div class="s-field">
+                <div class="s-label">Cover Image</div>
+                <div
+                  class="sidebar-cover-drop"
+                  id="coverDrop"
+                  onclick="triggerCoverUpload()"
+                >
+                  <div
+                    id="coverPlaceholder"
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      gap: 6px;
+                    "
+                  >
+                    <div class="drop-icon"><i class="fas fa-image"></i></div>
+                    <p><strong>Upload</strong> or drop image</p>
+                    <p style="font-size: 10px; letter-spacing: 0.08em">
+                      PNG · JPG · WEBP · Max 1 MB
+                    </p>
+                  </div>
+                  <div
+                    class="cover-preview"
+                    id="coverPreview"
+                    style="display: none"
+                  >
+                    <img id="coverPreviewImg" src="" alt="Cover" />
+                    <div class="cover-preview-overlay">
+                      <button onclick="removeCover(event)">
+                        <i class="fas fa-sync-alt"></i> Change
+                      </button>
+                      <button
+                        onclick="removeCover(event)"
+                        style="background: rgba(220, 60, 60, 0.9); color: white"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <input
+                    type="file"
+                    id="coverFileInput"
+                    accept="image/*"
+                    onchange="handleCoverFile(event)"
+                  />
+                </div>
+              </div>
+
+              <hr class="s-divider" />
+
+              <div class="s-field">
+                <div class="s-label">Category</div>
+                <select class="s-select" id="categorySelect">
+                  <option value="traditions">Traditions</option>
+                  <option value="artisan-crafts">Artisan Crafts</option>
+                  <option value="festivals">Festivals</option>
+                  <option value="wellness">Wellness</option>
+                  <option value="community">Community</option>
+                  <option value="sacred-recipes">Sacred Recipes</option>
+                </select>
+              </div>
+
+              <div class="s-field">
+                <div class="s-label">
+                  Tags
+                  <span
+                    style="
+                      font-weight: 300;
+                      text-transform: none;
+                      letter-spacing: 0;
+                      color: var(--ink-faint);
+                      font-size: 10px;
+                    "
+                    >— press Enter</span
+                  >
+                </div>
+                <div
+                  class="tags-input-wrap"
+                  id="tagsWrap"
+                  onclick="focusTagInput()"
+                >
+                  <input
+                    class="tags-actual-input"
+                    id="tagInput"
+                    placeholder="Add tag…"
+                    onkeydown="handleTagInput(event)"
+                  />
+                </div>
+              </div>
+
+              <hr class="s-divider" />
+
+              <div class="s-field">
+                <div class="s-label">Author</div>
+                <input
+                  class="s-input"
+                  type="text"
+                  id="authorInput"
+                  value="Shri Brand"
+                />
+              </div>
+              <div class="s-field">
+                <div class="s-label">Publish Date</div>
+                <input class="s-input" type="date" id="publishDate" />
+              </div>
+              <div class="s-field">
+                <div class="s-label">Read Time</div>
+                <input
+                  class="s-input"
+                  type="text"
+                  id="readTime"
+                  placeholder="e.g. 5 min read"
+                />
+              </div>
+
+              <hr class="s-divider" />
+
+              <div class="s-field">
+                <div class="toggle-row">
+                  <span>Featured Post</span>
+                  <div>
+                    <input
+                      class="toggle-input"
+                      type="checkbox"
+                      id="tgl1"
+                    /><label class="toggle-label" for="tgl1"></label>
+                  </div>
+                </div>
+              </div>
+              <div class="s-field">
+                <div class="toggle-row">
+                  <span>Allow Comments</span>
+                  <div>
+                    <input
+                      class="toggle-input"
+                      type="checkbox"
+                      id="tgl2"
+                      checked
+                    /><label class="toggle-label" for="tgl2"></label>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="s-divider" />
+
+              <div class="read-stats">
+                <div class="read-stat">
+                  <div class="rs-val" id="stat-words">0</div>
+                  <div class="rs-lbl">Words</div>
+                </div>
+                <div class="read-stat">
+                  <div class="rs-val" id="stat-read">0m</div>
+                  <div class="rs-lbl">Read</div>
+                </div>
+                <div class="read-stat">
+                  <div class="rs-val" id="stat-para">0</div>
+                  <div class="rs-lbl">Blocks</div>
+                </div>
+                <div class="read-stat">
+                  <div class="rs-val" id="stat-imgs">0</div>
+                  <div class="rs-lbl">Images</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- FLOATING TOOLBAR -->
+    <div class="float-toolbar" id="floatToolbar">
+      <button onclick="fmt('bold')" title="Bold">
+        <i class="fas fa-bold"></i>
+      </button>
+      <button onclick="fmt('italic')" title="Italic">
+        <i class="fas fa-italic"></i>
+      </button>
+      <button onclick="fmt('underline')" title="Underline">
+        <i class="fas fa-underline"></i>
+      </button>
+      <div class="ft-sep"></div>
+      <button onclick="fmt('hiliteColor', '#fff8d6')" title="Highlight">
+        <i class="fas fa-highlighter"></i>
+      </button>
+      <button onclick="insertLink()" title="Link">
+        <i class="fas fa-link"></i>
+      </button>
+      <div class="ft-sep"></div>
+      <button onclick="insertQuoteBlock()" title="Blockquote">
+        <i class="fas fa-quote-left"></i>
+      </button>
+    </div>
+
+    <!-- SLASH BLOCK MENU -->
+    <div class="block-menu" id="blockMenu">
+      <div class="bm-label">Insert Block</div>
+      <div class="bm-item" onclick="insertFromMenu('p')">
+        <div class="bm-icon"><i class="fas fa-paragraph"></i></div>
+        <div class="bm-item-text">
+          <strong>Paragraph</strong><span>Normal text</span>
+        </div>
+      </div>
+      <div class="bm-item" onclick="insertFromMenu('h2')">
+        <div class="bm-icon">
+          <b
+            style="
+              font-family: &quot;Cormorant Garamond&quot;, serif;
+              font-size: 0.9rem;
+              color: var(--primary-color);
+            "
+            >H2</b
+          >
+        </div>
+        <div class="bm-item-text">
+          <strong>Heading 2</strong><span>Large heading</span>
+        </div>
+      </div>
+      <div class="bm-item" onclick="insertFromMenu('h3')">
+        <div class="bm-icon">
+          <b
+            style="
+              font-family: &quot;Cormorant Garamond&quot;, serif;
+              font-size: 0.75rem;
+              color: var(--primary-color);
+            "
+            >H3</b
+          >
+        </div>
+        <div class="bm-item-text">
+          <strong>Heading 3</strong><span>Subheading</span>
+        </div>
+      </div>
+      <div class="bm-item" onclick="insertFromMenu('blockquote')">
+        <div class="bm-icon"><i class="fas fa-quote-left"></i></div>
+        <div class="bm-item-text">
+          <strong>Blockquote</strong><span>Styled quote</span>
+        </div>
+      </div>
+      <div class="bm-item" onclick="insertFromMenu('idea')">
+        <div class="bm-icon">💡</div>
+        <div class="bm-item-text">
+          <strong>Idea Box</strong><span>Gold callout</span>
+        </div>
+      </div>
+      <div class="bm-item" onclick="insertFromMenu('warning')">
+        <div class="bm-icon">⚠️</div>
+        <div class="bm-item-text">
+          <strong>Warning</strong><span>Red alert</span>
+        </div>
+      </div>
+      <div class="bm-item" onclick="insertFromMenu('info')">
+        <div class="bm-icon">ℹ️</div>
+        <div class="bm-item-text">
+          <strong>Info Box</strong><span>Blue note</span>
+        </div>
+      </div>
+      <div class="bm-item" onclick="insertFromMenu('ul')">
+        <div class="bm-icon"><i class="fas fa-list-ul"></i></div>
+        <div class="bm-item-text">
+          <strong>Bullet List</strong><span>Unordered</span>
+        </div>
+      </div>
+      <div class="bm-item" onclick="insertFromMenu('image')">
+        <div class="bm-icon"><i class="fas fa-image"></i></div>
+        <div class="bm-item-text">
+          <strong>Image</strong><span>Embed image</span>
+        </div>
+      </div>
+      <div class="bm-item" onclick="insertFromMenu('diamond')">
+        <div class="bm-icon">
+          <i class="fas fa-gem" style="color: var(--accent-gold)"></i>
+        </div>
+        <div class="bm-item-text">
+          <strong>Divider</strong><span>Diamond separator</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMAGE MODAL -->
+    <div class="modal-overlay" id="imgModal">
+      <div class="modal-box">
+        <div class="modal-head">
+          <h3>Insert Image</h3>
+          <button class="modal-close" onclick="closeImgModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="img-tab-row">
+          <button class="img-tab active" onclick="switchImgTab('url', this)">
+            URL
+          </button>
+          <button class="img-tab" onclick="switchImgTab('upload', this)">
+            Upload File
+          </button>
+        </div>
+        <div id="imgTabUrl">
+          <div class="s-field" style="margin-bottom: 12px">
+            <div class="s-label">Image URL</div>
+            <div class="img-url-row">
+              <input
+                class="s-input"
+                type="text"
+                id="imgUrlInput"
+                placeholder="https://images.unsplash.com/…"
+              />
+              <button onclick="insertImageFromUrl()">Insert</button>
+            </div>
+          </div>
+        </div>
+        <div id="imgTabUpload" style="display: none">
+          <div
+            class="mini-drop"
+            onclick="document.getElementById('inlineFileInput').click()"
+          >
+            <i
+              class="fas fa-cloud-upload-alt"
+              style="font-size: 1.5rem; color: rgba(184, 134, 11, 0.4)"
+            ></i>
+            <p>Click to upload image</p>
+            <p
+              style="
+                font-size: 10px;
+                color: var(--ink-faint);
+                letter-spacing: 0.08em;
+              "
+            >
+              Max 1 MB · PNG · JPG · WEBP
+            </p>
+            <input
+              type="file"
+              id="inlineFileInput"
+              accept="image/*"
+              onchange="handleInlineFile(event)"
+            />
+          </div>
+        </div>
+        <div class="s-field" style="margin-top: 12px">
+          <div class="s-label">Caption (optional)</div>
+          <input
+            class="s-input"
+            type="text"
+            id="imgCaptionInput"
+            placeholder="Add an image caption…"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- PREVIEW PANEL -->
+    <div class="preview-panel" id="previewPanel">
+      <div class="preview-topbar">
+        <i class="fas fa-eye" style="color: var(--accent-gold)"></i>
+        <span>Preview as</span>
+        <strong>Published Article</strong>
+        <button class="preview-close" onclick="closePreview()">
+          <i class="fas fa-times"></i> Close Preview
+        </button>
+      </div>
+      <div class="preview-content">
+        <img
+          id="pvCover"
+          class="preview-cover"
+          src=""
+          alt=""
+          style="display: none"
+        />
+        <div class="preview-tags" id="pvTags"></div>
+        <h1 id="pvTitle">Untitled Story</h1>
+        <p class="preview-subtitle" id="pvSubtitle"></p>
+        <div class="preview-meta">
+          <span><i class="fas fa-user"></i> Priya Sharma</span>
+          <span><i class="fas fa-calendar"></i> <span id="pvDate"></span></span>
+          <span
+            ><i class="fas fa-clock"></i>
+            <span id="pvReadTime">1 min read</span></span
+          >
+        </div>
+        <div class="preview-body" id="pvBody"></div>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+      <i class="fas fa-check-circle"></i> Draft saved
+    </div>
+
+    <script>
+      /* ═══════════════════════════════════════════════
+       API CONFIGURATION & CRUD LAYER
+    ═══════════════════════════════════════════════ */
+      const API_BASE = "https://shri-brand.onrender.com/api/v1/blogs";
+      const FETCH_TIMEOUT = 12000;
+      let currentPostId = null;
+
+      class ApiError extends Error {
+        constructor(message, status, errors) {
+          super(message);
+          this.name = "ApiError";
+          this.status = status;
+          this.errors = errors;
+        }
+      }
+
+      async function apiFetch(url, options = {}) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+        options.signal = controller.signal;
+        options.headers = {
+          "Content-Type": "application/json",
+          ...(options.headers || {}),
+        };
+
+        try {
+          const resp = await fetch(url, options);
+          clearTimeout(timer);
+          if (resp.status === 204) return { status: "success", data: null };
+          const body = await resp.json().catch(() => ({}));
+          if (!resp.ok) {
+            const msg = body.message || `Server error (${resp.status})`;
+            throw new ApiError(msg, resp.status, body.errors);
+          }
+          return body;
+        } catch (err) {
+          clearTimeout(timer);
+          if (err instanceof ApiError) throw err;
+          if (err.name === "AbortError")
+            throw new ApiError("Request timed out. Check your connection.", 0);
+          if (!navigator.onLine)
+            throw new ApiError(
+              "You are offline. Check your internet connection.",
+              0,
+            );
+          throw new ApiError("Cannot connect to server. Try again later.", 0);
+        }
+      }
+
+      /* ── DOM → BLOCKS SERIALIZER ── */
+      function serializeContentToBlocks() {
+        const area = document.getElementById("contentArea");
+        const blocks = [];
+        let blockId = 0;
+        const nextId = () => "blk-" + ++blockId + "-" + Date.now();
+
+        area.childNodes.forEach((node) => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            const t = node.textContent.trim();
+            if (t) blocks.push({ id: nextId(), type: "paragraph", html: t });
+            return;
+          }
+          if (node.nodeType !== Node.ELEMENT_NODE) return;
+          const el = node;
+          const tag = el.tagName.toLowerCase();
+
+          // Block wrapper (special blocks: pullquote, idea, warning, info, divider)
+          if (el.classList.contains("block-wrapper")) {
+            if (el.querySelector(".editor-pullquote")) {
+              const txt =
+                (el.querySelector(".editor-pullquote-text") || {}).innerText ||
+                "";
+              blocks.push({
+                id: nextId(),
+                type: "pullquote",
+                text: txt.trim(),
+              });
+            } else if (el.querySelector(".editor-idea")) {
+              const txt =
+                (el.querySelector(".editor-idea-content") || {}).innerText ||
+                "";
+              blocks.push({ id: nextId(), type: "idea", text: txt.trim() });
+            } else if (el.querySelector(".editor-warning")) {
+              const txt =
+                (el.querySelector(".editor-warning-content") || {}).innerText ||
+                "";
+              blocks.push({ id: nextId(), type: "warning", text: txt.trim() });
+            } else if (el.querySelector(".editor-info")) {
+              const txt =
+                (el.querySelector(".editor-info-content") || {}).innerText ||
+                "";
+              blocks.push({ id: nextId(), type: "info", text: txt.trim() });
+            } else if (el.querySelector(".editor-divider")) {
+              const div = el.querySelector(".editor-divider");
+              let style = "plain";
+              if (div.classList.contains("d-diamond")) style = "diamond";
+              else if (div.classList.contains("d-flame")) style = "flame";
+              else if (div.classList.contains("d-stars")) style = "stars";
+              else if (div.classList.contains("d-wave")) style = "wave";
+              blocks.push({ id: nextId(), type: "divider", style });
+            }
+            return;
+          }
+          // Image block
+          if (el.classList.contains("editor-img-block")) {
+            const img = el.querySelector("img");
+            const cap = el.querySelector(".img-caption-input");
+            if (img && img.src) {
+              blocks.push({
+                id: nextId(),
+                type: "image",
+                url: img.src,
+                caption: cap ? cap.value : "",
+                alt: cap ? cap.value : "",
+              });
+            }
+            return;
+          }
+          // Headings
+          if (["h1", "h2", "h3"].includes(tag)) {
+            const level = parseInt(tag[1]);
+            blocks.push({
+              id: nextId(),
+              type: "heading",
+              level,
+              text: el.innerText.trim(),
+            });
+            return;
+          }
+          // Blockquote
+          if (tag === "blockquote") {
+            blocks.push({
+              id: nextId(),
+              type: "blockquote",
+              text: el.innerText.trim(),
+            });
+            return;
+          }
+          // Lists
+          if (tag === "ul" || tag === "ol") {
+            const items = Array.from(el.querySelectorAll("li"))
+              .map((li) => li.innerText.trim())
+              .filter(Boolean);
+            if (items.length)
+              blocks.push({
+                id: nextId(),
+                type: "list",
+                ordered: tag === "ol",
+                items,
+              });
+            return;
+          }
+          // Code block
+          if (tag === "pre") {
+            const code = el.querySelector("code");
+            const lang = code
+              ? code.className.replace("language-", "") || ""
+              : "";
+            blocks.push({
+              id: nextId(),
+              type: "code",
+              text: (code || el).innerText.trim(),
+              language: lang,
+            });
+            return;
+          }
+          // Paragraph (default)
+          const html = el.innerHTML.trim();
+          if (html && html !== "<br>" && html !== "<br/>") {
+            blocks.push({ id: nextId(), type: "paragraph", html });
+          }
+        });
+        return blocks;
+      }
+
+      /* ── BLOCKS → DOM DESERIALIZER ── */
+      function deserializeBlocksToDOM(blocks) {
+        const area = document.getElementById("contentArea");
+        area.innerHTML = "";
+        if (!blocks || !blocks.length) return;
+
+        const del = `<button class="block-delete-btn" title="Delete block" onclick="deleteBlock(this)"><i class="fas fa-times"></i></button>`;
+
+        blocks.forEach((b) => {
+          let html = "";
+          switch (b.type) {
+            case "paragraph":
+              html = `<p>${b.html || b.text || ""}</p>`;
+              break;
+            case "heading":
+              html = `<h${b.level || 2}>${b.text || ""}</h${b.level || 2}>`;
+              break;
+            case "blockquote":
+              html = `<blockquote>${b.text || ""}</blockquote>`;
+              break;
+            case "pullquote":
+              html = `<div class="block-wrapper" contenteditable="false">${del}<div class="editor-pullquote"><span class="editor-pullquote-text" contenteditable="true" onkeydown="handleBlockInnerKeydown(event,this)">${b.text || ""}</span></div></div>`;
+              break;
+            case "idea":
+              html = `<div class="block-wrapper" contenteditable="false">${del}<div class="editor-idea"><span class="idea-icon">💡</span><div class="editor-idea-content" contenteditable="true" onkeydown="handleBlockInnerKeydown(event,this)">${b.text || ""}</div></div></div>`;
+              break;
+            case "warning":
+              html = `<div class="block-wrapper" contenteditable="false">${del}<div class="editor-warning"><span class="warn-icon"><i class="fas fa-exclamation-triangle"></i></span><div class="editor-warning-content" contenteditable="true" onkeydown="handleBlockInnerKeydown(event,this)">${b.text || ""}</div></div></div>`;
+              break;
+            case "info":
+              html = `<div class="block-wrapper" contenteditable="false">${del}<div class="editor-info"><span class="info-icon"><i class="fas fa-info-circle"></i></span><div class="editor-info-content" contenteditable="true" onkeydown="handleBlockInnerKeydown(event,this)">${b.text || ""}</div></div></div>`;
+              break;
+            case "image":
+              html = `<div class="editor-img-block" contenteditable="false"><button class="img-remove" onclick="this.parentElement.remove();updateStats()"><i class="fas fa-times"></i></button><img src="${b.url}" alt="${b.alt || b.caption || ""}"/><input class="img-caption-input" value="${b.caption || ""}" placeholder="Add a caption…"/></div>`;
+              break;
+            case "divider": {
+              const dividers = {
+                diamond: `<div class="editor-divider d-diamond"><div class="d-line"></div><span class="d-gem">✦ ◆ ✦</span><div class="d-line"></div></div>`,
+                flame: `<div class="editor-divider d-flame"><div class="d-line"></div><span class="d-gem"><i class="fas fa-fire-flame-curved"></i></span><div class="d-line"></div></div>`,
+                stars: `<div class="editor-divider d-stars">✦ &nbsp;&nbsp;✦ &nbsp;&nbsp;✦</div>`,
+                wave: `<div class="editor-divider d-wave"><svg viewBox="0 0 400 12" xmlns="http://www.w3.org/2000/svg"><path d="M0,6 C50,0 100,12 150,6 C200,0 250,12 300,6 C350,0 380,10 400,6" stroke="#b8860b" stroke-width="1.5" fill="none" opacity=".5"/></svg></div>`,
+                plain: `<div class="editor-divider d-plain"></div>`,
+              };
+              html = `<div class="block-wrapper" contenteditable="false">${del}${dividers[b.style] || dividers.plain}</div>`;
+              break;
+            }
+            case "list": {
+              const tag = b.ordered ? "ol" : "ul";
+              html = `<${tag}>${(b.items || []).map((it) => `<li>${it}</li>`).join("")}</${tag}>`;
+              break;
+            }
+            case "code":
+              html = `<pre><code${b.language ? ` class="language-${b.language}"` : ""}>${b.text || ""}</code></pre>`;
+              break;
+            default:
+              break;
+          }
+          if (html) area.insertAdjacentHTML("beforeend", html);
+        });
+        area.insertAdjacentHTML("beforeend", "<p><br/></p>");
+      }
+
+      /* ── GATHER FORM DATA ── */
+      function gatherPostData() {
+        const tags = [];
+        document.querySelectorAll("#tagsWrap .tag-chip").forEach((c) => {
+          const t = c.textContent.replace(/[×✕]/g, "").trim();
+          if (t) tags.push(t);
+        });
+        const coverPreviewEl = document.getElementById("coverPreview");
+        const coverSrc = document.getElementById("coverPreviewImg").src;
+        const isCoverVisible =
+          coverPreviewEl && coverPreviewEl.style.display !== "none";
+        const hasCover =
+          isCoverVisible &&
+          coverSrc &&
+          (coverSrc.startsWith("http") || coverSrc.startsWith("data:"));
+
+        return {
+          title: document.getElementById("titleInput").value.trim(),
+          subtitle: document.getElementById("subtitleInput").value.trim(),
+          blocks: serializeContentToBlocks(),
+          category: document.getElementById("categorySelect").value,
+          tags,
+          author: document.getElementById("authorInput").value.trim(),
+          publishDate:
+            document.getElementById("publishDate").value || undefined,
+          readTime:
+            document.getElementById("readTime").value.trim() || undefined,
+          coverImage: hasCover ? { url: coverSrc } : undefined,
+          settings: {
+            isFeatured: document.getElementById("tgl1").checked,
+            allowComments: document.getElementById("tgl2").checked,
+          },
+        };
+      }
+
+      /* ── CLIENT-SIDE VALIDATION ── */
+      function validatePostData(data, forPublish = false) {
+        const errors = [];
+        if (!data.title) errors.push("Title is required.");
+        else if (data.title.length > 300)
+          errors.push("Title cannot exceed 300 characters.");
+        if (data.subtitle && data.subtitle.length > 500)
+          errors.push("Subtitle cannot exceed 500 characters.");
+        if (data.tags && data.tags.length > 20)
+          errors.push("Maximum 20 tags allowed.");
+        if (forPublish) {
+          if (!data.blocks || data.blocks.length === 0)
+            errors.push("Add some content before publishing.");
+          if (!data.coverImage || !data.coverImage.url)
+            errors.push("Cover image is required to publish.");
+          if (!data.subtitle) errors.push("Subtitle is required to publish.");
+          if (!data.category) errors.push("Category is required to publish.");
+        }
+        // Validate image blocks
+        (data.blocks || []).forEach((b, i) => {
+          if (b.type === "image" && (!b.url || !b.url.trim()))
+            errors.push(`Block ${i + 1} (image): URL is missing.`);
+          if (b.type === "heading" && (!b.text || !b.text.trim()))
+            errors.push(`Block ${i + 1} (heading): text is empty.`);
+        });
+        return errors;
+      }
+
+      /* ── INTERNAL SAVE (used by publish only) ── */
+      async function _savePost(data) {
+        let result;
+        if (currentPostId) {
+          result = await apiFetch(`${API_BASE}/${currentPostId}`, {
+            method: "PATCH",
+            body: JSON.stringify(data),
+          });
+        } else {
+          result = await apiFetch(API_BASE, {
+            method: "POST",
+            body: JSON.stringify(data),
+          });
+          if (result.data && result.data.post) {
+            currentPostId = result.data.post._id;
+          }
+        }
+        return result;
+      }
+
+      /* ── LOAD EXISTING POST ── */
+      async function loadPost(idOrSlug) {
+        try {
+          setStatus("loading");
+          let url = `${API_BASE}/${idOrSlug}`;
+          // Try slug if it doesn't look like a MongoDB ObjectId
+          if (!/^[a-f\d]{24}$/i.test(idOrSlug))
+            url = `${API_BASE}/slug/${idOrSlug}`;
+          const data = await apiFetch(url);
+          if (!data || !data.data || !data.data.post)
+            throw new ApiError("Post not found", 404);
+          const p = data.data.post;
+          currentPostId = p._id;
+
+          document.getElementById("titleInput").value = p.title || "";
+          document.getElementById("subtitleInput").value = p.subtitle || "";
+          autoResize(document.getElementById("titleInput"));
+          autoResize(document.getElementById("subtitleInput"));
+          document.getElementById("categorySelect").value =
+            p.category || "traditions";
+          document.getElementById("authorInput").value =
+            p.author || "Priya Sharma";
+          if (p.publishDate)
+            document.getElementById("publishDate").value = new Date(
+              p.publishDate,
+            )
+              .toISOString()
+              .split("T")[0];
+          if (p.readTime) {
+            document.getElementById("readTime").value = p.readTime;
+            readTimeManuallyEdited = true;
+          }
+          document.getElementById("tgl1").checked = !!(
+            p.settings && p.settings.isFeatured
+          );
+          document.getElementById("tgl2").checked = p.settings
+            ? p.settings.allowComments
+            : true;
+
+          // Tags
+          const tagsWrap = document.getElementById("tagsWrap");
+          tagsWrap.querySelectorAll(".tag-chip").forEach((t) => t.remove());
+          (p.tags || []).forEach((t) => addTag(t));
+
+          // Cover
+          if (p.coverImage && p.coverImage.url) {
+            document.getElementById("coverPreviewImg").src = p.coverImage.url;
+            document.getElementById("coverPlaceholder").style.display = "none";
+            document.getElementById("coverPreview").style.display = "block";
+          }
+          // Content
+          deserializeBlocksToDOM(p.blocks || []);
+          updateStats();
+          // Update breadcrumb
+          const breadcrumb = document.querySelector(
+            ".header-breadcrumb strong",
+          );
+          if (breadcrumb)
+            breadcrumb.textContent =
+              p.status === "published" ? "Edit Story" : "Edit Draft";
+          history.replaceState(null, "", `?edit=${currentPostId}`);
+          setEditMode(true);
+          setStatus("saved");
+          showToast("Post loaded");
+        } catch (err) {
+          setStatus("error");
+          showToast(
+            err.message || "Could not load post",
+            "fa-exclamation-triangle",
+            true,
+          );
+        }
+      }
+
+      /* ── DELETE POST ── */
+      async function deleteCurrentPost() {
+        if (!currentPostId) {
+          showToast("No post to delete", "fa-info-circle", true);
+          return;
+        }
+        if (!confirm("Permanently delete this post? This cannot be undone."))
+          return;
+        try {
+          setStatus("saving");
+          await apiFetch(`${API_BASE}/${currentPostId}`, { method: "DELETE" });
+          currentPostId = null;
+          confirmReset();
+          setEditMode(false);
+          history.replaceState(null, "", "blogPost.html");
+          showToast("Post deleted successfully");
+          refreshPostsDrawer();
+          setStatus("saved");
+        } catch (err) {
+          setStatus("error");
+          showToast(
+            err.message || "Delete failed",
+            "fa-exclamation-triangle",
+            true,
+          );
+        }
+      }
+
+      /* ── STATUS INDICATOR ── */
+      function setStatus(state) {
+        const el =
+          document.getElementById("hStatus") ||
+          document.querySelector(".h-status");
+        if (!el) return;
+        const map = {
+          saving:
+            '<div class="status-dot" style="background:#d4a520;animation:none"></div> Saving…',
+          saved: '<div class="status-dot"></div> Draft Saved',
+          loading:
+            '<div class="status-dot" style="background:#2196f3;animation:none"></div> Loading…',
+          error:
+            '<div class="status-dot" style="background:#e57373;animation:none"></div> Error',
+        };
+        el.innerHTML = map[state] || map.saved;
+      }
+
+      /* ── SETTINGS DRAWER (mobile) ── */
+      function toggleSettingsDrawer() {
+        const col = document.querySelector(".settings-col");
+        const overlay = document.getElementById("drawerOverlay");
+        const fab = document.getElementById("postSettingsFab");
+        const isOpen = col.classList.toggle("drawer-open");
+        overlay.classList.toggle("show", isOpen);
+        fab.classList.toggle("active", isOpen);
+        fab.innerHTML = isOpen
+          ? '<i class="fas fa-times"></i>'
+          : '<i class="fas fa-sliders-h"></i>';
+      }
+      function closeSettingsDrawer() {
+        document.querySelector(".settings-col").classList.remove("drawer-open");
+        document.getElementById("drawerOverlay").classList.remove("show");
+        const fab = document.getElementById("postSettingsFab");
+        fab.classList.remove("active");
+        fab.innerHTML = '<i class="fas fa-sliders-h"></i>';
+      }
+
+      /* ── RESET ── */
+      function openResetModal() {
+        document.getElementById("resetModal").classList.add("show");
+      }
+      function closeResetModal() {
+        document.getElementById("resetModal").classList.remove("show");
+      }
+      function confirmReset() {
+        document.getElementById("titleInput").value = "";
+        document.getElementById("subtitleInput").value = "";
+        document.getElementById("contentArea").innerHTML = "";
+        document.getElementById("subtitleInput").style.height = "";
+        document.getElementById("titleInput").style.height = "";
+        removeCover({ stopPropagation: () => {} });
+        document.getElementById("categorySelect").selectedIndex = 0;
+        document
+          .getElementById("tagsWrap")
+          .querySelectorAll(".tag-chip")
+          .forEach((t) => t.remove());
+        document.getElementById("authorInput").value = "Priya Sharma";
+        document.getElementById("publishDate").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        document.getElementById("readTime").value = "";
+        readTimeManuallyEdited = false;
+        document.getElementById("tgl1").checked = false;
+        document.getElementById("tgl2").checked = true;
+        closeResetModal();
+        updateStats();
+        showToast("Page reset successfully", "fa-rotate-left");
+      }
+
+      /* ── TABS ── */
+      function switchTab(name, btn) {
+        document
+          .querySelectorAll(".s-tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll(".s-panel")
+          .forEach((p) => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("tab-" + name).classList.add("active");
+      }
+
+      /* ── AUTO RESIZE ── */
+      function autoResize(el) {
+        el.style.height = "auto";
+        el.style.height = el.scrollHeight + "px";
+      }
+
+      /* ── CARET RANGE ── */
+      let savedRange = null;
+      function saveCaretRange() {
+        const s = window.getSelection();
+        if (s && s.rangeCount) savedRange = s.getRangeAt(0).cloneRange();
+      }
+      function restoreRange() {
+        if (!savedRange) return;
+        const s = window.getSelection();
+        s.removeAllRanges();
+        s.addRange(savedRange);
+      }
+
+      /* ── FORMATTING ── */
+      function fmt(cmd, val) {
+        restoreRange();
+        document.getElementById("contentArea").focus();
+        document.execCommand(cmd, false, val || null);
+        savedRange = null;
+      }
+      function formatBlock(tag) {
+        document.getElementById("contentArea").focus();
+        document.execCommand("formatBlock", false, tag);
+      }
+      function wrapCode() {
+        restoreRange();
+        const sel = window.getSelection();
+        if (!sel || sel.isCollapsed) return;
+        document.execCommand(
+          "insertHTML",
+          false,
+          `<code>${sel.toString()}</code>`,
+        );
+      }
+      function insertLink() {
+        restoreRange();
+        const url = prompt("Enter URL:");
+        if (url) document.execCommand("createLink", false, url);
+      }
+      function insertQuoteBlock() {
+        document.getElementById("contentArea").focus();
+        restoreRange();
+        const sel = window.getSelection();
+        if (sel && !sel.isCollapsed) {
+          document.execCommand("formatBlock", false, "blockquote");
+        } else {
+          insertHTML(
+            "<blockquote>Write your quote here…</blockquote><p><br/></p>",
+          );
+        }
+      }
+
+      /* ── INSERT HTML ── */
+      function insertHTML(html) {
+        const area = document.getElementById("contentArea");
+        area.focus();
+        restoreRange();
+        if (!document.execCommand("insertHTML", false, html)) {
+          const sel = window.getSelection();
+          if (!sel.rangeCount) return;
+          const r = sel.getRangeAt(0);
+          r.deleteContents();
+          const div = document.createElement("div");
+          div.innerHTML = html;
+          const frag = document.createDocumentFragment();
+          let node, last;
+          while ((node = div.firstChild)) {
+            last = frag.appendChild(node);
+          }
+          r.insertNode(frag);
+          if (last) {
+            const nr = r.cloneRange();
+            nr.setStartAfter(last);
+            nr.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(nr);
+          }
+        }
+        updateStats();
+      }
+
+      /* ── BLOCK DELETE ── */
+      function deleteBlock(btn) {
+        const w = btn.closest(".block-wrapper");
+        if (w) {
+          w.remove();
+          updateStats();
+        }
+      }
+      function handleBlockInnerKeydown(e, innerEl) {
+        if (
+          (e.key === "Backspace" || e.key === "Delete") &&
+          !(innerEl.innerText || "").trim()
+        ) {
+          e.preventDefault();
+          const w = innerEl.closest(".block-wrapper");
+          if (w) {
+            w.remove();
+            updateStats();
+          }
+        }
+      }
+
+      /* ── SPECIAL BLOCKS ── */
+      function insertSpecialBlock(type) {
+        saveCaretRange();
+        const del = `<button class="block-delete-btn" title="Delete block" onclick="deleteBlock(this)"><i class="fas fa-times"></i></button>`;
+        let inner = "";
+        if (type === "pullquote")
+          inner = `<div class="editor-pullquote"><span class="editor-pullquote-text" contenteditable="true" onkeydown="handleBlockInnerKeydown(event,this)">Write your pull quote here…</span></div>`;
+        else if (type === "idea")
+          inner = `<div class="editor-idea"><span class="idea-icon">💡</span><div class="editor-idea-content" contenteditable="true" onkeydown="handleBlockInnerKeydown(event,this)"></div></div>`;
+        else if (type === "warning")
+          inner = `<div class="editor-warning"><span class="warn-icon"><i class="fas fa-exclamation-triangle"></i></span><div class="editor-warning-content" contenteditable="true" onkeydown="handleBlockInnerKeydown(event,this)"></div></div>`;
+        else if (type === "info")
+          inner = `<div class="editor-info"><span class="info-icon"><i class="fas fa-info-circle"></i></span><div class="editor-info-content" contenteditable="true" onkeydown="handleBlockInnerKeydown(event,this)"></div></div>`;
+        insertHTML(
+          `<div class="block-wrapper" contenteditable="false">${del}${inner}</div><p><br/></p>`,
+        );
+      }
+
+      /* ── DECORATIVE DIVIDERS ── */
+      function insertDecorDiv(type) {
+        saveCaretRange();
+        const del = `<button class="block-delete-btn" title="Delete divider" onclick="deleteBlock(this)"><i class="fas fa-times"></i></button>`;
+        const dividers = {
+          diamond: `<div class="editor-divider d-diamond"><div class="d-line"></div><span class="d-gem">✦ ◆ ✦</span><div class="d-line"></div></div>`,
+          flame: `<div class="editor-divider d-flame"><div class="d-line"></div><span class="d-gem"><i class="fas fa-fire-flame-curved"></i></span><div class="d-line"></div></div>`,
+          stars: `<div class="editor-divider d-stars">✦ &nbsp;&nbsp;✦ &nbsp;&nbsp;✦</div>`,
+          wave: `<div class="editor-divider d-wave"><svg viewBox="0 0 400 12" xmlns="http://www.w3.org/2000/svg"><path d="M0,6 C50,0 100,12 150,6 C200,0 250,12 300,6 C350,0 380,10 400,6" stroke="#b8860b" stroke-width="1.5" fill="none" opacity=".5"/></svg></div>`,
+          plain: `<div class="editor-divider d-plain"></div>`,
+        };
+        insertHTML(
+          `<div class="block-wrapper" contenteditable="false">${del}${dividers[type]}</div><p><br/></p>`,
+        );
+      }
+
+      /* ── SLASH MENU ── */
+      let blockMenuOpen = false;
+      function handleKeydown(e) {
+        if (e.key === "/" && !blockMenuOpen) {
+          setTimeout(showBlockMenu, 0);
+        }
+        if (e.key === "Escape") {
+          closeBlockMenu();
+          hideFloatToolbar();
+        }
+      }
+      function handleKeyup(e) {
+        if (blockMenuOpen && e.key !== "/") closeBlockMenu();
+        updateStats();
+      }
+      function showBlockMenu() {
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return;
+        const rect = sel.getRangeAt(0).getBoundingClientRect();
+        const m = document.getElementById("blockMenu");
+        m.style.visibility = "hidden";
+        m.style.display = "block";
+        const mw = m.offsetWidth,
+          mh = m.offsetHeight;
+        m.style.display = "";
+        m.style.visibility = "";
+        const vw = window.innerWidth,
+          vh = window.innerHeight,
+          GAP = 8;
+        let top = rect.bottom + GAP,
+          left = rect.left;
+        if (top + mh > vh - GAP) top = rect.top - mh - GAP;
+        top = Math.max(GAP, top);
+        if (left + mw > vw - GAP) left = vw - mw - GAP;
+        left = Math.max(GAP, left);
+        m.style.top = top + "px";
+        m.style.left = left + "px";
+        m.classList.add("show");
+        blockMenuOpen = true;
+      }
+      function closeBlockMenu() {
+        document.getElementById("blockMenu").classList.remove("show");
+        blockMenuOpen = false;
+      }
+      function insertFromMenu(type) {
+        closeBlockMenu();
+        document.getElementById("contentArea").focus();
+        document.execCommand("delete", false, null);
+        const blockTypes = {
+          p: () => document.execCommand("formatBlock", false, "p"),
+          ul: () => document.execCommand("insertUnorderedList"),
+          blockquote: insertQuoteBlock,
+          image: openImageModal,
+        };
+        if (blockTypes[type]) blockTypes[type]();
+        else if (["idea", "warning", "info", "pullquote"].includes(type))
+          insertSpecialBlock(type);
+        else if (["diamond", "flame", "stars", "wave", "plain"].includes(type))
+          insertDecorDiv(type);
+        else document.execCommand("formatBlock", false, type);
+      }
+      document.addEventListener("click", (e) => {
+        const m = document.getElementById("blockMenu"),
+          ca = document.getElementById("contentArea");
+        if (m && !m.contains(e.target) && !ca.contains(e.target))
+          closeBlockMenu();
+      });
+
+      /* ── FLOATING TOOLBAR ── */
+      function showFloatToolbar() {
+        const sel = window.getSelection();
+        if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+          hideFloatToolbar();
+          return;
+        }
+        saveCaretRange();
+        const rect = sel.getRangeAt(0).getBoundingClientRect();
+        const ft = document.getElementById("floatToolbar");
+        ft.style.top = rect.top + window.scrollY - 44 + "px";
+        ft.style.left = Math.max(0, rect.left + rect.width / 2 - 88) + "px";
+        ft.classList.add("show");
+      }
+      function hideFloatToolbar() {
+        document.getElementById("floatToolbar").classList.remove("show");
+      }
+      document.addEventListener("mousedown", (e) => {
+        if (!document.getElementById("floatToolbar").contains(e.target))
+          setTimeout(hideFloatToolbar, 100);
+      });
+
+      /* ═══════════════════════════════════════════════
+       IMAGE UPLOAD — Cloudinary via server endpoints
+       All images are uploaded to the server which stores
+       them in Cloudinary and returns a permanent HTTPS URL.
+       No base64 is ever saved to the database.
+    ═══════════════════════════════════════════════ */
+
+      const IMG_UPLOAD_BASE =
+        "https://shri-brand.onrender.com/api/v1/blog-images";
+      const MAX_IMG_BYTES = 1024 * 1024; // 1 MB hard limit (enforced client + server)
+      const ALLOWED_IMG_TYPES = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+      ];
+
+      /**
+       * Validate image before any upload attempt.
+       * Returns true if valid, false + shows toast if invalid.
+       */
+      function validateImageFile(file) {
+        if (!file) return false;
+
+        if (!ALLOWED_IMG_TYPES.includes(file.type)) {
+          showToast(
+            `Invalid type "${file.type}". Use JPG, PNG, or WEBP.`,
+            "fa-exclamation-triangle",
+            true,
+          );
+          return false;
+        }
+
+        if (file.size > MAX_IMG_BYTES) {
+          const kb = Math.round(file.size / 1024);
+          showToast(
+            `Image too large (${kb} KB). Maximum is 1 024 KB (1 MB).`,
+            "fa-exclamation-triangle",
+            true,
+          );
+          return false;
+        }
+
+        return true;
+      }
+
+      /**
+       * Upload a File to the given server endpoint.
+       * endpoint: '/cover' | '/content'
+       * Returns the Cloudinary URL string on success, null on failure.
+       *
+       * Shows an uploading toast while in-flight and an error toast on failure.
+       */
+      async function uploadImageToCloudinary(file, endpoint) {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        // Optimistic uploading indicator
+        const toastKey = `Uploading ${endpoint === "/cover" ? "cover" : "image"}…`;
+        showToast(toastKey, "fa-spinner fa-spin", false);
+
+        try {
+          const resp = await fetch(`${IMG_UPLOAD_BASE}${endpoint}`, {
+            method: "POST",
+            body: formData,
+            // NOTE: do NOT set Content-Type — browser sets it with the correct boundary
+          });
+
+          const body = await resp.json().catch(() => ({}));
+
+          if (!resp.ok) {
+            // Server-side validation or Cloudinary error
+            const msg = body.message || `Upload failed (${resp.status})`;
+            showToast(msg, "fa-exclamation-triangle", true);
+            return null;
+          }
+
+          return body.data.url; // Cloudinary secure_url
+        } catch (err) {
+          const msg =
+            err.name === "TypeError"
+              ? "Cannot reach server. Is it running?"
+              : err.message || "Upload failed";
+          showToast(msg, "fa-exclamation-triangle", true);
+          return null;
+        }
+      }
+
+      /* ── COVER IMAGE ── */
+      function triggerCoverUpload() {
+        document.getElementById("coverFileInput").click();
+      }
+
+      async function handleCoverFile(e) {
+        const f = e.target.files[0];
+        if (!f) return;
+        if (!validateImageFile(f)) {
+          e.target.value = "";
+          return;
+        }
+
+        // Show a local preview immediately for responsiveness
+        const localUrl = URL.createObjectURL(f);
+        document.getElementById("coverPreviewImg").src = localUrl;
+        document.getElementById("coverPlaceholder").style.display = "none";
+        document.getElementById("coverPreview").style.display = "block";
+
+        // Upload to Cloudinary in background
+        const cloudUrl = await uploadImageToCloudinary(f, "/cover");
+        e.target.value = ""; // always reset input
+
+        if (cloudUrl) {
+          // Replace local blob URL with permanent Cloudinary URL
+          document.getElementById("coverPreviewImg").src = cloudUrl;
+          showToast("Cover image uploaded", "fa-check-circle");
+        } else {
+          // Upload failed — revert preview so user knows it's not saved
+          document.getElementById("coverPreviewImg").src = "";
+          document.getElementById("coverPlaceholder").style.display = "flex";
+          document.getElementById("coverPreview").style.display = "none";
+        }
+        URL.revokeObjectURL(localUrl);
+      }
+
+      function removeCover(e) {
+        e.stopPropagation();
+        document.getElementById("coverPreviewImg").src = "";
+        document.getElementById("coverPlaceholder").style.display = "flex";
+        document.getElementById("coverPreview").style.display = "none";
+        document.getElementById("coverFileInput").value = "";
+      }
+
+      /* ── IMAGE MODAL ── */
+      function openImageModal() {
+        saveCaretRange();
+        document.getElementById("imgModal").classList.add("show");
+      }
+      function closeImgModal() {
+        document.getElementById("imgModal").classList.remove("show");
+        document.getElementById("imgUrlInput").value = "";
+        document.getElementById("imgCaptionInput").value = "";
+      }
+      function switchImgTab(tab, btn) {
+        document
+          .querySelectorAll(".img-tab")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("imgTabUrl").style.display =
+          tab === "url" ? "block" : "none";
+        document.getElementById("imgTabUpload").style.display =
+          tab === "upload" ? "block" : "none";
+      }
+      function insertImageHtml(src, cap) {
+        insertHTML(
+          `<div class="editor-img-block" contenteditable="false"><button class="img-remove" onclick="this.parentElement.remove();updateStats()"><i class="fas fa-times"></i></button><img src="${src}" alt="${cap || ""}"/><input class="img-caption-input" value="${cap || ""}" placeholder="Add a caption…"/></div><p><br/></p>`,
+        );
+        closeImgModal();
+      }
+      function insertImageFromUrl() {
+        const u = document.getElementById("imgUrlInput").value.trim();
+        const c = document.getElementById("imgCaptionInput").value.trim();
+        if (!u) return;
+        insertImageHtml(u, c);
+      }
+      async function handleInlineFile(e) {
+        const f = e.target.files[0];
+        if (!f) return;
+        if (!validateImageFile(f)) {
+          e.target.value = "";
+          return;
+        }
+
+        const caption = document.getElementById("imgCaptionInput").value.trim();
+
+        // Show a temporary placeholder block while uploading
+        const placeholderId = "img-uploading-" + Date.now();
+        insertHTML(
+          `<div id="${placeholderId}" class="editor-img-block" contenteditable="false" ` +
+            `style="background:rgba(184,134,11,0.06);border:1px dashed rgba(184,134,11,0.4);` +
+            `display:flex;align-items:center;justify-content:center;min-height:80px;padding:14px;gap:8px;` +
+            `font-family:'Jost',sans-serif;font-size:11px;letter-spacing:.08em;color:var(--ink-faint)">` +
+            `<i class="fas fa-spinner fa-spin" style="color:var(--accent-gold)"></i> Uploading image…` +
+            `</div><p><br/></p>`,
+        );
+        e.target.value = "";
+        closeImgModal();
+
+        const cloudUrl = await uploadImageToCloudinary(f, "/content");
+
+        // Remove the placeholder
+        const placeholder = document.getElementById(placeholderId);
+        if (placeholder) placeholder.remove();
+
+        if (cloudUrl) {
+          // Insert the real image block with the Cloudinary URL
+          const del = `<button class="img-remove" onclick="this.parentElement.remove();updateStats()"><i class="fas fa-times"></i></button>`;
+          const area = document.getElementById("contentArea");
+          area.insertAdjacentHTML(
+            "beforeend",
+            `<div class="editor-img-block" contenteditable="false">${del}` +
+              `<img src="${cloudUrl}" alt="${caption}"/>` +
+              `<input class="img-caption-input" value="${caption}" placeholder="Add a caption…"/></div>` +
+              `<p><br/></p>`,
+          );
+          updateStats();
+          showToast("Image inserted", "fa-check-circle");
+        }
+      }
+
+      /* ── TAGS ── */
+      function handleTagInput(e) {
+        if (e.key === "Enter" || e.key === ",") {
+          e.preventDefault();
+          const v = e.target.value.trim().replace(",", "");
+          if (!v) return;
+          addTag(v);
+          e.target.value = "";
+        }
+        if (e.key === "Backspace" && !e.target.value) {
+          const chips = document.querySelectorAll(".tag-chip");
+          if (chips.length) chips[chips.length - 1].remove();
+        }
+      }
+      function addTag(val) {
+        const w = document.getElementById("tagsWrap"),
+          inp = document.getElementById("tagInput");
+        const c = document.createElement("span");
+        c.className = "tag-chip";
+        c.innerHTML = `${val} <button onclick="removeTag(this)"><i class="fas fa-times"></i></button>`;
+        w.insertBefore(c, inp);
+      }
+      function removeTag(btn) {
+        btn.parentElement.remove();
+      }
+      function focusTagInput() {
+        document.getElementById("tagInput").focus();
+      }
+
+      /* ── STATS ── */
+      let readTimeManuallyEdited = false;
+      function updateStats() {
+        const text = document.getElementById("contentArea").innerText || "";
+        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+        const mins = Math.max(1, Math.ceil(words / 220));
+        const chars = text.length;
+        const blocks = document
+          .getElementById("contentArea")
+          .querySelectorAll(
+            "p,h1,h2,h3,blockquote,.editor-idea,.editor-warning,.editor-info,.editor-pullquote",
+          ).length;
+        const imgs = document
+          .getElementById("contentArea")
+          .querySelectorAll("img").length;
+        document.getElementById("wordCountBar").textContent =
+          `${words} words · ~${mins} min read`;
+        document.getElementById("charCount").textContent = `${chars} chars`;
+        document.getElementById("stat-words").textContent = words;
+        document.getElementById("stat-read").textContent = mins + "m";
+        document.getElementById("stat-para").textContent = blocks;
+        document.getElementById("stat-imgs").textContent = imgs;
+        if (!readTimeManuallyEdited)
+          document.getElementById("readTime").value = mins + " min read";
+      }
+
+      /* ── PREVIEW ── */
+      function openPreview() {
+        document.getElementById("pvTitle").textContent =
+          document.getElementById("titleInput").value || "Untitled Story";
+        document.getElementById("pvSubtitle").textContent =
+          document.getElementById("subtitleInput").value || "";
+        document.getElementById("pvBody").innerHTML =
+          document.getElementById("contentArea").innerHTML || "";
+        document.getElementById("pvDate").textContent =
+          new Date().toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          });
+        document.getElementById("pvReadTime").textContent =
+          document.getElementById("readTime").value || "1 min read";
+        const cvr = document.getElementById("pvCover"),
+          src = document.getElementById("coverPreviewImg").src;
+        if (src && src.length > 20 && !src.endsWith("undefined")) {
+          cvr.src = src;
+          cvr.style.display = "block";
+        } else {
+          cvr.style.display = "none";
+        }
+        const pvTags = document.getElementById("pvTags");
+        pvTags.innerHTML = "";
+        document.querySelectorAll(".tag-chip").forEach((c) => {
+          const t = document.createElement("span");
+          t.className = "preview-tag";
+          t.textContent = c.textContent.replace(/[×✕]/g, "").trim();
+          pvTags.appendChild(t);
+        });
+        document.getElementById("previewPanel").classList.add("show");
+      }
+      function closePreview() {
+        document.getElementById("previewPanel").classList.remove("show");
+      }
+
+      /* ── TOAST ── */
+      function showToast(msg, icon, isError) {
+        const t = document.getElementById("toast");
+        const ic = icon || "fa-check-circle";
+        const icColor = isError ? "#e57373" : "var(--accent-gold)";
+        t.innerHTML = `<i class="fas ${ic}" style="color:${icColor}"></i> ${msg || "Draft saved"}`;
+        t.style.borderTopColor = isError ? "#e57373" : "var(--accent-gold)";
+        t.classList.add("show");
+        setTimeout(
+          () => {
+            t.classList.remove("show");
+            if (isError)
+              setTimeout(() => {
+                t.innerHTML = '<i class="fas fa-check-circle"></i> Draft saved';
+                t.style.borderTopColor = "";
+              }, 300);
+          },
+          isError ? 4000 : 2300,
+        );
+      }
+
+      /* ── PUBLISH (API-backed) ── */
+      async function handlePublish() {
+        const data = gatherPostData();
+        const errs = validatePostData(data, true);
+        if (errs.length) {
+          showToast(errs[0], "fa-exclamation-triangle", true);
+          if (!data.title) document.getElementById("titleInput").focus();
+          return;
+        }
+        if (!confirm(`Publish "${data.title}"?`)) return;
+        const btn = document.getElementById("headerPublishBtn");
+        try {
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing…';
+          btn.disabled = true;
+          await _savePost(data);
+          await apiFetch(`${API_BASE}/${currentPostId}/publish`, {
+            method: "PATCH",
+          });
+          btn.innerHTML = '<i class="fas fa-check"></i> Published!';
+          btn.style.cssText =
+            "background:#3a7a56;border-color:#3a7a56;color:white";
+          btn.disabled = false;
+          showToast("Post published successfully!", "fa-check-circle");
+          refreshPostsDrawer();
+          // Notify parent (admin SPA) if inside an iframe
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: "blog-published" }, "*");
+          }
+          // Auto-reset editor for a new post after a short delay
+          setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Publish';
+            btn.style.cssText = "";
+            startNewPost();
+          }, 2000);
+        } catch (err) {
+          showToast(
+            err.message || "Publish failed",
+            "fa-exclamation-triangle",
+            true,
+          );
+          btn.innerHTML = '<i class="fas fa-paper-plane"></i> Publish';
+          btn.style.cssText = "";
+          btn.disabled = false;
+        }
+      }
+
+      /* ── EDIT MODE FLAG ── */
+      let isEditMode = false;
+
+      function setEditMode(active) {
+        isEditMode = active;
+        const btn = document.getElementById("headerPublishBtn");
+        if (!btn) return;
+        if (active) {
+          btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Update';
+          btn.title = "Save & update this post";
+        } else {
+          btn.innerHTML = '<i class="fas fa-paper-plane"></i> Publish';
+          btn.title = "";
+        }
+      }
+
+      function handlePublishOrUpdate() {
+        if (isEditMode) {
+          handleUpdate();
+        } else {
+          handlePublish();
+        }
+      }
+
+      /* ── UPDATE (edit mode — API-backed) ── */
+      async function handleUpdate() {
+        const data = gatherPostData();
+        const errs = validatePostData(data, true);
+        if (errs.length) {
+          showToast(errs[0], "fa-exclamation-triangle", true);
+          if (!data.title) document.getElementById("titleInput").focus();
+          return;
+        }
+        if (!confirm(`Update "${data.title}"?`)) return;
+        const btn = document.getElementById("headerPublishBtn");
+        try {
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating…';
+          btn.disabled = true;
+          await _savePost(data);
+          btn.innerHTML = '<i class="fas fa-check"></i> Updated!';
+          btn.style.cssText =
+            "background:#3a7a56;border-color:#3a7a56;color:white";
+          btn.disabled = false;
+          showToast("Post updated successfully!", "fa-check-circle");
+          refreshPostsDrawer();
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: "blog-updated" }, "*");
+          }
+          setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Update';
+            btn.style.cssText = "";
+          }, 2000);
+        } catch (err) {
+          showToast(
+            err.message || "Update failed",
+            "fa-exclamation-triangle",
+            true,
+          );
+          btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Update';
+          btn.style.cssText = "";
+          btn.disabled = false;
+        }
+      }
+
+      /* ═══════════════════════════════════════════════
+       POSTS DRAWER — browse & manage all posts
+    ═══════════════════════════════════════════════ */
+      let postsDrawerOpen = false;
+      let postsListCache = [];
+      let postsFilterStatus = "";
+
+      function openPostsDrawer() {
+        document.getElementById("postsDrawer").classList.add("open");
+        document.getElementById("postsDrawerOverlay").classList.add("show");
+        postsDrawerOpen = true;
+        fetchPostsList();
+      }
+
+      function closePostsDrawer() {
+        document.getElementById("postsDrawer").classList.remove("open");
+        document.getElementById("postsDrawerOverlay").classList.remove("show");
+        postsDrawerOpen = false;
+      }
+
+      function refreshPostsDrawer() {
+        if (postsDrawerOpen) fetchPostsList();
+      }
+
+      async function fetchPostsList() {
+        const list = document.getElementById("pdList");
+        list.innerHTML =
+          '<div class="pd-loading"><i class="fas fa-spinner fa-spin"></i> Loading posts…</div>';
+        try {
+          let url = `${API_BASE}?limit=50&sortBy=updatedAt&order=desc`;
+          if (postsFilterStatus) url += `&status=${postsFilterStatus}`;
+          const data = await apiFetch(url);
+          if (!data || !data.data || !data.data.posts)
+            throw new Error("Invalid response");
+          postsListCache = data.data.posts;
+          renderPostsList(postsListCache);
+        } catch (err) {
+          list.innerHTML = `<div class="pd-empty"><i class="fas fa-exclamation-triangle"></i><p>${err.message || "Could not load posts"}</p></div>`;
+        }
+      }
+
+      function renderPostsList(posts) {
+        const list = document.getElementById("pdList");
+        const countEl = document.getElementById("pdCount");
+        list.innerHTML = "";
+        countEl.textContent = `${posts.length} post${posts.length !== 1 ? "s" : ""}`;
+
+        if (!posts.length) {
+          list.innerHTML =
+            '<div class="pd-empty"><i class="fas fa-feather-alt"></i><p>No posts found. Create your first story!</p></div>';
+          return;
+        }
+
+        const CAT_MAP = {
+          traditions: "Traditions",
+          "artisan-crafts": "Artisan Crafts",
+          festivals: "Festivals",
+          wellness: "Wellness",
+          community: "Community",
+          "sacred-recipes": "Sacred Recipes",
+        };
+
+        posts.forEach((p) => {
+          const item = document.createElement("div");
+          item.className =
+            "pd-item" + (p._id === currentPostId ? " active" : "");
+          const statusClass =
+            p.status === "published"
+              ? "st-published"
+              : p.status === "archived"
+                ? "st-archived"
+                : "st-draft";
+          const statusLabel =
+            (p.status || "draft").charAt(0).toUpperCase() +
+            (p.status || "draft").slice(1);
+          const date = p.updatedAt
+            ? new Date(p.updatedAt).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })
+            : "";
+          const cat = CAT_MAP[p.category] || p.category || "";
+
+          item.innerHTML = `
+          <div class="pd-item-title">${p.title || "Untitled"}</div>
+          <div class="pd-item-meta">
+            <span class="pd-status ${statusClass}">${statusLabel}</span>
+            ${cat ? `<span class="pd-item-cat">${cat}</span>` : ""}
+            <span class="pd-item-date">${date}</span>
+          </div>`;
+          item.addEventListener("click", () => {
+            closePostsDrawer();
+            loadPost(p._id);
+          });
+          list.appendChild(item);
+        });
+      }
+
+      function filterPosts(status, btn) {
+        postsFilterStatus = status;
+        document
+          .querySelectorAll(".pd-filter")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        fetchPostsList();
+      }
+
+      function startNewPost() {
+        closePostsDrawer();
+        currentPostId = null;
+        confirmReset();
+        setEditMode(false);
+        history.replaceState(null, "", "blogPost.html");
+        const breadcrumb = document.querySelector(".header-breadcrumb strong");
+        if (breadcrumb) breadcrumb.textContent = "New Story";
+        showToast("Ready for a new story", "fa-feather-alt");
+      }
+
+      /* ── INIT ── */
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("publishDate").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        updateStats();
+        document.execCommand("defaultParagraphSeparator", false, "p");
+
+        const rt = document.getElementById("readTime");
+        rt.addEventListener("input", () => {
+          readTimeManuallyEdited = true;
+        });
+        rt.addEventListener("change", () => {
+          if (!rt.value.trim()) readTimeManuallyEdited = false;
+        });
+
+        document
+          .getElementById("blockToolbar")
+          .addEventListener("mousedown", (e) => {
+            if (e.target.tagName !== "SELECT") e.preventDefault();
+          });
+        document
+          .getElementById("blockMenu")
+          .addEventListener("mousedown", (e) => e.preventDefault());
+        document
+          .getElementById("floatToolbar")
+          .addEventListener("mousedown", (e) => e.preventDefault());
+
+        /* Drag & drop cover */
+        const drop = document.getElementById("coverDrop");
+        drop.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          drop.classList.add("drag-over");
+        });
+        drop.addEventListener("dragleave", () =>
+          drop.classList.remove("drag-over"),
+        );
+        drop.addEventListener("drop", async (e) => {
+          e.preventDefault();
+          drop.classList.remove("drag-over");
+          const f = e.dataTransfer.files[0];
+          if (!f || !f.type.startsWith("image/")) return;
+          if (!validateImageFile(f)) return;
+
+          // Immediate local preview
+          const localUrl = URL.createObjectURL(f);
+          document.getElementById("coverPreviewImg").src = localUrl;
+          document.getElementById("coverPlaceholder").style.display = "none";
+          document.getElementById("coverPreview").style.display = "block";
+
+          const cloudUrl = await uploadImageToCloudinary(f, "/cover");
+          if (cloudUrl) {
+            document.getElementById("coverPreviewImg").src = cloudUrl;
+            showToast("Cover image uploaded", "fa-check-circle");
+          } else {
+            document.getElementById("coverPreviewImg").src = "";
+            document.getElementById("coverPlaceholder").style.display = "flex";
+            document.getElementById("coverPreview").style.display = "none";
+          }
+          URL.revokeObjectURL(localUrl);
+        });
+
+        /* Keyboard shortcut: Escape to close drawer */
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && postsDrawerOpen) closePostsDrawer();
+        });
+
+        /* Load existing post if ?edit= param present */
+        const params = new URLSearchParams(window.location.search);
+        const editId = params.get("edit");
+        if (editId) {
+          setEditMode(true);
+          loadPost(editId);
+        }
+
+        /* Show close button when inside iframe (admin SPA modal) */
+        if (window.parent !== window) {
+          const closeBtn = document.getElementById("blogEditorCloseBtn");
+          if (closeBtn) closeBtn.style.display = "";
+          const backWrap = document.getElementById("hDropdownBackWrap");
+          if (backWrap) backWrap.style.display = "";
+        }
+      });
+
+      /* ── MOBILE HEADER MENU ── */
+      function toggleHeaderMenu() {
+        const btn = document.getElementById("hMobileMenuBtn");
+        const dropdown = document.getElementById("hDropdown");
+        if (!btn || !dropdown) return;
+        const isOpen = dropdown.classList.toggle("open");
+        btn.classList.toggle("open", isOpen);
+      }
+
+      function closeHeaderMenu() {
+        const btn = document.getElementById("hMobileMenuBtn");
+        const dropdown = document.getElementById("hDropdown");
+        if (btn) btn.classList.remove("open");
+        if (dropdown) dropdown.classList.remove("open");
+      }
+
+      /* Close dropdown when clicking outside */
+      document.addEventListener("click", function (e) {
+        const btn = document.getElementById("hMobileMenuBtn");
+        const dropdown = document.getElementById("hDropdown");
+        if (dropdown && dropdown.classList.contains("open")) {
+          if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+            closeHeaderMenu();
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

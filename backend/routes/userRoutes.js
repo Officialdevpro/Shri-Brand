@@ -7,7 +7,7 @@ const router = express.Router();
 // ==================== PROTECTED ROUTES (Must be logged in) ====================
 
 // Apply protect middleware to all routes below
-// router.use(authController.protect);
+router.use(authController.protect);
 
 // Current user routes
 router.get("/me", userController.getMe);
@@ -24,7 +24,7 @@ router.delete("/addresses/:addressId", userController.deleteAddress);
 // ==================== ADMIN ONLY ROUTES ====================
 
 // Restrict to admin role for routes below
-// router.use(authController.restrictTo("admin"));
+router.use(authController.restrictTo("admin"));
 
 router.get("/", userController.getAllUsers);
 router.get("/:id", userController.getUserById);
