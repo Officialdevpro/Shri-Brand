@@ -30,6 +30,7 @@ const cartItemSnapshotSchema = new mongoose.Schema(
     name:               { type: String, required: true },
     sku:                { type: String, required: true },
     mainImage:          { type: String, required: true },
+    packWeight:         { type: String, required: true },                    // which pack was ordered
     price:              { type: Number, required: true, min: 0 },       // price at order time
     originalPrice:      { type: Number, required: true, min: 0 },
     discountPercentage: { type: Number, default: 0 },
@@ -147,13 +148,12 @@ orderSchema.index({ createdAt: -1 });                   // newest first for orde
 
 // ── AUTO-GENERATE ORDER NUMBER ─────────────────────────────────
 // Format: SB-20240215-A3F9  (SB = Shri Brand, date, 4 random hex chars)
-orderSchema.pre("save", function (next) {
+orderSchema.pre("save", async function () {
   if (this.isNew) {
     const date    = new Date().toISOString().slice(0, 10).replace(/-/g, "");
     const random  = Math.random().toString(16).slice(2, 6).toUpperCase();
     this.orderNumber = `SB-${date}-${random}`;
   }
-  next();
 });
 
 const Order = mongoose.model("Order", orderSchema);

@@ -19,6 +19,7 @@ const postRoutes = require('./routes/blogRoutes');
 const categoryRoutes = require("./routes/categoryRoutes");
 const stockRoutes = require('./routes/stockRoutes');
 const blogImageUpload = require('./routes/blogImgUpload'); // adjust path
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 
 
@@ -81,6 +82,8 @@ app.use('/api/v1/blogs', postRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/production', stockRoutes);
 app.use('/api/v1/blog-images', blogImageUpload);
+
+app.use("/api/dashboard", dashboardRoutes);
 
 // ── 404 handler ────────────────────────────────────────────────
 app.use((req, res, next) => {

@@ -119,6 +119,7 @@ async function addToCart(productId, btn, packWeight) {
         showToast(data.message || "Added to cart!", "success");
         updateCartCount(data.data.cart.summary.totalItems);
         renderCartSidebar(data.data.cart);
+        openCartSidebar();
 
     } catch (err) {
         console.error("addToCart error:", err);
@@ -295,6 +296,19 @@ function updateCartCount(count) {
 
     badge.style.transform = "scale(1.4)";
     setTimeout(() => { badge.style.transform = "scale(1)"; }, 200);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  OPEN CART SIDEBAR (non-toggle — only opens, never closes)
+// ─────────────────────────────────────────────────────────────────────────────
+function openCartSidebar() {
+    const card = document.getElementById("card");
+    const backdrop = document.getElementById("cart-backdrop");
+    if (card && !card.classList.contains("active")) {
+        document.body.classList.add("no-scroll");
+        card.classList.add("active");
+        if (backdrop) backdrop.classList.add("active");
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

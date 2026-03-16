@@ -592,7 +592,18 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
       const newMRP        = calcMRP(totalCostPerBox);
       const priceChanged  = newMRP !== previousPrice;
 
-      // ── b) Build $set targeting only this pack subdocument ────────────
+      // ── b) Build wholesaler pricing from the packing entry's tiers ────────
+      //      Find the matching built entry to get wholesaler tier data
+      const matchingEntry = builtEntries.find(
+        (e) => e.product.toString() === productId && e.boxWeightGm === boxWeightGm
+      );
+      const wholesalerPricing = (matchingEntry?.wholesalerTiers || []).map((t) => ({
+        tierName:    t.tierName,
+        minBoxes:    t.minBoxes,
+        pricePerBox: t.pricePerBox,
+      }));
+
+      // ── c) Build $set targeting only this pack subdocument ────────────
       //      Uses positional $ — matched by packs._id (the pack's ObjectId)
       const setPayload = {
         "packs.$.stock":         newStock,
@@ -602,8 +613,11 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
       if (priceChanged) {
         setPayload["packs.$.discountPercentage"] = 0;
       }
+      if (wholesalerPricing.length > 0) {
+        setPayload["packs.$.wholesalerPricing"] = wholesalerPricing;
+      }
 
-      // ── c) Atomic update — NO product.save(), NO full validation ──────
+      // ── d) Atomic update — NO product.save(), NO full validation ──────
       await Product.findOneAndUpdate(
         {
           _id:        freshProduct._id,
@@ -619,7 +633,8 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
       console.log(
         `[COMMIT]   ✓ "${productName}" pack ${boxWeightGm}g: ` +
         `stock ${previousStock} → ${newStock} (+${totalBoxesToAdd}), ` +
-        `MRP ₹${previousPrice} → ₹${newMRP}${priceChanged ? " (CHANGED)" : " (unchanged)"}`
+        `MRP ₹${previousPrice} → ₹${newMRP}${priceChanged ? " (CHANGED)" : " (unchanged)"}` +
+        (wholesalerPricing.length ? `, ${wholesalerPricing.length} wholesaler tier(s) saved` : "")
       );
 
       productUpdateResults.push({

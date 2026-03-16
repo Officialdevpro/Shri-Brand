@@ -221,15 +221,7 @@
 </head>
 
 <body>
-  <!-- Auth Guard: Redirect to auth.html if not logged in -->
-  <script>
-    /* (function () {
-       const token = localStorage.getItem('token');
-       if (!token) {
-         window.location.href = 'auth.html';
-       }
-     })();*/
-  </script>
+
   <header class="site-header" role="banner">
     <nav class="container" aria-label="Main navigation">
       <div class="nav-row">
@@ -1767,25 +1759,17 @@
     // ==================== LOGOUT ====================
     async function logoutUser() {
       try {
-        const token = localStorage.getItem('token');
-        // Call backend logout endpoint
-        await fetch('http://localhost:5000/api/v1/auth/logout', {
+        // Call backend logout endpoint — cookie sent automatically
+        await fetch('/api/v1/auth/logout', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
+          headers: { 'Content-Type': 'application/json' },
           credentials: 'include'
         });
       } catch (err) {
-        // Even if API call fails, still clear local data
         console.log('Logout API call failed:', err);
       }
-      // Clear local storage
-      localStorage.removeItem('token');
-      localStorage.removeItem('userName');
-      // Redirect to auth page
-      // window.location.href = 'auth.html';
+      // Redirect to auth page (cookie cleared by server)
+      window.location.href = '/auth';
     }
 
     function toggleCard() {

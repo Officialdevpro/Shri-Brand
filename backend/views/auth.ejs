@@ -895,8 +895,8 @@
 
     <script>
         // ==================== CONFIGURATION ====================
-        const API_BASE = 'https://shri-brand.onrender.com/api/v1/auth';
-        const CART_API_BASE = 'https://shri-brand.onrender.com/api/v1/cart';
+        const API_BASE = 'http://localhost:5000/api/v1/auth';
+        const CART_API_BASE = 'http://localhost:5000/api/v1/cart';
         const CART_STORAGE_KEY = 'shriCart';
 
         // Global variables
@@ -911,10 +911,10 @@
         /**
          * After login/signup, sync any localStorage cart items to MongoDB,
          * clear localStorage cart, and redirect appropriately.
-         * @param {string} token - The JWT token just obtained
+         * Uses cookies (credentials: 'include') for auth — no token parameter needed.
          * @returns {Promise<boolean>} - true if items were synced (redirect to /checkout)
          */
-        async function syncLocalCartToServer(token) {
+        async function syncLocalCartToServer() {
             const savedCart = localStorage.getItem(CART_STORAGE_KEY);
             if (!savedCart) return false;
 
@@ -927,11 +927,6 @@
 
             if (!Array.isArray(cartItems) || cartItems.length === 0) return false;
 
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            };
-
             let syncedAny = false;
 
             // Add each localStorage item to the server cart
@@ -940,7 +935,7 @@
                 try {
                     await fetch(`${CART_API_BASE}/add`, {
                         method: 'POST',
-                        headers,
+                        headers: { 'Content-Type': 'application/json' },
                         credentials: 'include',
                         body: JSON.stringify({
                             productId: item.id,
@@ -960,43 +955,16 @@
         }
 
         // ==================== AUTH CHECK ON LOAD ====================
-        // If user is already logged in, redirect to home page
-        (function checkExistingAuth() {
-            const token = localStorage.getItem('token');
-            if (token) {
-                // Verify the token is still valid
-                fetch(`${API_BASE}/check-auth`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.isAuthenticated) {
-                            window.location.href = '/';
-                        } else {
-                            // Token is invalid, clear it
-                            localStorage.removeItem('token');
-                            localStorage.removeItem('userName');
-                        }
-                    })
-                    .catch(() => {
-                        // Server not reachable, keep on auth page
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('userName');
-                    });
-            }
-        })();
+        // Server-side redirect handles already-logged-in users in viewController.js
+        // No frontend check needed — if we reach here, user is NOT authenticated.
 
         // ==================== API HELPER ====================
         async function apiCall(endpoint, method, body) {
             const options = {
                 method,
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include' // Include cookies for refresh token
+                credentials: 'include' // Cookies sent automatically
             };
-            const token = localStorage.getItem('token');
-            if (token) {
-                options.headers['Authorization'] = `Bearer ${token}`;
-            }
             if (body) {
                 options.body = JSON.stringify(body);
             }
@@ -1333,18 +1301,12 @@
                     setLoading(submitBtn, true);
                     const data = await apiCall('/login', 'POST', { email, password });
 
-                    // Store token and user info
-                    if (data.token) {
-                        localStorage.setItem('token', data.token);
-                    }
-                    if (data.data && data.data.user) {
-                        localStorage.setItem('userName', data.data.user.name);
-                    }
+                    // Cookie is set by the server automatically (httpOnly)
 
                     showNotification('Login successful!', 'success');
 
                     // Sync localStorage cart to server, then redirect
-                    const hadCartItems = await syncLocalCartToServer(data.token);
+                    const hadCartItems = await syncLocalCartToServer();
                     setTimeout(() => {
                         window.location.href = hadCartItems ? '/checkout' : '/';
                     }, 1000);
@@ -1459,16 +1421,10 @@
 
                 clearInterval(signupTimerInterval);
 
-                // Store token and user info
-                if (data.token) {
-                    localStorage.setItem('token', data.token);
-                }
-                if (data.data && data.data.user) {
-                    localStorage.setItem('userName', data.data.user.name);
-                }
+                // Cookie is set by the server automatically (httpOnly)
 
                 // Sync localStorage cart to server
-                const hadCartItems = await syncLocalCartToServer(data.token);
+                const hadCartItems = await syncLocalCartToServer();
 
                 // Show success card
                 document.getElementById('successTitle').textContent = 'Account Verified!';

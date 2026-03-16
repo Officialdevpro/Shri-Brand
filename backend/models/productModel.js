@@ -54,6 +54,27 @@ const packSchema = new mongoose.Schema(
       default: 10,
       min: [0, "Low stock threshold cannot be negative"],
     },
+    // Wholesaler pricing tiers — populated during production run commits
+    wholesalerPricing: [
+      {
+        tierName: {
+          type: String,
+          required: [true, "Tier name is required"],
+          trim: true,
+        },
+        minBoxes: {
+          type: Number,
+          required: [true, "Minimum boxes is required"],
+          min: [1, "Minimum boxes must be at least 1"],
+        },
+        pricePerBox: {
+          type: Number,
+          required: [true, "Price per box is required"],
+          min: [0, "Price cannot be negative"],
+          set: (v) => Math.round(v * 100) / 100,
+        },
+      },
+    ],
   },
   { _id: true }
 );

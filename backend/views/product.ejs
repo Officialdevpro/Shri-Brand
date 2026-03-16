@@ -1162,7 +1162,7 @@
                 id="quantityInput"
                 value="1"
                 min="1"
-                max="<%= defaultPack ? Math.min(defaultPack.stock, 99) : 0 %>"
+                max="<%= defaultPack ? Math.min(defaultPack.stock, 2000) : 0 %>"
                 <%= totalStock === 0 ? 'disabled' : '' %>
               />
               <button class="quantity-btn" id="increaseBtn" <%= totalStock === 0 ? 'disabled' : '' %>>+</button>
@@ -1354,7 +1354,7 @@
           }
         } else {
           quantityInput.disabled = false;
-          quantityInput.max      = Math.min(stock, 99);
+          quantityInput.max      = Math.min(stock, 2000);
 
           if (parseInt(quantityInput.value) > stock) quantityInput.value = stock;
           if (parseInt(quantityInput.value) < 1)     quantityInput.value = 1;
@@ -1466,12 +1466,12 @@
 
       increaseBtn.addEventListener('click', function () {
         var v   = parseInt(quantityInput.value);
-        var max = parseInt(quantityInput.max) || 99;
+        var max = parseInt(quantityInput.max) || 2000;
         if (v < max) quantityInput.value = v + 1;
       });
 
       quantityInput.addEventListener('change', function () {
-        var max = parseInt(quantityInput.max) || 99;
+        var max = parseInt(quantityInput.max) || 2000;
         var v   = parseInt(quantityInput.value);
         if (isNaN(v) || v < 1) v = 1;
         if (v > max) v = max;
@@ -1537,6 +1537,24 @@
             }
 
             showToast(quantity + ' x ' + packWeight + ' added to cart!', 'success');
+
+            // Update cart badge and sidebar instantly (functions from product.js)
+            if (typeof updateCartCount === 'function' && data.data && data.data.cart) {
+              updateCartCount(data.data.cart.summary.totalItems);
+            }
+            if (typeof renderCartSidebar === 'function' && data.data && data.data.cart) {
+              renderCartSidebar(data.data.cart);
+            }
+
+            // Auto-open cart sidebar (function from product.js)
+            if (typeof openCartSidebar === 'function') {
+              openCartSidebar();
+            } else {
+              var card = document.getElementById('card');
+              if (card && !card.classList.contains('active')) {
+                if (typeof toggleCard === 'function') toggleCard();
+              }
+            }
           } catch (err) {
             showToast('Network error. Please try again.', 'error');
           } finally {

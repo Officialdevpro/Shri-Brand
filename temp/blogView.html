@@ -323,7 +323,10 @@
       height: clamp(320px, 48vw, 600px);
       display: none;
     }
-    .hero-cover-wrap.has-image { display: block; }
+    .hero-cover-wrap.has-image { display: block;
+      max-width: 860px;
+      margin: 0px auto;
+     }
 
     .hero-img {
       width: 100%; height: 100%;
@@ -1031,7 +1034,7 @@
   <nav class="site-nav" role="navigation" aria-label="Site navigation">
     <a href="/" class="nav-brand" aria-label="Sacred Flame home">
       <div class="nav-logo-wrap" aria-hidden="true"><span>S</span></div>
-      <div class="nav-wordmark">Sacred <span>Flame</span></div>
+      <div class="nav-wordmark">Shri <span>Brand</span></div>
     </a>
 
     <div class="nav-center" id="navCenter" aria-label="Breadcrumb">
@@ -1041,9 +1044,7 @@
     </div>
 
     <div class="nav-actions">
-      <button class="nav-btn nav-btn-outline" onclick="window.print()" aria-label="Print article">
-        <i class="fas fa-print"></i> <span>Print</span>
-      </button>
+     
       <button class="nav-btn nav-btn-solid" onclick="shareArticle()" aria-label="Share article">
         <i class="fas fa-share-nodes"></i> <span>Share</span>
       </button>
@@ -1121,20 +1122,7 @@
         <div class="footer-divider-line"></div>
       </div>
 
-      <div class="stats-row" id="footerStats" role="region" aria-label="Article statistics">
-        <div class="stat-cell">
-          <div class="stat-val" id="statWords">0</div>
-          <div class="stat-lbl">Words</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-val" id="statRead">0m</div>
-          <div class="stat-lbl">Read</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-val" id="statBlocks">0</div>
-          <div class="stat-lbl">Sections</div>
-        </div>
-      </div>
+    
       <div class="stat-tags-cell" id="statTagsCell" style="margin-bottom:40px;">
         <div class="stat-tags-label">Topics</div>
         <div class="stat-tags-list" id="statTagsList" role="list"></div>
@@ -1154,16 +1142,9 @@
         </div>
       </div>
 
-      <div class="footer-tags" id="footerTags" role="list" aria-label="Post tags"></div>
+     
 
-      <div class="article-nav-row">
-        <a href="/" class="art-nav-btn art-nav-btn-outline">
-          <i class="fas fa-arrow-left"></i> Back to Journal
-        </a>
-        <button class="art-nav-btn art-nav-btn-ghost" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-          <i class="fas fa-arrow-up"></i> Back to top
-        </button>
-      </div>
+     
 
     </footer>
 
@@ -1242,7 +1223,7 @@
   </button>
 
   <script>
-    const API_BASE    = 'http://localhost:5000/api/v1/blogs/69af6b4f6cd0b342dd434392';
+    const API_BASE    = 'http://localhost:5000/api/v1/blogs/69b7588e80a3f4887a2348d9';
     const FETCH_TIMEOUT = 10000;
     // Real API endpoint (no id/slug appended — the base IS the full URL)
     const DIRECT_URL  = API_BASE;
@@ -1476,18 +1457,13 @@
       document.getElementById('footerDate').textContent     = dateStr || '—';
       document.getElementById('footerReadTime').textContent = post.readTime || '—';
 
-      const footerTags = document.getElementById('footerTags');
-      (post.tags || []).forEach(t => {
-        const span = document.createElement('span');
-        span.className = 'f-tag'; span.textContent = t; span.setAttribute('role','listitem');
-        footerTags.appendChild(span);
-      });
+     
 
       const stats = post.stats || {};
-      document.getElementById('statWords').textContent  = stats.wordCount || wc || 0;
-      const mins = post.readTime ? parseInt(post.readTime) || 0 : 0;
-      document.getElementById('statRead').textContent   = mins ? `${mins}m` : '—';
-      document.getElementById('statBlocks').textContent = stats.blockCount || (post.blocks || []).length;
+      
+    
+     
+      
 
       const body = document.getElementById('articleBody');
       body.innerHTML = '';

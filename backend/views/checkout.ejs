@@ -11,8 +11,8 @@
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/checkout.css" />
 
-  <!-- Razorpay SDK — must load before our script -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <!-- TODO: Uncomment when real Razorpay key is provided -->
+  <!-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script> -->
 </head>
 
 <body>
@@ -55,14 +55,16 @@
 
             <div class="form-group">
               <label for="fullName">Full Name <span class="required">*</span></label>
-              <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" />
+              <input type="text" id="fullName" name="fullName" placeholder="Enter your full name"
+                value="<%= typeof userName !== 'undefined' ? userName : '' %>" />
               <div class="error-message" id="fullNameError">Please enter your full name</div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
                 <label for="email">Email <span class="required">*</span></label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" />
+                <input type="email" id="email" name="email" placeholder="Enter your email"
+                  value="<%= typeof userEmail !== 'undefined' ? userEmail : '' %>" />
                 <div class="error-message" id="emailError">Please enter a valid email</div>
               </div>
               <div class="form-group">
@@ -171,8 +173,44 @@
       .btn-place-order { width:100%; padding:16px; font-size:15px; font-weight:700; background:#7d1f1f; color:#fff; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; margin-top:8px; transition:all 0.3s; }
       .btn-place-order:hover:not(:disabled) { background:#5a1616; transform:translateY(-2px); box-shadow:0 6px 20px rgba(125,31,31,0.3); }
       .btn-place-order:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+      /* ── Payment Processing Overlay ── */
+      .payment-overlay {
+        display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+        background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); z-index:9998;
+        justify-content:center; align-items:center;
+      }
+      .payment-overlay.active { display:flex; }
+      .payment-card {
+        background:#fff; border-radius:16px; padding:48px 40px; text-align:center;
+        max-width:400px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3);
+        animation:slideUp 0.4s ease;
+      }
+      .payment-card .spinner {
+        width:64px; height:64px; border:4px solid #f3f3f3; border-top:4px solid #7d1f1f;
+        border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 20px;
+      }
+      @keyframes spin { to { transform:rotate(360deg); } }
+      .payment-card h3 { font-family:'Playfair Display',serif; color:#7d1f1f; margin-bottom:8px; }
+      .payment-card p { color:#666; font-size:14px; margin-bottom:16px; }
+      .countdown-number { font-size:48px; font-weight:700; color:#7d1f1f; font-family:'Playfair Display',serif; }
+      .progress-bar-container { width:100%; height:6px; background:#f0f0f0; border-radius:3px; overflow:hidden; margin-top:16px; }
+      .progress-bar-fill { height:100%; background:linear-gradient(90deg,#7d1f1f,#b83232); border-radius:3px; transition:width 1s linear; width:0%; }
     </style>
 
+  </div>
+
+  <!-- Payment Processing Overlay (simulated) -->
+  <div class="payment-overlay" id="payment-overlay">
+    <div class="payment-card">
+      <div class="spinner"></div>
+      <h3>Processing Your Payment</h3>
+      <p>Please do not close this page...</p>
+      <div class="countdown-number" id="countdown-number">10</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -225,7 +263,7 @@
               <span class="item-name">${item.name}</span>
               <span class="item-qty">Qty: ${item.quantity}</span>
             </div>
-            <span class="item-price">₹${(item.price * item.quantity).toFixed(0)}</span>
+            <span class="item-price">₹${(item.selectedPack.price * item.quantity).toFixed(0)}</span>
           </div>
         `).join('');
 
@@ -280,13 +318,16 @@
       };
     }
 
-    // ── Main Payment Flow ───────────────────────────────────────────
+    // ── Main Payment Flow (SIMULATED — 10-second countdown) ────
     //
     //  Step 1: Validate form
-    //  Step 2: POST /orders/create-order  → get razorpayOrderId + keyId
-    //  Step 3: Open Razorpay popup
-    //  Step 4: On success → POST /orders/verify-payment
+    //  Step 2: POST /orders/create-order → get orderId
+    //  Step 3: Show 10-second countdown overlay
+    //  Step 4: After 10s → POST /orders/simulate-payment
     //  Step 5: Show success modal
+    //
+    //  TODO: Replace this entire function with the real Razorpay
+    //        popup flow when Razorpay key is provided.
     //
     async function startPayment() {
       // Step 1 — Validate shipping form
@@ -330,107 +371,69 @@
         return;
       }
 
-      // Step 3 — Open Razorpay popup
-      const options = {
-        key:         orderData.keyId,
-        amount:      orderData.amount,          // in paise
-        currency:    orderData.currency || 'INR',
-        name:        'Shri Brand',
-        description: 'Premium Dhoop Products',
-        image:       '/assets/images/logo/Logo.png',
-        order_id:    orderData.razorpayOrderId,
+      // Step 3 — Show 10-second countdown overlay
+      // TODO: Replace this block with Razorpay popup:
+      //   const rzp = new Razorpay(options); rzp.open();
+      const overlay    = document.getElementById('payment-overlay');
+      const countdownEl = document.getElementById('countdown-number');
+      const progressBar = document.getElementById('progress-bar-fill');
 
-        prefill: {
-          name:    orderData.prefill.name,
-          email:   orderData.prefill.email,
-          contact: orderData.prefill.contact,
-        },
+      overlay.classList.add('active');
+      let secondsLeft = 10;
+      countdownEl.textContent = secondsLeft;
+      progressBar.style.width = '0%';
 
-        theme: { color: '#7d1f1f' },
+      // Update step indicators
+      document.querySelector('.step[data-step="1"]').classList.remove('active');
+      document.querySelector('.step[data-step="1"]').classList.add('completed');
+      document.querySelector('.step[data-step="2"]').classList.add('active');
 
-        // Step 4a — Payment succeeded inside Razorpay popup
-        handler: async function (response) {
-          payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying payment...';
+      await new Promise(resolve => {
+        const interval = setInterval(() => {
+          secondsLeft--;
+          countdownEl.textContent = secondsLeft;
+          progressBar.style.width = `${((10 - secondsLeft) / 10) * 100}%`;
 
-          try {
-            const verifyRes = await fetch(`${ORDER_API}/verify-payment`, {
-              method:      'POST',
-              headers:     { 'Content-Type': 'application/json' },
-              credentials: 'include',
-              body: JSON.stringify({
-                orderId:            orderData.orderId,
-                razorpayOrderId:    response.razorpay_order_id,
-                razorpayPaymentId:  response.razorpay_payment_id,
-                razorpaySignature:  response.razorpay_signature,
-              }),
-            });
-
-            const verifyJson = await verifyRes.json();
-
-            if (!verifyRes.ok) {
-              showToast(verifyJson.message || 'Payment verification failed. Contact support.');
-              payBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Pay';
-              payBtn.disabled  = false;
-              return;
-            }
-
-            // Step 5 — Show success
-            document.getElementById('success-order-number').textContent =
-              `Order #${verifyJson.data.orderNumber}`;
-            document.getElementById('success-modal').classList.add('active');
-
-          } catch {
-            showToast('Verification error. Your payment may have gone through — contact support.');
-            payBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Pay';
-            payBtn.disabled  = false;
+          if (secondsLeft <= 0) {
+            clearInterval(interval);
+            resolve();
           }
-        },
-
-        // Step 4b — User dismissed or payment failed inside popup
-        modal: {
-          ondismiss: async function () {
-            // Notify backend so the order is marked failed (not left as "pending" forever)
-            try {
-              await fetch(`${ORDER_API}/payment-failed`, {
-                method:      'POST',
-                headers:     { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({
-                  orderId: orderData.orderId,
-                  reason:  'User dismissed payment popup',
-                }),
-              });
-            } catch { /* silent — best effort */ }
-
-            showToast('Payment cancelled. Your cart is still saved.', '#6b6b6b');
-            payBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Pay';
-            payBtn.disabled  = false;
-          },
-        },
-      };
-
-      const rzp = new Razorpay(options);
-
-      // Handle Razorpay's own error event (card declined, bank error, etc.)
-      rzp.on('payment.failed', async function (response) {
-        try {
-          await fetch(`${ORDER_API}/payment-failed`, {
-            method:      'POST',
-            headers:     { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({
-              orderId: orderData.orderId,
-              reason:  response.error?.description || 'Payment failed',
-            }),
-          });
-        } catch { /* silent */ }
-
-        showToast(`Payment failed: ${response.error?.description || 'Please try again.'}`);
-        payBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Pay';
-        payBtn.disabled  = false;
+        }, 1000);
       });
 
-      rzp.open();
+      // Step 4 — Simulate payment confirmation
+      countdownEl.textContent = '✓';
+      payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirming order...';
+
+      try {
+        const verifyRes = await fetch(`${ORDER_API}/simulate-payment`, {
+          method:      'POST',
+          headers:     { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ orderId: orderData.orderId }),
+        });
+
+        const verifyJson = await verifyRes.json();
+        overlay.classList.remove('active');
+
+        if (!verifyRes.ok) {
+          showToast(verifyJson.message || 'Payment failed. Please try again.');
+          payBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Pay';
+          payBtn.disabled  = false;
+          return;
+        }
+
+        // Step 5 — Show success modal
+        document.getElementById('success-order-number').textContent =
+          `Order #${verifyJson.data.orderNumber}`;
+        document.getElementById('success-modal').classList.add('active');
+
+      } catch (err) {
+        overlay.classList.remove('active');
+        showToast('Payment error. Please contact support.');
+        payBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Pay';
+        payBtn.disabled  = false;
+      }
     }
 
     // ── Init ────────────────────────────────────────────────────────
@@ -443,13 +446,6 @@
       Object.keys(VALIDATORS).forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('input', () => validateField(id));
-      });
-
-      // Update step indicator when pay button is clicked
-      document.getElementById('pay-btn').addEventListener('click', () => {
-        document.querySelector('.step[data-step="1"]').classList.remove('active');
-        document.querySelector('.step[data-step="1"]').classList.add('completed');
-        document.querySelector('.step[data-step="2"]').classList.add('active');
       });
     });
   </script>

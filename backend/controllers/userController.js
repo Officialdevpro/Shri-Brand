@@ -235,6 +235,30 @@ exports.getUserById = catchAsync(async (req, res, next) => {
   });
 });
 
+// ==================== ADMIN: UPDATE USER ====================
+
+exports.updateUser = catchAsync(async (req, res, next) => {
+  // Only allow these fields to be updated by admin
+  const filteredBody = filterObj(req.body, "name", "email", "phone", "role", "active");
+
+  const user = await User.findByIdAndUpdate(req.params.id, filteredBody, {
+    new: true,
+    runValidators: true
+  });
+
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: "User updated successfully",
+    data: {
+      user
+    }
+  });
+});
+
 // ==================== ADMIN: DELETE USER ====================
 
 exports.deleteUser = catchAsync(async (req, res, next) => {

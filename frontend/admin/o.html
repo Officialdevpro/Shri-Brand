@@ -6,7 +6,7 @@
   <title>Orders — Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     :root {
@@ -22,6 +22,7 @@
       --shadow-warm: 0 4px 28px rgba(127,4,3,0.07);
       --shadow-deep: 0 16px 56px rgba(127,4,3,0.13);
       --ease: cubic-bezier(0.4,0,0.2,1);
+      --font-num: "Poppins", sans-serif;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     html{scroll-behavior:smooth;}
@@ -65,7 +66,7 @@
     .stat-pill.sp-shipped::before{background:var(--purple);}
     .stat-pill.sp-delivered::before{background:var(--green);}
     .stat-pill.sp-cancelled::before{background:var(--crimson);}
-    .sp-num{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:700;color:var(--crimson);line-height:1;}
+    .sp-num{font-family:var(--font-num);font-size:20px;font-weight:700;color:var(--crimson);line-height:1;}
     .sp-lbl{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);}
 
     /* ── TOOLBAR ── */
@@ -100,7 +101,7 @@
     .stab-count{
       display:inline-flex;align-items:center;justify-content:center;
       width:18px;height:18px;border-radius:50%;
-      font-size:9px;font-weight:700;margin-left:5px;
+      font-family:var(--font-num);font-size:9px;font-weight:700;margin-left:5px;
       background:var(--gold-pale);color:var(--gold);
     }
     .stab.active .stab-count{background:rgba(127,4,3,.1);color:var(--crimson);}
@@ -149,8 +150,7 @@
     .orders-table td{padding:13px 16px;font-size:13px;color:var(--ink-mid);vertical-align:middle;white-space:nowrap;transition:color .15s;}
 
     /* order number cell */
-    .on-wrap{}
-    .on-num{font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:700;color:var(--crimson);line-height:1.1;}
+    .on-num{font-family:var(--font-num);font-size:13px;font-weight:700;color:var(--crimson);line-height:1.1;letter-spacing:0;}
     .on-date{font-size:10.5px;color:var(--ink-faint);margin-top:2px;}
 
     /* customer cell */
@@ -171,7 +171,7 @@
     .items-more{font-size:10.5px;color:var(--ink-faint);margin-top:2px;}
 
     /* amount */
-    .amt-val{font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:700;color:var(--crimson);}
+    .amt-val{font-family:var(--font-num);font-size:15px;font-weight:700;color:var(--crimson);}
     .amt-note{font-size:10px;color:var(--ink-faint);margin-top:1px;}
 
     /* badges */
@@ -213,7 +213,7 @@
     .pagination{display:flex;align-items:center;justify-content:space-between;margin-top:18px;flex-wrap:wrap;gap:10px;}
     .pg-info{font-size:12px;color:var(--ink-faint);letter-spacing:.06em;}
     .pg-btns{display:flex;gap:4px;}
-    .pg-btn{min-width:34px;height:34px;padding:0 8px;border:1px solid var(--border);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink-muted);transition:all .18s var(--ease);}
+    .pg-btn{min-width:34px;height:34px;padding:0 8px;border:1px solid var(--border);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-num);font-size:12px;color:var(--ink-muted);transition:all .18s var(--ease);}
     .pg-btn:hover,.pg-btn.active{border-color:var(--gold);color:var(--crimson);background:var(--gold-pale);}
     .pg-btn:disabled{opacity:.35;pointer-events:none;}
 
@@ -237,7 +237,7 @@
     }
     .drawer-head::before{content:"";position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--crimson),var(--gold),transparent);}
     .d-eyebrow{font-size:9px;font-weight:600;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
-    .d-title{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:700;color:var(--crimson);}
+    .d-title{font-family:var(--font-num);font-size:18px;font-weight:700;color:var(--crimson);}
     .d-close{width:32px;height:32px;border:1px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--ink-muted);font-size:13px;transition:all .18s;flex-shrink:0;}
     .d-close:hover{border-color:var(--crimson);color:var(--crimson);}
 
@@ -256,7 +256,7 @@
     .oh-inner{position:relative;z-index:2;display:flex;align-items:stretch;min-height:120px;}
     .oh-left{padding:20px 24px;flex:1;display:flex;flex-direction:column;justify-content:center;gap:0;}
     .oh-eyebrow{font-size:9px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:rgba(184,134,11,.7);margin-bottom:5px;}
-    .oh-num{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:700;color:#fff;line-height:1.1;letter-spacing:.01em;}
+    .oh-num{font-family:var(--font-num);font-size:18px;font-weight:700;color:#fff;line-height:1.1;letter-spacing:0;}
     .oh-date{font-size:11.5px;color:rgba(255,255,255,.4);margin-top:4px;}
     .oh-badges{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
     .oh-badge{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:4px 12px;}
@@ -268,7 +268,7 @@
     }
     .oh-stat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 20px;text-align:center;}
     .oh-stat+.oh-stat{border-top:1px solid rgba(184,134,11,.12);}
-    .oh-stat-num{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:700;color:var(--gold-light);line-height:1;}
+    .oh-stat-num{font-family:var(--font-num);font-size:18px;font-weight:700;color:var(--gold-light);line-height:1;}
     .oh-stat-lbl{font-size:8.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:3px;}
 
     /* drawer tabs */
@@ -298,11 +298,11 @@
     .oi-img{width:52px;height:52px;background:var(--parchment-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;color:rgba(184,134,11,.3);flex-shrink:0;}
     .oi-info{flex:1;min-width:0;}
     .oi-name{font-weight:600;color:var(--ink);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .oi-sku{font-size:10.5px;color:var(--ink-faint);margin-top:2px;}
+    .oi-sku{font-family:var(--font-num);font-size:10px;color:var(--ink-faint);margin-top:2px;letter-spacing:0;}
     .oi-disc{font-size:10px;color:var(--green);font-weight:600;margin-top:1px;}
     .oi-right{text-align:right;flex-shrink:0;}
-    .oi-qty{font-size:11px;color:var(--ink-faint);}
-    .oi-total{font-family:"Cormorant Garamond",serif;font-size:17px;font-weight:700;color:var(--crimson);margin-top:2px;}
+    .oi-qty{font-family:var(--font-num);font-size:11px;font-weight:600;color:var(--ink-faint);}
+    .oi-total{font-family:var(--font-num);font-size:15px;font-weight:700;color:var(--crimson);margin-top:2px;}
 
     /* pricing breakdown */
     .price-breakdown{border:1px solid var(--border);background:var(--parchment);}
@@ -310,9 +310,9 @@
     .pb-row:last-child{border-bottom:none;}
     .pb-row.total-row{background:var(--gold-pale);border-top:2px solid var(--gold-border);}
     .pb-lbl{color:var(--ink-muted);font-size:12px;}
-    .pb-val{color:var(--ink-mid);font-weight:500;}
+    .pb-val{font-family:var(--font-num);color:var(--ink-mid);font-weight:500;font-size:13px;}
     .pb-val.disc{color:var(--green);}
-    .pb-val.total{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:700;color:var(--crimson);}
+    .pb-val.total{font-family:var(--font-num);font-size:17px;font-weight:700;color:var(--crimson);}
 
     /* info cards grid */
     .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
@@ -323,7 +323,7 @@
     .info-card-body{padding:12px 14px;display:flex;flex-direction:column;gap:8px;}
     .ic-row{display:flex;gap:8px;font-size:12.5px;}
     .ic-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);flex-shrink:0;width:60px;margin-top:2px;}
-    .ic-val{color:var(--ink-mid);word-break:break-word;}
+    .ic-val{font-family:var(--font-num);font-size:12px;color:var(--ink-mid);word-break:break-word;font-weight:400;}
 
     /* status update panel */
     .status-panel{border:1px solid var(--border);background:var(--parchment);padding:16px 18px;}
@@ -540,99 +540,14 @@
 
 <script>
 /* ═══════════════════════════════════════════════════════════
-   MOCK DATA  — matches Order mongoose schema exactly
+   API CONFIG
 ═══════════════════════════════════════════════════════════ */
-let orders = [
-  {
-    _id:"o1", orderNumber:"SB-20260131-A3F9", createdAt:"2026-01-31T08:22:00Z",
-    userId:{_id:"u5", name:"Pooja Vaisshanv", email:"poojaavaisshanv@gmail.com"},
-    orderStatus:"delivered",
-    payment:{method:"razorpay",status:"paid",razorpayOrderId:"order_abc123",razorpayPaymentId:"pay_xyz001",razorpaySignature:"sig_001",paidAt:"2026-01-31T09:10:00Z"},
-    pricing:{subtotal:2799,totalDiscount:300,shippingCost:0,total:2499},
-    shippingAddress:{fullName:"Pooja Vaisshanv",email:"poojaavaisshanv@gmail.com",phone:"9123456789",address:"22 Rose Avenue",city:"Bangalore",state:"Karnataka",pincode:"560001"},
-    items:[{productId:"p1",name:"Silk Pattu Saree",sku:"SAR-001",mainImage:"",price:2499,originalPrice:2799,discountPercentage:11,quantity:1,itemTotal:2499}],
-    notes:""
-  },
-  {
-    _id:"o2", orderNumber:"SB-20260215-B7D2", createdAt:"2026-02-15T14:05:00Z",
-    userId:{_id:"u5", name:"Pooja Vaisshanv", email:"poojaavaisshanv@gmail.com"},
-    orderStatus:"shipped",
-    payment:{method:"razorpay",status:"paid",razorpayOrderId:"order_def456",razorpayPaymentId:"pay_xyz002",razorpaySignature:"sig_002",paidAt:"2026-02-15T14:20:00Z"},
-    pricing:{subtotal:1598,totalDiscount:200,shippingCost:0,total:1398},
-    shippingAddress:{fullName:"Pooja Vaisshanv",email:"poojaavaisshanv@gmail.com",phone:"9123456789",address:"22 Rose Avenue",city:"Bangalore",state:"Karnataka",pincode:"560001"},
-    items:[{productId:"p2",name:"Cotton Kurta Set",sku:"KRT-022",mainImage:"",price:699,originalPrice:799,discountPercentage:13,quantity:2,itemTotal:1398}],
-    notes:""
-  },
-  {
-    _id:"o3", orderNumber:"SB-20260210-C1E8", createdAt:"2026-02-10T11:30:00Z",
-    userId:{_id:"u6", name:"Nandhu V", email:"naveenv7574@gmail.com"},
-    orderStatus:"processing",
-    payment:{method:"cod",status:"pending",razorpayOrderId:null,razorpayPaymentId:null,razorpaySignature:null,paidAt:null},
-    pricing:{subtotal:3200,totalDiscount:0,shippingCost:60,total:3260},
-    shippingAddress:{fullName:"Nandhu V",email:"naveenv7574@gmail.com",phone:"9876512345",address:"7/B Nehru Colony, 2nd Floor",city:"Trichy",state:"Tamil Nadu",pincode:"620001"},
-    items:[{productId:"p3",name:"Bridal Lehenga",sku:"LHG-008",mainImage:"",price:3260,originalPrice:3200,discountPercentage:0,quantity:1,itemTotal:3260}],
-    notes:"Please pack carefully"
-  },
-  {
-    _id:"o4", orderNumber:"SB-20260218-D4G3", createdAt:"2026-02-18T09:55:00Z",
-    userId:{_id:"u6", name:"Nandhu V", email:"naveenv7574@gmail.com"},
-    orderStatus:"placed",
-    payment:{method:"razorpay",status:"paid",razorpayOrderId:"order_ghi789",razorpayPaymentId:"pay_xyz003",razorpaySignature:"sig_003",paidAt:"2026-02-18T10:00:00Z"},
-    pricing:{subtotal:1200,totalDiscount:150,shippingCost:0,total:1050},
-    shippingAddress:{fullName:"Nandhu V",email:"naveenv7574@gmail.com",phone:"9876512345",address:"7/B Nehru Colony",city:"Trichy",state:"Tamil Nadu",pincode:"620001"},
-    items:[{productId:"p4",name:"Anarkali Suit",sku:"ANK-015",mainImage:"",price:1050,originalPrice:1200,discountPercentage:13,quantity:1,itemTotal:1050}],
-    notes:""
-  },
-  {
-    _id:"o5", orderNumber:"SB-20260204-E9K1", createdAt:"2026-02-04T16:40:00Z",
-    userId:{_id:"u8", name:"Naveen Kumar", email:"nandhuv1390@gmail.com"},
-    orderStatus:"delivered",
-    payment:{method:"razorpay",status:"paid",razorpayOrderId:"order_jkl012",razorpayPaymentId:"pay_xyz004",razorpaySignature:"sig_004",paidAt:"2026-02-04T17:00:00Z"},
-    pricing:{subtotal:4500,totalDiscount:500,shippingCost:0,total:4000},
-    shippingAddress:{fullName:"Naveen Kumar",email:"nandhuv1390@gmail.com",phone:"9001122334",address:"Plot 9, Tech Park, Phase 2",city:"Hyderabad",state:"Telangana",pincode:"500081"},
-    items:[
-      {productId:"p5",name:"Banarasi Silk Dupatta",sku:"DUP-031",mainImage:"",price:2000,originalPrice:2250,discountPercentage:11,quantity:1,itemTotal:2000},
-      {productId:"p6",name:"Zari Border Saree",sku:"SAR-077",mainImage:"",price:2000,originalPrice:2250,discountPercentage:11,quantity:1,itemTotal:2000}
-    ],
-    notes:""
-  },
-  {
-    _id:"o6", orderNumber:"SB-20260220-F2H5", createdAt:"2026-02-20T10:12:00Z",
-    userId:{_id:"u4", name:"Mohammed Rifath M", email:"m.rifath1711@gmail.com"},
-    orderStatus:"cancelled",
-    payment:{method:"razorpay",status:"refunded",razorpayOrderId:"order_mno345",razorpayPaymentId:"pay_xyz005",razorpaySignature:"sig_005",paidAt:"2026-02-20T10:20:00Z"},
-    pricing:{subtotal:1800,totalDiscount:0,shippingCost:0,total:1800},
-    shippingAddress:{fullName:"Mohammed Rifath",email:"m.rifath1711@gmail.com",phone:"9988776655",address:"45 Gandhi Street",city:"Madurai",state:"Tamil Nadu",pincode:"625001"},
-    items:[{productId:"p7",name:"Chiffon Saree",sku:"CHF-044",mainImage:"",price:1800,originalPrice:1800,discountPercentage:0,quantity:1,itemTotal:1800}],
-    notes:"Customer requested cancellation"
-  },
-  {
-    _id:"o7", orderNumber:"SB-20260222-G7J9", createdAt:"2026-02-22T13:00:00Z",
-    userId:{_id:"u4", name:"Mohammed Rifath M", email:"m.rifath1711@gmail.com"},
-    orderStatus:"processing",
-    payment:{method:"cod",status:"pending",razorpayOrderId:null,razorpayPaymentId:null,razorpaySignature:null,paidAt:null},
-    pricing:{subtotal:2600,totalDiscount:260,shippingCost:60,total:2400},
-    shippingAddress:{fullName:"Mohammed Rifath",email:"m.rifath1711@gmail.com",phone:"9988776655",address:"Old House, 3rd Cross, Bypass Road",city:"Coimbatore",state:"Tamil Nadu",pincode:"641001"},
-    items:[
-      {productId:"p8",name:"Kanjivaram Silk Saree",sku:"KAN-019",mainImage:"",price:1600,originalPrice:1800,discountPercentage:11,quantity:1,itemTotal:1600},
-      {productId:"p9",name:"Blouse Piece",sku:"BLP-003",mainImage:"",price:800,originalPrice:800,discountPercentage:0,quantity:1,itemTotal:800}
-    ],
-    notes:""
-  },
-  {
-    _id:"o8", orderNumber:"SB-20260223-H3K4", createdAt:"2026-02-23T08:45:00Z",
-    userId:{_id:"u1", name:"Admin User", email:"admin@example.com"},
-    orderStatus:"placed",
-    payment:{method:"razorpay",status:"paid",razorpayOrderId:"order_pqr678",razorpayPaymentId:"pay_xyz006",razorpaySignature:"sig_006",paidAt:"2026-02-23T09:00:00Z"},
-    pricing:{subtotal:5500,totalDiscount:550,shippingCost:0,total:4950},
-    shippingAddress:{fullName:"Admin User",email:"admin@example.com",phone:"9876500001",address:"12 Palace Road, Near Central Park",city:"Chennai",state:"Tamil Nadu",pincode:"600001"},
-    items:[
-      {productId:"p10",name:"Designer Lehenga Choli",sku:"DLC-001",mainImage:"",price:3500,originalPrice:3900,discountPercentage:10,quantity:1,itemTotal:3500},
-      {productId:"p11",name:"Embroidered Dupatta",sku:"DUP-055",mainImage:"",price:1450,originalPrice:1600,discountPercentage:9,quantity:1,itemTotal:1450}
-    ],
-    notes:"Gift wrapping requested"
-  }
-];
+const API_BASE = "https://localhost:5000/api/v1/orders";
+
+/* ═══════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════ */
+let orders = [];  // populated from backend
 
 /* ═══════════════════════════════════
    STATE
@@ -644,6 +559,60 @@ let viewingId = null;
 let deleteTarget = null;
 let activeStatusTab = "";
 let activeDrawerTab = "items";
+
+/* ═══════════════════════════════════
+   API HELPERS
+═══════════════════════════════════ */
+async function apiFetch(url, options = {}) {
+  const res = await fetch(url, {
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    ...options,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || `Request failed (${res.status})`);
+  return data;
+}
+
+async function fetchOrders() {
+  showLoadingState(true);
+  try {
+    let allOrders = [], page = 1, pages = 1;
+    do {
+      const data = await apiFetch(`http://localhost:5000/api/v1/orders?page=${page}&limit=100`);
+      allOrders = allOrders.concat(data.data.orders);
+      pages = data.pages || 1;
+      page++;
+    } while (page <= pages);
+    orders = allOrders;
+    applyFilters();
+  } catch (err) {
+    showError(err.message);
+  } finally {
+    showLoadingState(false);
+  }
+}
+
+function showLoadingState(on) {
+  const tbody = document.getElementById("ordersBody");
+  const empty = document.getElementById("emptyState");
+  if (on) {
+    empty.style.display = "none";
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--ink-faint);font-size:13px;letter-spacing:.06em;">
+      <i class="fa-solid fa-circle-notch fa-spin" style="color:var(--gold);font-size:1.4rem;display:block;margin-bottom:12px;"></i>Loading orders…</td></tr>`;
+  }
+}
+
+function showError(msg) {
+  document.getElementById("ordersBody").innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;">
+    <i class="fa-solid fa-triangle-exclamation" style="color:var(--crimson);font-size:1.4rem;display:block;margin-bottom:10px;"></i>
+    <div style="color:var(--crimson);font-size:13px;font-weight:600;margin-bottom:6px;">Failed to load orders</div>
+    <div style="color:var(--ink-faint);font-size:12px;margin-bottom:14px;">${msg}</div>
+    <button onclick="fetchOrders()" style="padding:8px 20px;border:1px solid var(--gold);background:var(--gold-pale);color:var(--ink-mid);font-family:'Jost',sans-serif;font-size:12px;cursor:pointer;">
+      <i class="fa-solid fa-rotate-right" style="margin-right:6px;"></i>Retry
+    </button>
+  </td></tr>`;
+}
 
 /* ═══════════════════════════════════
    HELPERS
@@ -735,7 +704,7 @@ function render(){
         </td>
         <td>${psBadge(o.payment.status)}</td>
         <td>${osBadge(o.orderStatus)}</td>
-        <td style="font-size:12px;color:var(--ink-muted);">${fmtDate(o.createdAt)}</td>
+        <td style="font-family:var(--font-num);font-size:12px;color:var(--ink-muted);font-weight:400;">${fmtDate(o.createdAt)}</td>
         <td onclick="event.stopPropagation()">
           <div class="act-cell">
             <button class="act-btn" title="View order" onclick="openView('${o._id}')"><i class="fa-regular fa-eye"></i></button>
@@ -958,7 +927,7 @@ function manageTab(o){
       <div style="border:1px solid var(--border);background:var(--parchment);padding:14px 16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
         <div>${osBadge(o.orderStatus)}</div>
         <div>${psBadge(o.payment.status)}</div>
-        <div style="font-size:11.5px;color:var(--ink-muted);margin-left:auto;">Last updated: ${fmtDate(o.createdAt)}</div>
+        <div style="font-family:var(--font-num);font-size:11px;color:var(--ink-muted);margin-left:auto;font-weight:400;">Last updated: ${fmtDate(o.createdAt)}</div>
       </div>
     </div>
     <div>
@@ -967,30 +936,38 @@ function manageTab(o){
         <div class="cust-av" style="width:40px;height:40px;font-size:14px;">${initials(o.userId.name)}</div>
         <div>
           <div style="font-weight:600;color:var(--ink);font-size:13px;">${o.userId.name}</div>
-          <div style="font-size:11.5px;color:var(--ink-faint);">${o.userId.email}</div>
+          <div style="font-family:var(--font-num);font-size:11px;color:var(--ink-faint);font-weight:400;">${o.userId.email}</div>
         </div>
       </div>
     </div>`;
 }
 
-function updateOrderStatus(){
+async function updateOrderStatus(){
   const o=orders.find(x=>x._id===viewingId);
   const newStatus=document.getElementById("mgr_os").value;
-  o.orderStatus=newStatus;
-  buildHero(o);
-  buildDrawerTab(o,"manage");
-  render();
-  toast(`Order status updated to "${newStatus}"`, "success");
+  try {
+    await apiFetch(`http://localhost:5000/api/v1/orders/${o._id}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ orderStatus: newStatus }),
+    });
+    o.orderStatus=newStatus;
+    buildHero(o); buildDrawerTab(o,"manage"); render();
+    toast(`Order status updated to "${newStatus}"`, "success");
+  } catch(err) { toast(err.message, "error"); }
 }
 
-function updatePayStatus(){
+async function updatePayStatus(){
   const o=orders.find(x=>x._id===viewingId);
   const newStatus=document.getElementById("mgr_ps").value;
-  o.payment.status=newStatus;
-  buildHero(o);
-  buildDrawerTab(o,"manage");
-  render();
-  toast(`Payment status updated to "${newStatus}"`, "info");
+  try {
+    await apiFetch(`http://localhost:5000/api/v1/orders/${o._id}/payment-status`, {
+      method: "PATCH",
+      body: JSON.stringify({ paymentStatus: newStatus }),
+    });
+    o.payment.status=newStatus;
+    buildHero(o); buildDrawerTab(o,"manage"); render();
+    toast(`Payment status updated to "${newStatus}"`, "info");
+  } catch(err) { toast(err.message, "error"); }
 }
 
 /* ═══════════════════════════════════
@@ -1008,10 +985,13 @@ function closeDel(){
   deleteTarget=null;
   document.body.style.overflow="";
 }
-function confirmDelete(){
-  orders=orders.filter(x=>x._id!==deleteTarget);
-  closeDel(); closeAll(); applyFilters();
-  toast("Order deleted","error");
+async function confirmDelete(){
+  try {
+    await apiFetch(`http://localhost:5000/api/v1/orders/${deleteTarget}`, { method: "DELETE" });
+    orders=orders.filter(x=>x._id!==deleteTarget);
+    closeDel(); closeAll(); applyFilters();
+    toast("Order deleted","error");
+  } catch(err) { closeDel(); toast(err.message, "error"); }
 }
 
 /* ═══════════════════════════════════
@@ -1044,7 +1024,7 @@ function toast(msg,type="success"){
 /* ═══════════════════════════════════
    INIT
 ═══════════════════════════════════ */
-applyFilters();
+fetchOrders();
 </script>
 </body>
 </html>

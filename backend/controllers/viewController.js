@@ -40,10 +40,28 @@ exports.renderHomePage = catchAsync(async (req, res, next) => {
     });
 });
 
-// Render Auth Page
-exports.renderAuthPage = (req, res) => {
+// Render Auth Page — redirect to / if already logged in (cookie check)
+exports.renderAuthPage = catchAsync(async (req, res, next) => {
+    const jwt = require("jsonwebtoken");
+    const { promisify } = require("util");
+    const User = require("../models/userModel");
+
+    // Check if user has a valid JWT cookie
+    if (req.cookies.jwt && req.cookies.jwt !== "loggedout") {
+        try {
+            const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+            const user = await User.findById(decoded.id);
+            if (user && !user.isPasswordChangedAfter(decoded.iat)) {
+                // User is already authenticated — redirect to home
+                return res.redirect("/");
+            }
+        } catch {
+            // Token invalid/expired — fall through to render auth page
+        }
+    }
+
     res.status(200).render("auth");
-};
+});
 
 // Render Product Detail Page (SSR with real product data)
 exports.renderProductPage = catchAsync(async (req, res, next) => {
@@ -56,7 +74,32 @@ exports.renderProductPage = catchAsync(async (req, res, next) => {
     res.status(200).render("product", { product });
 });
 
-// Render Checkout Page
-exports.renderCheckoutPage = (req, res) => {
-    res.status(200).render("checkout");
-};
+// Render Checkout Page — auth-guarded, autofills name & email
+exports.renderCheckoutPage = catchAsync(async (req, res, next) => {
+    const jwt = require("jsonwebtoken");
+    const { promisify } = require("util");
+    const User = require("../models/userModel");
+
+    // ── Auth guard: only logged-in users ──
+    let token;
+    if (req.cookies.jwt && req.cookies.jwt !== "loggedout") {
+        token = req.cookies.jwt;
+    }
+
+    if (!token) {
+        return res.redirect("/auth");
+    }
+
+    try {
+        const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+        if (!user) return res.redirect("/auth");
+
+        res.status(200).render("checkout", {
+            userName:  user.name  || "",
+            userEmail: user.email || "",
+        });
+    } catch {
+        return res.redirect("/auth");
+    }
+});

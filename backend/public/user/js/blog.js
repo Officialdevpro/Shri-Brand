@@ -6,7 +6,7 @@
 (function () {
     'use strict';
 
-    const BLOG_API_BASE = 'https://shri-brand.onrender.com/api/v1/blogs';
+    const BLOG_API_BASE = 'http://localhost:5000/api/v1/blogs';
     const BLOG_PER_PAGE = 4;
     const BLOG_FETCH_TIMEOUT = 12000;
 

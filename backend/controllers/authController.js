@@ -290,7 +290,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
 // ==================== LOGOUT ====================
 
-exports.logout = catchAsync(async (req, res) => {
+exports.logout = catchAsync(async (req, res, next) => {
   // Clear refresh token from database if user is authenticated
   if (req.user) {
     await req.user.clearRefreshToken();
