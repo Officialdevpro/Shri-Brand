@@ -9,6 +9,7 @@ router.get("/", viewController.renderHomePage);
 router.get("/auth", viewController.renderAuthPage);
 router.get("/profile", isAuthenticated, profileController.renderProfilePage);
 router.get("/product/:slug", viewController.renderProductPage);
+router.get("/blog/:id", viewController.renderBlogPage);
 router.get("/checkout", viewController.renderCheckoutPage);
 
 module.exports = router;

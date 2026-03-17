@@ -63,71 +63,104 @@ function dashDestroyChart(id) {
   }
 }
 
-/* ── Revenue chart static data ── */
-const dashRevData = {
-  monthly: {
-    labels: [
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-    ],
-    rev: [
-      18400, 24600, 21300, 31200, 28700, 35400, 29800, 42100, 38500, 44200,
-      39600, 51000, 46800, 53200, 58100,
-    ],
-    ord: [28, 38, 31, 47, 42, 56, 44, 66, 58, 68, 61, 78, 72, 82, 92],
-  },
-  weekly: {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    rev: [82400, 71200, 95600, 88300, 112400, 124600, 98200],
-    ord: [120, 105, 142, 130, 168, 188, 148],
-  },
-  yearly: {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
-    rev: [
-      620000, 590000, 842560, 780000, 910000, 875000, 950000, 1020000, 980000,
-      1050000, 1100000, 1250000,
-    ],
-    ord: [950, 910, 1284, 1190, 1380, 1320, 1450, 1560, 1490, 1600, 1680, 1920],
-  },
+/* ── Revenue chart data (built from API) ── */
+let dashRevData = {
+  daily: { labels: [], rev: [], ord: [] },
+  weekly: { labels: [], rev: [], ord: [] },
+  monthly: { labels: [], rev: [], ord: [] },
+  yearly: { labels: [], rev: [], ord: [] },
 };
 
-function dashBuildRevenueChart() {
+function dashBuildRevData(apiChart) {
+  // apiChart = [ { date: "2026-03-01", revenue: 1200, orders: 3 }, ... ]
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  // ── Daily (raw from API — last 30 days) ──
+  const daily = { labels: [], rev: [], ord: [] };
+  apiChart.forEach((d) => {
+    const dt = new Date(d.date);
+    daily.labels.push(`${dt.getDate()}/${dt.getMonth() + 1}`);
+    daily.rev.push(Math.round(d.revenue));
+    daily.ord.push(d.orders);
+  });
+
+  // ── Weekly (aggregate last 7 days by day name) ──
+  const weekly = { labels: [], rev: [], ord: [] };
+  const last7 = apiChart.slice(-7);
+  last7.forEach((d) => {
+    const dt = new Date(d.date);
+    weekly.labels.push(dayNames[dt.getDay()]);
+    weekly.rev.push(Math.round(d.revenue));
+    weekly.ord.push(d.orders);
+  });
+
+  // ── Monthly (daily data for current month from the API data) ──
+  const monthly = { labels: [], rev: [], ord: [] };
+  const now = new Date();
+  const curMonth = now.getMonth();
+  const curYear = now.getFullYear();
+  apiChart.forEach((d) => {
+    const dt = new Date(d.date);
+    if (dt.getMonth() === curMonth && dt.getFullYear() === curYear) {
+      monthly.labels.push(String(dt.getDate()));
+      monthly.rev.push(Math.round(d.revenue));
+      monthly.ord.push(d.orders);
+    }
+  });
+  // If no data for current month, fall back to daily
+  if (!monthly.labels.length) {
+    monthly.labels = daily.labels;
+    monthly.rev = daily.rev;
+    monthly.ord = daily.ord;
+  }
+
+  // ── Yearly (aggregate by month across all API data) ──
+  const yearlyMap = {};
+  apiChart.forEach((d) => {
+    const dt = new Date(d.date);
+    const key = dt.getMonth();
+    if (!yearlyMap[key]) yearlyMap[key] = { rev: 0, ord: 0 };
+    yearlyMap[key].rev += d.revenue;
+    yearlyMap[key].ord += d.orders;
+  });
+  const yearly = { labels: [], rev: [], ord: [] };
+  Object.keys(yearlyMap)
+    .sort((a, b) => a - b)
+    .forEach((m) => {
+      yearly.labels.push(monthNames[+m]);
+      yearly.rev.push(Math.round(yearlyMap[m].rev));
+      yearly.ord.push(yearlyMap[m].ord);
+    });
+
+  dashRevData = { daily, weekly, monthly, yearly };
+}
+
+function dashBuildRevenueChart(startKey) {
+  const key = startKey || "monthly";
   dashDestroyChart("revenueChart");
   const ctx = dashEl("revenueChart").getContext("2d");
   dashCharts["revenueChart"] = new Chart(ctx, {
     data: {
-      labels: dashRevData.monthly.labels,
+      labels: dashRevData[key].labels,
       datasets: [
         {
           type: "bar",
           label: "Revenue",
-          data: dashRevData.monthly.rev,
+          data: dashRevData[key].rev,
           backgroundColor: "rgba(127,4,3,0.75)",
           hoverBackgroundColor: "rgba(127,4,3,1)",
           borderRadius: 2,
@@ -137,7 +170,7 @@ function dashBuildRevenueChart() {
         {
           type: "line",
           label: "Orders",
-          data: dashRevData.monthly.ord,
+          data: dashRevData[key].ord,
           borderColor: "rgba(184,134,11,0.8)",
           backgroundColor: "rgba(184,134,11,0.06)",
           fill: true,
@@ -202,6 +235,10 @@ function dashBuildRevenueChart() {
       },
     },
   });
+  // Update legend total for initial key
+  const total = dashRevData[key].rev.reduce((a, b) => a + b, 0);
+  dashEl("rev-total").innerHTML =
+    dashFmtRs(total) + " <span>total this period</span>";
 }
 
 function switchRevTab(el, key) {
@@ -217,6 +254,32 @@ function switchRevTab(el, key) {
   const total = dashRevData[key].rev.reduce((a, b) => a + b, 0);
   dashEl("rev-total").innerHTML =
     dashFmtRs(total) + " <span>total this period</span>";
+  // Update subtitle
+  const subEl = dashEl("rev-chart-sub");
+  if (subEl) {
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    const now = new Date();
+    const subs = {
+      weekly: "Last 7 days performance",
+      monthly: `Daily performance · ${monthNames[now.getMonth()]} ${now.getFullYear()}`,
+      yearly: `Monthly overview · ${now.getFullYear()}`,
+      daily: "Daily performance · last 30 days",
+    };
+    subEl.textContent = subs[key] || "Performance overview";
+  }
 }
 
 function dashMakeLineChart(id, labels, data, label, color) {
@@ -368,7 +431,11 @@ function dashRenderRevenue(d) {
   dashEl("rev-total").innerHTML =
     dashFmtRs(d.totalRevenue) + " <span>all time</span>";
 
-  dashBuildRevenueChart();
+  // Build revenue chart data from API revenueChart array
+  if (d.revenueChart && d.revenueChart.length) {
+    dashBuildRevData(d.revenueChart);
+  }
+  dashBuildRevenueChart("monthly");
 
   const payLabels = d.paymentSplit.map((p) =>
     p.method === "razorpay"
@@ -542,160 +609,6 @@ function dashRenderCustomers(d) {
     : `<tr><td colspan="5" style="text-align:center;color:#aa9988;padding:24px">No orders yet</td></tr>`;
 }
 
-/* ── Mock data fallback ── */
-function dashLoadMockData() {
-  const days = Array.from({ length: 30 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - 29 + i);
-    return d.toISOString().slice(0, 10);
-  });
-
-  dashRenderRevenue({
-    totalRevenue: 842560,
-    avgOrderValue: 656,
-    ordersToday: { count: 14, revenue: 17430 },
-    ordersThisWeek: { count: 87, revenue: 108225 },
-    paymentSplit: [
-      { method: "razorpay", count: 312, revenue: 389000 },
-      { method: "cod", count: 75, revenue: 93600 },
-    ],
-    revenueChart: days.map((date, i) => ({
-      date,
-      revenue: 8000 + Math.sin(i * 0.4) * 3000 + Math.random() * 4000,
-      orders: 6 + Math.floor(Math.random() * 8),
-    })),
-    statusBreakdown: [
-      { status: "placed", count: 42 },
-      { status: "processing", count: 38 },
-      { status: "shipped", count: 91 },
-      { status: "delivered", count: 184 },
-      { status: "cancelled", count: 21 },
-    ],
-  });
-
-  dashRenderProducts({
-    activeStats: { total: 48, active: 41, inactive: 7 },
-    lowStockCount: 3,
-    outOfStockCount: 2,
-    byCategory: [
-      { category: "floral", count: 14 },
-      { category: "woody", count: 11 },
-      { category: "resin", count: 9 },
-      { category: "heritage", count: 8 },
-      { category: "mixed", count: 6 },
-    ],
-    topSellers: [
-      {
-        name: "Rose Agarbatti",
-        fragranceCategory: "floral",
-        totalSoldAll: 1840,
-      },
-      {
-        name: "Sandalwood Classic",
-        fragranceCategory: "woody",
-        totalSoldAll: 1512,
-      },
-      { name: "Guggul Dhoop", fragranceCategory: "resin", totalSoldAll: 1203 },
-      {
-        name: "Jasmine Premium",
-        fragranceCategory: "floral",
-        totalSoldAll: 984,
-      },
-      {
-        name: "Chandan Heritage",
-        fragranceCategory: "heritage",
-        totalSoldAll: 761,
-      },
-      { name: "Loban Mix", fragranceCategory: "mixed", totalSoldAll: 640 },
-    ],
-    lowStockProducts: [
-      {
-        name: "Rose Agarbatti",
-        packs: {
-          weight: "40g",
-          stock: 4,
-          lowStockThreshold: 10,
-          sku: "ROSE-40",
-        },
-      },
-      {
-        name: "Sandalwood Classic",
-        packs: {
-          weight: "80g",
-          stock: 7,
-          lowStockThreshold: 10,
-          sku: "SAND-80",
-        },
-      },
-      {
-        name: "Jasmine Premium",
-        packs: {
-          weight: "100g",
-          stock: 3,
-          lowStockThreshold: 10,
-          sku: "JASM-100",
-        },
-      },
-    ],
-    outOfStockProducts: [
-      { name: "Guggul Dhoop", packs: { weight: "200g", sku: "GUGG-200" } },
-      { name: "Loban Mix", packs: { weight: "40g", sku: "LOBN-40" } },
-    ],
-  });
-
-  dashRenderCustomers({
-    totalUsers: 1284,
-    newSignups: { today: 8, week: 47, month: 194 },
-    repeatCustomers: 346,
-    lockedAccounts: 2,
-    verifiedStats: { verified: 1086, unverified: 198 },
-    topStates: [
-      { state: "Tamil Nadu", count: 284 },
-      { state: "Maharashtra", count: 198 },
-      { state: "Karnataka", count: 162 },
-      { state: "Gujarat", count: 141 },
-      { state: "Uttar Pradesh", count: 118 },
-      { state: "Rajasthan", count: 94 },
-    ],
-    signupChart: days.map((date, i) => ({
-      date,
-      count: 3 + Math.floor(Math.sin(i * 0.3) * 2 + Math.random() * 6),
-    })),
-    topCustomersBySpend: [
-      {
-        name: "Priya Nair",
-        email: "priya@gmail.com",
-        orderCount: 12,
-        totalSpend: 18400,
-      },
-      {
-        name: "Rajan Mehta",
-        email: "rajan@outlook.com",
-        orderCount: 9,
-        totalSpend: 14200,
-      },
-      {
-        name: "Kavitha Nair",
-        email: "kavitha@gmail.com",
-        orderCount: 8,
-        totalSpend: 11800,
-      },
-      {
-        name: "Suresh Pillai",
-        email: "suresh@yahoo.com",
-        orderCount: 7,
-        totalSpend: 9600,
-      },
-      {
-        name: "Ananya Iyer",
-        email: "ananya@gmail.com",
-        orderCount: 6,
-        totalSpend: 8100,
-      },
-    ],
-  });
-}
-
 /* ── Main load function — called by navigate() in index.html ── */
 async function loadDashboard() {
   // Ensure Chart.js defaults are set each time
@@ -705,14 +618,14 @@ async function loadDashboard() {
   }
 
   try {
-    const res = await fetch(`${DASH_API_BASE}/all`);
-    if (!res.ok) throw new Error();
+    const res = await fetch(`${DASH_API_BASE}/all`, { credentials: "include" });
+    if (!res.ok) throw new Error(`API returned ${res.status}`);
     const json = await res.json();
-    if (json.status !== "success") throw new Error();
+    if (json.status !== "success") throw new Error("Dashboard API error");
     dashRenderRevenue(json.data.revenue);
     dashRenderProducts(json.data.products);
     dashRenderCustomers(json.data.customers);
-  } catch {
-    dashLoadMockData();
+  } catch (e) {
+    console.error("Dashboard load failed:", e.message);
   }
 }

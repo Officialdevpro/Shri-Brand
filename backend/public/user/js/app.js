@@ -332,17 +332,19 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     document.head.appendChild(style);
   })();
-  // ---------- Sidebar ScrollSpy ----------
-  (function initSidebarSpy() {
+  // ---------- ScrollSpy (Sidebar + Desktop Nav) ----------
+  (function initScrollSpy() {
     const sidebarLinks = document.querySelectorAll('.sidebar .nav-item');
-    if (!sidebarLinks.length) return;
+    const desktopLinks = document.querySelectorAll('.desktop-nav .nav-link');
+    const allNavLinks = [...sidebarLinks, ...desktopLinks];
+    if (!allNavLinks.length) return;
 
     // specific check for current page URL (e.g. profile.html)
     const currentPath = window.location.pathname;
     const pageName = currentPath.split("/").pop(); // e.g., "profile.html"
 
     // 1. Highlight based on Page URL (for non-hash links)
-    sidebarLinks.forEach(link => {
+    allNavLinks.forEach(link => {
       const href = link.getAttribute('href');
       if (href && !href.startsWith('#') && href.includes(pageName) && pageName !== "" && pageName !== "index.html") {
         link.classList.add('active');
@@ -352,7 +354,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. ScrollSpy for index.html sections
     // Only run if we are on the main page (index.html or root)
     if (pageName === "" || pageName === "index.html") {
-      const sections = document.querySelectorAll("section"); // Assuming sections have IDs matching hashes
+      const sections = document.querySelectorAll("section[id]");
       if (!sections.length || typeof IntersectionObserver === "undefined") return;
 
       const observerOptions = {
@@ -366,7 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (entry.isIntersecting) {
             const id = entry.target.getAttribute("id");
             if (id) {
-              sidebarLinks.forEach((link) => {
+              allNavLinks.forEach((link) => {
                 link.classList.remove("active");
                 if (link.getAttribute("href") === `#${id}`) {
                   link.classList.add("active");
@@ -384,9 +386,11 @@ document.addEventListener("DOMContentLoaded", () => {
       // Also highlight "Home" if near top
       window.addEventListener('scroll', () => {
         if (window.scrollY < 100) {
-          sidebarLinks.forEach(l => l.classList.remove('active'));
-          const homeLink = document.querySelector('.sidebar .nav-item[href="#home"]');
-          if (homeLink) homeLink.classList.add('active');
+          allNavLinks.forEach(l => l.classList.remove('active'));
+          const homeSidebar = document.querySelector('.sidebar .nav-item[href="#home"]');
+          const homeDesktop = document.querySelector('.desktop-nav .nav-link[href="#home"]');
+          if (homeSidebar) homeSidebar.classList.add('active');
+          if (homeDesktop) homeDesktop.classList.add('active');
         }
       });
     }

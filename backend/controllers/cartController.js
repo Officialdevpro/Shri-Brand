@@ -4,6 +4,22 @@ const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 
 // ─────────────────────────────────────────────
+//  HELPER: Resolve wholesaler tier price
+//  Must be logically identical to the client-side
+//  version in product.js
+// ─────────────────────────────────────────────
+const resolveWholesalerPrice = (wholesalerPricing, quantity, retailPrice) => {
+    if (!wholesalerPricing || !Array.isArray(wholesalerPricing) || wholesalerPricing.length === 0) {
+        return retailPrice;
+    }
+    // Sort tiers by minBoxes descending
+    const sorted = [...wholesalerPricing].sort((a, b) => b.minBoxes - a.minBoxes);
+    // Find the first tier where quantity >= tier.minBoxes
+    const matchedTier = sorted.find(t => quantity >= t.minBoxes);
+    return matchedTier ? matchedTier.pricePerBox : retailPrice;
+};
+
+// ─────────────────────────────────────────────
 //  HELPER: Check if user is authenticated
 // ─────────────────────────────────────────────
 const requireAuth = (req, res) => {
@@ -64,6 +80,7 @@ exports.getCart = catchAsync(async (req, res, next) => {
     return res.status(200).json({
         status: "success",
         data: { cart },
+        userRole: req.user.role,
         // Send issues so frontend can show relevant notifications
         ...(issues.length > 0 && { issues }),
     });
@@ -155,6 +172,22 @@ exports.addToCart = catchAsync(async (req, res, next) => {
     // Uses the cartModel's addItem instance method
     await cart.addItem(product, selectedPack, parsedQty);
 
+    // ── Wholesaler tier pricing: resolve price after add ──
+    if (req.user.role === "wholesaler") {
+        const freshCart = await Cart.findOne({ userId: req.user.id });
+        const idx = freshCart.items.findIndex(
+            (item) =>
+                item.productId.toString() === productId.toString() &&
+                item.selectedPack.weight === selectedPack.weight
+        );
+        if (idx > -1) {
+            const wp = selectedPack.wholesalerPricing || [];
+            const tierPrice = resolveWholesalerPrice(wp, freshCart.items[idx].quantity, selectedPack.price);
+            freshCart.items[idx].selectedPack.price = tierPrice;
+            await freshCart.save();
+        }
+    }
+
     const updatedCart = await Cart.findOne({ userId: req.user.id });
 
     return res.status(200).json({
@@ -197,6 +230,25 @@ exports.updateCartItem = catchAsync(async (req, res, next) => {
     // ── Handle pack change ──
     if (newPackWeight && packWeight && newPackWeight !== packWeight) {
         await cart.changeItemPack(productId, packWeight, newPackWeight, product);
+
+        // ── Wholesaler tier pricing: resolve price after pack change ──
+        if (req.user.role === "wholesaler") {
+            const freshCart = await Cart.findOne({ userId: req.user.id });
+            const newPack = product.getPackByWeight(newPackWeight);
+            if (freshCart && newPack) {
+                const idx = freshCart.items.findIndex(
+                    (item) =>
+                        item.productId.toString() === productId.toString() &&
+                        item.selectedPack.weight === newPackWeight
+                );
+                if (idx > -1) {
+                    const wp = newPack.wholesalerPricing || [];
+                    const tierPrice = resolveWholesalerPrice(wp, freshCart.items[idx].quantity, newPack.price);
+                    freshCart.items[idx].selectedPack.price = tierPrice;
+                    await freshCart.save();
+                }
+            }
+        }
 
         const updatedCart = await Cart.findOne({ userId: req.user.id });
         return res.status(200).json({
@@ -255,6 +307,14 @@ exports.updateCartItem = catchAsync(async (req, res, next) => {
             );
             if (itemIndex > -1) {
                 cart.items[itemIndex].selectedPack.stock = currentPack.stock;
+
+                // ── Wholesaler tier pricing: resolve price on quantity change ──
+                if (req.user.role === "wholesaler") {
+                    const wp = currentPack.wholesalerPricing || [];
+                    const tierPrice = resolveWholesalerPrice(wp, parsedQty, currentPack.price);
+                    cart.items[itemIndex].selectedPack.price = tierPrice;
+                }
+
                 await cart.save();
             }
         }

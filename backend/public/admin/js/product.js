@@ -1,8 +1,8 @@
 (function () {
   "use strict";
 
-  const API = "http://127.0.0.1:5000/api/v1/products";
-  const CAT_API = "http://127.0.0.1:5000/api/v1/categories";
+  const API = "/api/v1/products";
+  const CAT_API = "/api/v1/categories";
 
   let products = [],
     isEditing = false,
@@ -48,7 +48,7 @@
   // ── Fetch ──────────────────────────────────────────
   async function fetchProducts() {
     try {
-      const r = await fetch(`${API}?limit=200`);
+      const r = await fetch(`${API}?limit=200`, { credentials: "include" });
       if (!r.ok) throw 0;
       const d = await r.json();
       products = Array.isArray(d) ? d : d.products || d.data || [];
@@ -124,7 +124,7 @@
 
   async function fetchCategories() {
     try {
-      const r = await fetch(CAT_API);
+      const r = await fetch(CAT_API, { credentials: "include" });
       if (!r.ok) throw 0;
       const d = await r.json();
       categoriesData = d.data || [];
@@ -256,6 +256,7 @@
           fetch(`${CAT_API}/${c._id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({ order: c.order }),
           })
         )
@@ -279,6 +280,7 @@
       const r = await fetch(CAT_API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ name, label, order: categoriesData.length }),
       });
       if (!r.ok) {
@@ -301,7 +303,7 @@
       "Are you sure you want to delete this category? Products using it will need to be reassigned.",
       async () => {
         try {
-          const r = await fetch(`${CAT_API}/${id}`, { method: "DELETE" });
+          const r = await fetch(`${CAT_API}/${id}`, { method: "DELETE", credentials: "include" });
           if (!r.ok) {
             const err = await r.json().catch(() => ({}));
             throw new Error(err.message || "Delete failed");
@@ -780,7 +782,7 @@
     // Always fetch fresh data from API on every Edit click
     let p;
     try {
-      const r = await fetch(`${API}/${id}`);
+      const r = await fetch(`${API}/${id}`, { credentials: "include" });
       if (!r.ok) throw 0;
       const d = await r.json();
       p = d.product || d.data || d;
@@ -908,6 +910,7 @@
       const url = isEditing ? `${API}/${id}` : API;
       const res = await fetch(url, {
         method: isEditing ? "PUT" : "POST",
+        credentials: "include",
         body: form,
       });
       if (!res.ok) {
@@ -954,7 +957,7 @@
     const btn = $("modalConfirm");
     setLoading(btn, true, "Deleting…");
     try {
-      const r = await fetch(`${API}/${pendingDelId}`, { method: "DELETE" });
+      const r = await fetch(`${API}/${pendingDelId}`, { method: "DELETE", credentials: "include" });
       if (!r.ok) throw 0;
       products = products.filter((p) => (p._id || p.id) !== pendingDelId);
       showNotif("Product removed from collection.", "success");

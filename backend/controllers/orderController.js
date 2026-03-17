@@ -405,6 +405,122 @@ exports.paymentFailed = catchAsync(async (req, res, next) => {
 });
 
 // ─────────────────────────────────────────────────────────────────
+//  COD ORDER (Wholesaler-only)
+//  POST /api/v1/orders/create-cod-order
+//
+//  Same shipping validation and stock logic as the Razorpay flow,
+//  but no Razorpay IDs. Order is created with payment.method "cod".
+// ─────────────────────────────────────────────────────────────────
+exports.createCodOrder = catchAsync(async (req, res, next) => {
+  // ── 1. Role gate — wholesalers only ──────────────────────────
+  if (req.user.role !== "wholesaler") {
+    return next(new AppError("Cash on Delivery is available for wholesalers only.", 403));
+  }
+
+  const userId = req.user.id;
+
+  // ── 2. Pull cart from DB ─────────────────────────────────────
+  const cart = await Cart.findOne({ userId });
+
+  if (!cart || cart.items.length === 0) {
+    return next(new AppError("Your cart is empty. Please add items before checkout.", 400));
+  }
+
+  // ── 3. Validate shipping address ────────────────────────────
+  const { fullName, email, phone, address, city, state, pincode } = req.body;
+
+  if (!fullName || !email || !phone || !address || !city || !state || !pincode) {
+    return next(new AppError("All shipping address fields are required.", 400));
+  }
+
+  if (!/^[0-9]{10}$/.test(phone.replace(/\D/g, ""))) {
+    return next(new AppError("Please provide a valid 10-digit phone number.", 400));
+  }
+
+  if (!/^[0-9]{6}$/.test(pincode)) {
+    return next(new AppError("Please provide a valid 6-digit PIN code.", 400));
+  }
+
+  // ── 4. Calculate totals from DB cart ─────────────────────────
+  const subtotal      = cart.summary.subtotal;
+  const totalDiscount = cart.summary.totalDiscount;
+  const shippingCost  = 0;
+  const total         = subtotal + shippingCost;
+
+  if (total <= 0) {
+    return next(new AppError("Order total must be greater than zero.", 400));
+  }
+
+  // ── 5. Build cart snapshot ───────────────────────────────────
+  const itemsSnapshot = cart.items.map((item) => ({
+    productId:          item.productId,
+    name:               item.name,
+    sku:                item.sku,
+    mainImage:          item.mainImage,
+    packWeight:         item.selectedPack.weight,
+    price:              Number(item.selectedPack.price),
+    originalPrice:      Number(item.selectedPack.originalPrice || item.selectedPack.price),
+    discountPercentage: item.selectedPack.discountPercentage || 0,
+    quantity:           item.quantity,
+    itemTotal:          Math.round(Number(item.selectedPack.price) * item.quantity * 100) / 100,
+  }));
+
+  // ── 6. Create COD order ──────────────────────────────────────
+  const order = await Order.create({
+    userId,
+    items: itemsSnapshot,
+    shippingAddress: { fullName, email, phone, address, city, state, pincode },
+    pricing: { subtotal, totalDiscount, shippingCost, total },
+    payment: {
+      method: "cod",
+      status: "pending",
+    },
+    orderStatus: "placed",
+  });
+
+  console.log(`✅ COD Order created — Order ID: ${order._id}`);
+
+  // ── 7. Reduce stock for each ordered item ────────────────────
+  const Product = require("../models/productModel");
+
+  for (const item of order.items) {
+    try {
+      const product = await Product.findById(item.productId);
+      if (product && item.packWeight) {
+        await product.reserveStock(item.packWeight, item.quantity);
+      }
+    } catch (stockErr) {
+      console.error(`❌ Stock reduction failed for product ${item.productId}: ${stockErr.message}`);
+      logger.warn("Stock reduction failed (COD)", {
+        productId: item.productId,
+        packWeight: item.packWeight,
+        error: stockErr.message,
+      });
+    }
+  }
+
+  // ── 8. Clear the cart ────────────────────────────────────────
+  await Cart.deleteOne({ userId });
+
+  logger.info("COD order created", {
+    orderId:     order._id,
+    orderNumber: order.orderNumber,
+    amount:      total,
+    userId,
+  });
+
+  res.status(200).json({
+    status: "success",
+    message: "Order placed successfully via Cash on Delivery!",
+    data: {
+      orderNumber: order.orderNumber,
+      orderId:     order._id,
+      total:       order.pricing.total,
+    },
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────
 //  GET MY ORDERS  →  GET /api/v1/orders/my-orders
 // ─────────────────────────────────────────────────────────────────
 exports.getMyOrders = catchAsync(async (req, res, next) => {
@@ -557,5 +673,5 @@ exports.deleteOrder = catchAsync(async (req, res, next) => {
     orderNumber: order.orderNumber,
   });
 
-  res.status(204).json({ status: "success", data: null });
+  res.status(200).json({ status: "success", message: "Order deleted successfully", data: null });
 });

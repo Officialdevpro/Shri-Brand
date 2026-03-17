@@ -6,6 +6,7 @@ const orderController = require("../controllers/orderController");
 
 // ── User routes (all require login) ────────────────────────────
 router.post("/create-order",      authController.protect, orderController.createOrder);
+router.post("/create-cod-order",  authController.protect, orderController.createCodOrder);
 router.post("/simulate-payment",  authController.protect, orderController.simulatePayment);  // TODO: Remove when Razorpay is live
 router.post("/verify-payment",    authController.protect, orderController.verifyPayment);
 router.post("/payment-failed",    authController.protect, orderController.paymentFailed);

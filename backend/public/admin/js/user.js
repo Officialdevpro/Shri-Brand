@@ -22,9 +22,9 @@ async function loadUsers() {
 
     try {
         const [uRes, oRes] = await Promise.all([
-            fetch("http://127.0.0.1:5000/api/v1/users", { credentials: "include" }),
+            fetch("/api/v1/users", { credentials: "include" }),
             // Fetch a sufficiently large number of orders to populate the per-user order arrays for admin
-            fetch("http://127.0.0.1:5000/api/v1/orders?limit=5000", { credentials: "include" })
+            fetch("/api/v1/orders?limit=5000", { credentials: "include" })
         ]);
 
         const uData = await uRes.json();
@@ -203,7 +203,7 @@ async function saveUser() {
                 role: document.getElementById("f_role").value,
                 active: document.getElementById("f_status").value === "active"
             };
-            const res = await fetch(`http://127.0.0.1:5000/api/v1/users/${uEditingId}`, {
+            const res = await fetch(`/api/v1/users/${uEditingId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -221,7 +221,7 @@ async function saveUser() {
                 confirmPassword: document.getElementById("f_pass").value,
                 phone: phone || undefined
             };
-            const res = await fetch("http://127.0.0.1:5000/api/v1/auth/signup", {
+            const res = await fetch("/api/v1/auth/signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -457,7 +457,7 @@ function closeDel() {
 }
 async function uConfirmDelete() {
     try {
-        const res = await fetch(`http://127.0.0.1:5000/api/v1/users/${uDeleteTarget}`, {
+        const res = await fetch(`/api/v1/users/${uDeleteTarget}`, {
             method: "DELETE",
             credentials: "include"
         });

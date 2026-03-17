@@ -51,6 +51,13 @@ const cartSchema = new mongoose.Schema(
           stickCount: { type: Number },
           totalSold: { type: Number, default: 0 },
           lowStockThreshold: { type: Number, default: 10 },
+          wholesalerPricing: [
+            {
+              tierName: { type: String },
+              minBoxes: { type: Number },
+              pricePerBox: { type: Number },
+            },
+          ],
         },
 
         // All available packs snapshot (for pack switching in cart sidebar)
@@ -65,6 +72,13 @@ const cartSchema = new mongoose.Schema(
             stickCount: { type: Number },
             totalSold: { type: Number, default: 0 },
             lowStockThreshold: { type: Number, default: 10 },
+            wholesalerPricing: [
+              {
+                tierName: { type: String },
+                minBoxes: { type: Number },
+                pricePerBox: { type: Number },
+              },
+            ],
           },
         ],
 
@@ -153,7 +167,7 @@ cartSchema.methods.calculateSummary = function () {
 
   this.summary = {
     subtotal: Math.round(subtotal * 100) / 100,
-    totalDiscount: Math.round(totalDiscount * 100) / 100,
+    totalDiscount: Math.max(0, Math.round(totalDiscount * 100) / 100),
     totalItems,
     itemCount,
   };
@@ -188,6 +202,7 @@ cartSchema.methods.addItem = async function (product, pack, quantity = 1) {
     stickCount: p.stickCount,
     totalSold: p.totalSold,
     lowStockThreshold: p.lowStockThreshold,
+    wholesalerPricing: p.wholesalerPricing || [],
   }));
 
   // Check if same product + same pack already in cart
@@ -222,6 +237,7 @@ cartSchema.methods.addItem = async function (product, pack, quantity = 1) {
       stickCount: pack.stickCount,
       totalSold: pack.totalSold,
       lowStockThreshold: pack.lowStockThreshold,
+      wholesalerPricing: pack.wholesalerPricing || [],
     };
     this.items[existingItemIndex].availablePacks = packsSnapshot;
   } else {
@@ -242,6 +258,7 @@ cartSchema.methods.addItem = async function (product, pack, quantity = 1) {
         stickCount: pack.stickCount,
         totalSold: pack.totalSold,
         lowStockThreshold: pack.lowStockThreshold,
+        wholesalerPricing: pack.wholesalerPricing || [],
       },
       availablePacks: packsSnapshot,
       quantity,
@@ -327,6 +344,7 @@ cartSchema.methods.changeItemPack = async function (productId, oldPackWeight, ne
       stickCount: p.stickCount,
       totalSold: p.totalSold,
       lowStockThreshold: p.lowStockThreshold,
+      wholesalerPricing: p.wholesalerPricing || [],
     }));
 
     this.items[itemIndex].selectedPack = {
@@ -339,6 +357,7 @@ cartSchema.methods.changeItemPack = async function (productId, oldPackWeight, ne
       stickCount: newPack.stickCount,
       totalSold: newPack.totalSold,
       lowStockThreshold: newPack.lowStockThreshold,
+      wholesalerPricing: newPack.wholesalerPricing || [],
     };
     this.items[itemIndex].availablePacks = packsSnapshot;
   }
@@ -468,6 +487,7 @@ cartSchema.methods.validateCart = async function () {
       stickCount: currentPack.stickCount,
       totalSold: currentPack.totalSold,
       lowStockThreshold: currentPack.lowStockThreshold,
+      wholesalerPricing: currentPack.wholesalerPricing || [],
     };
 
     // ── Fully sync availablePacks (adds new packs, removes deleted ones) ──
@@ -484,6 +504,7 @@ cartSchema.methods.validateCart = async function () {
         stickCount: p.stickCount,
         totalSold: p.totalSold,
         lowStockThreshold: p.lowStockThreshold,
+        wholesalerPricing: p.wholesalerPricing || [],
       }));
 
     validItems.push(item);

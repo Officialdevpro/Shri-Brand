@@ -9,6 +9,24 @@ console.log(document.getElementsByClassName(".cart-btn"))
 const CART_API = "/api/v1/cart";
 
 // ─────────────────────────────────────────────────────────────────────────────
+//  RESOLVE WHOLESALER TIER PRICE
+//  Must be logically identical to the server-side version in cartController.js
+// ─────────────────────────────────────────────────────────────────────────────
+function resolveWholesalerPrice(wholesalerPricing, quantity, retailPrice) {
+    if (!wholesalerPricing || !Array.isArray(wholesalerPricing) || wholesalerPricing.length === 0) {
+        return { price: retailPrice, tier: null };
+    }
+    // Sort tiers by minBoxes descending
+    const sorted = [...wholesalerPricing].sort((a, b) => b.minBoxes - a.minBoxes);
+    // Find the first tier where quantity >= tier.minBoxes
+    const matchedTier = sorted.find(t => quantity >= t.minBoxes);
+    if (matchedTier) {
+        return { price: matchedTier.pricePerBox, tier: matchedTier };
+    }
+    return { price: retailPrice, tier: null };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 //  TOAST NOTIFICATION
 // ─────────────────────────────────────────────────────────────────────────────
 function showToast(message, type = "info") {
@@ -327,15 +345,11 @@ function renderCartSidebar(cart) {
     if (!container) return;
 
     const items = cart.items || [];
+    const isWholesaler = typeof window !== 'undefined' && window.__userRole === 'wholesaler';
 
     // Update header count
     if (countEl) {
         countEl.textContent = `${cart.summary?.itemCount || 0} item${(cart.summary?.itemCount || 0) !== 1 ? "s" : ""}`;
-    }
-
-    // Update total
-    if (totalEl) {
-        totalEl.textContent = `₹${cart.summary?.subtotal || 0}`;
     }
 
     // Show / hide summary bar
@@ -367,6 +381,9 @@ function renderCartSidebar(cart) {
     // Track if any item is frozen (out of stock)
     let hasFrozenItems = false;
 
+    // ── Track wholesaler grand total ──
+    let wholesalerGrandTotal = 0;
+
     // Render each cart item
     items.forEach(item => {
         const pack = item.selectedPack || {};
@@ -376,6 +393,20 @@ function renderCartSidebar(cart) {
         const allOutOfStock = !anyPackInStock;
 
         if (isFrozen) hasFrozenItems = true;
+
+        // ── Wholesaler pricing resolution ──
+        let displayPrice = pack.price || 0;
+        let tierBadge = '';
+        if (isWholesaler && !isFrozen) {
+            const wp = pack.wholesalerPricing || [];
+            const { price: resolvedPrice, tier } = resolveWholesalerPrice(wp, item.quantity, pack.price);
+            displayPrice = resolvedPrice;
+            if (tier) {
+                tierBadge = `<span style="display:inline-block;background:#7d1f1f;color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:4px;font-weight:700;">Wholesale${tier.tierName ? ' · ' + tier.tierName : ''}</span>`;
+            }
+        }
+        const lineTotal = displayPrice * item.quantity;
+        wholesalerGrandTotal += lineTotal;
 
         const div = document.createElement("div");
         div.className = "selecteditems product-details";
@@ -421,10 +452,14 @@ function renderCartSidebar(cart) {
                 <p style="font-weight:600;font-size:13px;margin-bottom:4px;${isFrozen ? 'color:#999;' : ''}">${item.name}</p>
                 ${frozenBanner}
                 <p style="color:#888;font-size:12px;margin-bottom:4px;">
-                    ${isFrozen ? '<strike style="color:#ccc;">' : ''}₹${pack.price || 0}${isFrozen ? '</strike>' : ''}
-                    ${(!isFrozen && pack.originalPrice && pack.originalPrice > pack.price)
+                    ${isFrozen ? '<strike style="color:#ccc;">' : ''}₹${displayPrice}${isFrozen ? '</strike>' : ''}
+                    ${(!isFrozen && pack.originalPrice && pack.originalPrice > displayPrice)
                 ? `<strike style="color:#bbb;margin-left:4px;">₹${pack.originalPrice}</strike>`
                 : ""}
+                    ${tierBadge}
+                </p>
+                <p style="color:#555;font-size:11px;font-weight:600;">
+                    Line total: ₹${lineTotal.toFixed(0)}
                 </p>
                 ${packs.length > 1
                 ? `<select class="pack-select"
@@ -462,6 +497,15 @@ function renderCartSidebar(cart) {
 
         container.appendChild(div);
     });
+
+    // ── Update total: use wholesaler calculation if applicable ──
+    if (totalEl) {
+        if (isWholesaler && items.length > 0) {
+            totalEl.textContent = `₹${Math.round(wholesalerGrandTotal)}`;
+        } else {
+            totalEl.textContent = `₹${cart.summary?.subtotal || 0}`;
+        }
+    }
 
     // ── Checkout button: block if any item is frozen ──
     if (checkoutBtn) {
@@ -531,4 +575,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Load cart on page load
     loadCart();
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  REFRESH CART ON BACK/FORWARD NAVIGATION (bfcache)
+//  When the browser restores a page from bfcache, DOMContentLoaded does NOT
+//  fire again, so the cart count badge stays stale. The `pageshow` event fires
+//  every time a page becomes visible; `persisted` is true for bfcache restores.
+// ─────────────────────────────────────────────────────────────────────────────
+window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+        loadCart();
+    }
 });

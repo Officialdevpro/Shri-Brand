@@ -775,7 +775,7 @@
 
       <!-- Footer -->
       <div class="sidebar-footer">
-        <button class="signout-btn">
+        <button class="signout-btn" onclick="adminSignOut()">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
             <polyline points="16 17 21 12 16 7" />
@@ -858,7 +858,7 @@
                 <div class="card-hd">
                   <div>
                     <div class="card-title">Revenue Overview</div>
-                    <div class="card-sub">Daily performance · March 2026</div>
+                    <div class="card-sub" id="rev-chart-sub">Daily performance · last 30 days</div>
                   </div>
                   <div class="ctabs">
                     <button class="ctab" onclick="switchRevTab(this,'weekly')">Weekly</button>
@@ -2653,6 +2653,20 @@
     document.addEventListener("DOMContentLoaded", function () {
       if (typeof loadDashboard === "function") loadDashboard();
     });
+
+    // ── Admin Sign Out ──
+    async function adminSignOut() {
+      try {
+        await fetch('/api/v1/auth/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
+        });
+      } catch (err) {
+        console.log('Logout API call failed:', err);
+      }
+      window.location.href = '/auth';
+    }
   </script>
 </body>
 

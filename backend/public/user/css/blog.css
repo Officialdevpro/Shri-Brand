@@ -56,7 +56,7 @@
 .blog-section .blog-page {
     max-width: 1160px;
     margin: 0 auto;
-    padding: 44px 24px 80px;
+    padding: 44px 24px 0px;
 }
 
 /* ══ SECTION HEADING ══ */
@@ -798,7 +798,7 @@
 
 @media (max-width: 768px) {
     .blog-section .blog-page {
-        padding: 24px 20px 50px;
+        padding: 24px 20px 0px;
     }
 
     .blog-section .blog-posts-grid {
@@ -851,7 +851,7 @@
     }
 
     .blog-section .blog-page {
-        padding: 20px 14px 44px;
+        padding: 20px 14px 4px;
     }
 
     .blog-section .blog-posts-grid {
@@ -892,7 +892,7 @@
     }
 
     .blog-section .blog-page {
-        padding: 18px 12px 40px;
+        padding: 18px 12px 0px;
     }
 
     .blog-section .blog-posts-grid {

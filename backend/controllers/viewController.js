@@ -29,6 +29,20 @@ exports.renderHomePage = catchAsync(async (req, res, next) => {
         }
     }
 
+    // ── Resolve userRole for non-admin logged-in users ──
+    let userRole = "";
+    if (req.cookies.jwt && req.cookies.jwt !== "loggedout") {
+        try {
+            const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+            const user = await User.findById(decoded.id);
+            if (user && !user.isPasswordChangedAfter(decoded.iat)) {
+                userRole = user.role || "";
+            }
+        } catch {
+            // Token invalid — userRole stays empty
+        }
+    }
+
     // 1. Fetch ALL active products
     const products = await Product.find({ isActive: true })
         .sort("createdAt")
@@ -62,6 +76,7 @@ exports.renderHomePage = catchAsync(async (req, res, next) => {
 
     res.status(200).render("index", {
         categories: categoryData,
+        userRole,
     });
 });
 
@@ -123,8 +138,14 @@ exports.renderCheckoutPage = catchAsync(async (req, res, next) => {
         res.status(200).render("checkout", {
             userName:  user.name  || "",
             userEmail: user.email || "",
+            userRole:  user.role  || "",
         });
     } catch {
         return res.redirect("/auth");
     }
 });
+
+// Render Blog Detail Page (client-side fetching, server just injects the blog ID)
+exports.renderBlogPage = (req, res) => {
+    res.status(200).render("blogView", { blogId: req.params.id });
+};

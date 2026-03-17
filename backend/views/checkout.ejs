@@ -16,6 +16,7 @@
 </head>
 
 <body>
+  <script>window.__userRole = "<%= typeof userRole !== 'undefined' ? userRole : '' %>";</script>
   <div class="checkout-page">
 
     <!-- Header -->
@@ -99,12 +100,33 @@
               </div>
             </div>
 
-            <!-- This button triggers Razorpay directly -->
+            <!-- This button triggers payment -->
             <button type="button" class="btn-place-order" id="pay-btn">
               <i class="fas fa-lock"></i>
               Proceed to Pay
             </button>
           </form>
+
+          <!-- Payment Method Selector (Wholesaler Only) -->
+          <% if (typeof userRole !== 'undefined' && userRole === 'wholesaler') { %>
+          <div class="payment-method-selector" id="payment-method-selector" style="margin-top:16px;padding:18px 20px;background:#faf6f0;border:1.5px solid #e8dcc8;border-radius:10px;">
+            <h3 style="font-size:14px;font-weight:700;color:#7d1f1f;margin:0 0 12px;display:flex;align-items:center;gap:8px;">
+              <i class="fas fa-credit-card"></i> Payment Method
+            </h3>
+            <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1.5px solid #ddd;border-radius:8px;cursor:pointer;margin-bottom:8px;transition:all 0.2s;" id="label-razorpay">
+              <input type="radio" name="paymentMethod" value="razorpay" checked
+                onclick="document.getElementById('pay-btn').innerHTML='<i class=\'fas fa-lock\'></i> Proceed to Pay';document.getElementById('label-razorpay').style.borderColor='#7d1f1f';document.getElementById('label-cod').style.borderColor='#ddd';" />
+              <i class="fas fa-mobile-alt" style="color:#7d1f1f;"></i>
+              <span style="font-size:13px;font-weight:600;">Pay Online (Razorpay)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1.5px solid #ddd;border-radius:8px;cursor:pointer;transition:all 0.2s;" id="label-cod">
+              <input type="radio" name="paymentMethod" value="cod"
+                onclick="document.getElementById('pay-btn').innerHTML='<i class=\'fas fa-truck\'></i> Place COD Order';document.getElementById('label-cod').style.borderColor='#7d1f1f';document.getElementById('label-razorpay').style.borderColor='#ddd';" />
+              <i class="fas fa-truck" style="color:#7d1f1f;"></i>
+              <span style="font-size:13px;font-weight:600;">Cash on Delivery</span>
+            </label>
+          </div>
+          <% } %>
         </div>
 
         <!-- RIGHT: Order Summary -->
@@ -255,21 +277,43 @@
         }
 
         // Render items
-        container.innerHTML = cart.items.map(item => `
+        let recalcSubtotal = 0;
+        const isWholesaler = window.__userRole === 'wholesaler';
+
+        container.innerHTML = cart.items.map(item => {
+          let displayPrice = item.selectedPack.price;
+          let tierLabel = '';
+
+          if (isWholesaler && item.selectedPack.wholesalerPricing && item.selectedPack.wholesalerPricing.length > 0) {
+            const wp = item.selectedPack.wholesalerPricing;
+            const sorted = [...wp].sort((a, b) => b.minBoxes - a.minBoxes);
+            const matched = sorted.find(t => item.quantity >= t.minBoxes);
+            if (matched) {
+              displayPrice = matched.pricePerBox;
+              tierLabel = `<span style="background:#7d1f1f;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;margin-left:4px;">Wholesale</span>`;
+            }
+          }
+
+          const lineTotal = displayPrice * item.quantity;
+          recalcSubtotal += lineTotal;
+
+          return `
           <div class="cart-item">
             <img src="${item.mainImage}" alt="${item.name}" class="item-image"
               onerror="this.src='/assets/images/logo/Logo.png'" />
             <div class="item-details">
-              <span class="item-name">${item.name}</span>
-              <span class="item-qty">Qty: ${item.quantity}</span>
+              <span class="item-name">${item.name}${tierLabel}</span>
+              <span class="item-qty">Qty: ${item.quantity} × ₹${displayPrice}</span>
             </div>
-            <span class="item-price">₹${(item.selectedPack.price * item.quantity).toFixed(0)}</span>
+            <span class="item-price">₹${lineTotal.toFixed(0)}</span>
           </div>
-        `).join('');
+        `;
+        }).join('');
 
         const s = cart.summary;
-        subtotalEl.textContent = `₹${s.subtotal}`;
-        totalEl.textContent    = `₹${s.subtotal}`;
+        const finalSubtotal = isWholesaler ? recalcSubtotal : s.subtotal;
+        subtotalEl.textContent = `₹${Math.round(finalSubtotal)}`;
+        totalEl.textContent    = `₹${Math.round(finalSubtotal)}`;
 
         if (s.totalDiscount > 0) {
           discountEl.textContent    = `-₹${s.totalDiscount}`;
@@ -329,7 +373,13 @@
     //  TODO: Replace this entire function with the real Razorpay
     //        popup flow when Razorpay key is provided.
     //
+    // ── Main Payment Flow ───────────────────────────────────────
     async function startPayment() {
+      // Check if COD is selected (wholesaler only)
+      const codRadio = document.querySelector('input[name="paymentMethod"][value="cod"]');
+      if (codRadio && codRadio.checked) {
+        return startCodPayment();
+      }
       // Step 1 — Validate shipping form
       if (!validateAll()) {
         showToast('Please fill all required fields correctly.');
@@ -448,6 +498,58 @@
         if (el) el.addEventListener('input', () => validateField(id));
       });
     });
+
+    // ── COD Payment Flow (Wholesaler Only) ──────────────────────
+    async function startCodPayment() {
+      if (!validateAll()) {
+        showToast('Please fill all required fields correctly.');
+        return;
+      }
+
+      const payBtn = document.getElementById('pay-btn');
+      payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing COD order...';
+      payBtn.disabled  = true;
+
+      try {
+        const res = await fetch(`${ORDER_API}/create-cod-order`, {
+          method:      'POST',
+          headers:     { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body:        JSON.stringify(getShippingData()),
+        });
+
+        const json = await res.json();
+
+        if (res.status === 401) { window.location.href = '/auth'; return; }
+        if (res.status === 403) {
+          showToast(json.message || 'COD is not available for your account.');
+          payBtn.innerHTML = '<i class="fas fa-truck"></i> Place COD Order';
+          payBtn.disabled  = false;
+          return;
+        }
+
+        if (!res.ok) {
+          showToast(json.message || 'Failed to place COD order.');
+          payBtn.innerHTML = '<i class="fas fa-truck"></i> Place COD Order';
+          payBtn.disabled  = false;
+          return;
+        }
+
+        // Show success modal directly (no countdown)
+        document.querySelector('.step[data-step="1"]').classList.remove('active');
+        document.querySelector('.step[data-step="1"]').classList.add('completed');
+        document.querySelector('.step[data-step="2"]').classList.add('active', 'completed');
+
+        document.getElementById('success-order-number').textContent =
+          `Order #${json.data.orderNumber}`;
+        document.getElementById('success-modal').classList.add('active');
+
+      } catch (err) {
+        showToast('Network error. Please check your connection.');
+        payBtn.innerHTML = '<i class="fas fa-truck"></i> Place COD Order';
+        payBtn.disabled  = false;
+      }
+    }
   </script>
 
 </body>

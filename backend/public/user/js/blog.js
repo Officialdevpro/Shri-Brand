@@ -255,7 +255,7 @@
               <span class="blog-feat-meta-item"><i class="fas fa-user"></i> ${f.author || "Staff"}</span>
               <span class="blog-feat-meta-item"><i class="fas fa-clock"></i> ${f.readTime || "—"}</span>
             </div>
-            <a href="/blog" class="blog-read-btn">Read Full Story <i class="fas fa-arrow-right"></i></a>
+            <a href="/blog/${f._id}" class="blog-read-btn">Read Full Story <i class="fas fa-arrow-right"></i></a>
           </div>`;
       strip.appendChild(slide);
 
@@ -367,7 +367,7 @@
       el.style.animationDelay = `${i * 0.07}s`;
       el.style.cursor = "pointer";
       el.addEventListener("click", () => {
-        window.location.href = "/blog";
+        window.location.href = "/blog/" + p._id;
       });
 
       const titleHl = blogHighlight(p.title, blogSearchQuery);
