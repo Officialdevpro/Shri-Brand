@@ -37,12 +37,6 @@ mongoose
     // Start server
     const server = app.listen(PORT, () => {
       logger.info(`Server running in ${NODE_ENV} mode on port ${PORT}`);
-      logger.info(`Health:    http://localhost:${PORT}/health`);
-      logger.info(`Products:  http://localhost:${PORT}/api/v1/products`);
-      logger.info(`Auth:      http://localhost:${PORT}/api/v1/auth`);
-      logger.info(`Users:     http://localhost:${PORT}/api/v1/users`);
-      logger.info(`Cart:      http://localhost:${PORT}/api/v1/cart`);
-      logger.info(`Cart Test: http://localhost:${PORT}/cart-test.html`);
     });
 
     // ===== Handle Unhandled Promise Rejections =====
