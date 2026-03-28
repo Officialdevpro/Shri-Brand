@@ -126,7 +126,7 @@ async function saveRawMaterial() {
     const ratePerKg =
       parseFloat(document.getElementById("stickRate").value) || 0;
     const res = await fetch(
-      "https://shri-brand.onrender.com/api/v1/production/inventory/raw-material",
+      "/api/v1/production/inventory/raw-material",
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -150,7 +150,7 @@ async function saveLabourRate() {
     const labourRatePerBox =
       parseFloat(document.getElementById("packRate").value) || 0;
     const res = await fetch(
-      "https://shri-brand.onrender.com/api/v1/production/inventory/raw-material",
+      "/api/v1/production/inventory/raw-material",
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -177,8 +177,7 @@ async function saveBoxType(boxId, card) {
       parseFloat(document.getElementById("boxRate_" + boxId)?.value) || 0;
     const label = card.querySelector(".inv-hd-name")?.textContent?.trim();
     const res = await fetch(
-      "https://shri-brand.onrender.com/api/v1/production/inventory/boxes/" +
-        boxId,
+      "/api/v1/production/inventory/boxes/" + boxId,
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -207,7 +206,7 @@ async function createBoxTypeAPI(idx, weightGm, stock, ratePerBox, card) {
   try {
     const label = `${weightGm} gm Box`;
     const res = await fetch(
-      "https://shri-brand.onrender.com/api/v1/production/inventory/boxes",
+      "/api/v1/production/inventory/boxes",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -235,8 +234,7 @@ async function createBoxTypeAPI(idx, weightGm, stock, ratePerBox, card) {
 async function deleteBoxTypeAPI(boxId, cardId) {
   try {
     const res = await fetch(
-      "https://shri-brand.onrender.com/api/v1/production/inventory/boxes/" +
-        boxId,
+      "/api/v1/production/inventory/boxes/" + boxId,
       { method: "DELETE" },
     );
     const json = await res.json();
@@ -780,7 +778,7 @@ async function commitToDatabase() {
   btn.innerHTML = `<div class="btn-commit-icon"><i class="fa-solid fa-circle-notch fa-spin"></i></div><div class="btn-commit-divider"></div>Committing…`;
   try {
     const res = await fetch(
-      "https://shri-brand.onrender.com/api/v1/production/runs/commit",
+      "/api/v1/production/runs/commit",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -826,7 +824,7 @@ async function commitToDatabase() {
 async function loadInventory() {
   try {
     const res = await fetch(
-      "https://shri-brand.onrender.com/api/v1/production/inventory",
+      "/api/v1/production/inventory",
     );
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || "Failed to load inventory");
@@ -931,9 +929,9 @@ async function loadFragProducts(search = "") {
     list.innerHTML = `<div class="frag-sb-loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading products…</div>`;
   try {
     const url = search
-      ? "https://shri-brand.onrender.com/api/v1/production/products?search=" +
+      ? "/api/v1/production/products?search=" +
         encodeURIComponent(search)
-      : "https://shri-brand.onrender.com/api/v1/production/products";
+      : "/api/v1/production/products";
     const res = await fetch(url);
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || "Failed to load products");

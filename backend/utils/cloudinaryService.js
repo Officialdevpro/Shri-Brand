@@ -1,5 +1,6 @@
 const cloudinary = require("../config/cloudinary");
 const AppError = require("./AppError");
+const logger = require("./logger");
 
 /**
  * Upload single image to Cloudinary
@@ -64,7 +65,7 @@ const deleteImage = async (publicId) => {
         const result = await cloudinary.uploader.destroy(publicId);
         return result;
     } catch (error) {
-        console.error("Error deleting image from Cloudinary:", error);
+        logger.warn("Error deleting image from Cloudinary", { error: error.message });
         // Don't throw error, just log it (image might already be deleted)
         return null;
     }
@@ -82,7 +83,7 @@ const deleteMultipleImages = async (publicIds) => {
         const deletePromises = publicIds.map((id) => deleteImage(id));
         return await Promise.all(deletePromises);
     } catch (error) {
-        console.error("Error deleting images from Cloudinary:", error);
+        logger.warn("Error deleting images from Cloudinary", { error: error.message });
         return [];
     }
 };

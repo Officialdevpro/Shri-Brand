@@ -234,7 +234,7 @@ exports.getAllInquiries = catchAsync(async (req, res, next) => {
  * Get a single inquiry by ID — Admin only
  */
 exports.getInquiryById = catchAsync(async (req, res, next) => {
-  const inquiry = await Inquiry.findById(req.params.id);
+  const inquiry = await Inquiry.findById(req.params.id).lean();
 
   if (!inquiry) {
     return next(new AppError("No inquiry found with that ID", 404));

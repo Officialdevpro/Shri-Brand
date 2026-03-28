@@ -5,6 +5,7 @@
 
 /* ─── Page wrapper ─── */
 .erp-body {
+ padding: 20px;
   min-height: 100%;
   position: relative;
   overflow-x: hidden;

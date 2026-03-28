@@ -10,6 +10,7 @@
   let searchQ = "",
     fType = "",
     fCat = "";
+  let showingDeleted = false;
 
   // Image state
   let heroState = { url: null, file: null };
@@ -48,12 +49,15 @@
   // ── Fetch ──────────────────────────────────────────
   async function fetchProducts() {
     try {
-      const r = await fetch(`${API}?limit=200`, { credentials: "include" });
+      const url = showingDeleted
+        ? `${API}?limit=200&showDeleted=true`
+        : `${API}?limit=200`;
+      const r = await fetch(url, { credentials: "include" });
       if (!r.ok) throw 0;
       const d = await r.json();
       products = Array.isArray(d) ? d : d.products || d.data || [];
     } catch {
-      products = sampleData();
+      products = showingDeleted ? [] : sampleData();
     }
     renderGrid();
     updateCount();
@@ -84,6 +88,9 @@
     });
     $("modalCancel").addEventListener("click", closeModal);
     $("modalConfirm").addEventListener("click", doDelete);
+
+    // Deleted products toggle
+    $("btnDeletedProducts").addEventListener("click", toggleDeletedView);
 
     // Category manager modal
     $("btnToggleCatMgr").addEventListener("click", openCatModal);
@@ -245,23 +252,33 @@
   }
 
   async function saveCategoryOrder() {
-    // Update order values and PATCH each category that's in the DB
-    const updates = categoriesData
-      .map((c, i) => ({ ...c, order: i }))
-      .filter((c) => c._id); // only save those with a DB id
+    // Map the new order from the UI
+    const updates = categoriesData.map((c, i) => ({ ...c, order: i }));
 
     try {
       await Promise.all(
-        updates.map((c) =>
-          fetch(`${CAT_API}/${c._id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ order: c.order }),
-          })
-        )
+        updates.map(async (c) => {
+          const id = c._id || c.id;
+          if (id) {
+            return fetch(`${CAT_API}/${id}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ order: c.order }),
+            });
+          } else {
+            // It's a default category not yet in DB, so create it!
+            return fetch(CAT_API, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ name: c.name, label: c.label, order: c.order }),
+            });
+          }
+        })
       );
       showNotif("Category order saved.", "success");
+      await fetchCategories(); // Refresh admin UI so newly created cats get DB _ids
     } catch {
       showNotif("Could not save order.", "error");
     }
@@ -298,23 +315,19 @@
 
   async function deleteCategory(id) {
     if (!id) return;
-    showConfirm(
-      "Delete Category",
-      "Are you sure you want to delete this category? Products using it will need to be reassigned.",
-      async () => {
-        try {
-          const r = await fetch(`${CAT_API}/${id}`, { method: "DELETE", credentials: "include" });
-          if (!r.ok) {
-            const err = await r.json().catch(() => ({}));
-            throw new Error(err.message || "Delete failed");
-          }
-          showNotif("Category deleted.", "success");
-          await fetchCategories();
-        } catch (err) {
-          showNotif(err.message || "Could not delete category.", "error");
-        }
+    try {
+      const r = await fetch(`${CAT_API}/${id}`, { method: "DELETE", credentials: "include" });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        // Server blocked deletion (e.g. products still use this category)
+        showNotif(data.message || "Could not delete category.", "error");
+        return;
       }
-    );
+      showNotif("Category deleted.", "success");
+      await fetchCategories();
+    } catch (err) {
+      showNotif("Could not delete category.", "error");
+    }
   }
 
   // ── Pack Manager ────────────────────────────────────
@@ -584,6 +597,23 @@
     document.body.style.overflow = "";
     resetForm();
   }
+  // ── Deleted Products Toggle ────────────────────────────
+  function toggleDeletedView() {
+    showingDeleted = !showingDeleted;
+    const btn = $("btnDeletedProducts");
+    btn.classList.toggle("active", showingDeleted);
+    btn.innerHTML = showingDeleted
+      ? '<i class="fas fa-arrow-left"></i> Back to Active'
+      : '<i class="fas fa-trash-alt"></i> Deleted Products';
+    // Update page title
+    const titleEl = document.querySelector(".page-title");
+    if (titleEl) titleEl.textContent = showingDeleted ? "Deleted Products" : "Product Collection";
+    const subtitleEl = document.querySelector(".page-subtitle");
+    if (subtitleEl) subtitleEl.textContent = showingDeleted
+      ? "Products that have been removed — restore them if needed"
+      : "Manage your sacred fragrance catalogue";
+    fetchProducts();
+  }
 
   // ── Grid ───────────────────────────────────────────
   function renderGrid() {
@@ -605,9 +635,9 @@
 
     if (!list.length) {
       grid.innerHTML = `<div class="empty-state">
-        <div class="empty-icon"><i class="fas fa-spa"></i></div>
-        <h3>No Products Found</h3>
-        <p>${searchQ || fType || fCat ? "Try adjusting your search or filters." : 'Click "Add New Product" to get started.'}</p>
+        <div class="empty-icon"><i class="fas ${showingDeleted ? 'fa-trash-alt' : 'fa-spa'}"></i></div>
+        <h3>${showingDeleted ? 'No Deleted Products' : 'No Products Found'}</h3>
+        <p>${showingDeleted ? 'All products are currently active.' : (searchQ || fType || fCat ? 'Try adjusting your search or filters.' : 'Click "Add New Product" to get started.')}</p>
       </div>`;
       return;
     }
@@ -625,6 +655,11 @@
           openModal(btn.dataset.del, btn.dataset.name),
         ),
       );
+    grid
+      .querySelectorAll("[data-restore]")
+      .forEach((btn) =>
+        btn.addEventListener("click", () => restoreProduct(btn.dataset.restore)),
+      );
   }
 
   function updateCount() {
@@ -634,148 +669,89 @@
   // ── Card HTML ──────────────────────────────────────
   function cardHTML(p, i) {
     const id = p._id || p.id;
-
-    // Pack price range
+    const category = p.fragranceCategory || "Floral";
+    const type = p.productType || "Single";
     const packs = p.packs || [];
-    const prices = packs.map((pk) => pk.price).filter((v) => v > 0);
-    const minPrice = prices.length ? Math.min(...prices) : (p.price || 0);
-    const maxPrice = prices.length ? Math.max(...prices) : minPrice;
-    const priceDisplay =
-      minPrice === maxPrice
-        ? `₹${minPrice.toLocaleString("en-IN")}`
-        : `₹${minPrice.toLocaleString("en-IN")} – ₹${maxPrice.toLocaleString("en-IN")}`;
-
-    // Pack count label
-    const packLabel =
-      packs.length > 0
-        ? `<span class="p-spec"><i class="fas fa-layer-group"></i>${packs.length} pack${packs.length > 1 ? "s" : ""}</span>`
-        : "";
-
-    // Total stock (virtual)
-    const totalStock =
-      packs.length > 0
-        ? packs.reduce((s, pk) => s + (pk.stock || 0), 0)
-        : (p.stock != null ? p.stock : null);
-
-    const stockTagDesktop =
-      totalStock == null
-        ? ""
-        : totalStock === 0
-          ? `<span class="p-tag p-tag-out">Out of Stock</span>`
-          : totalStock <= 5
-            ? `<span class="p-tag p-tag-low">Low Stock · ${totalStock}</span>`
-            : `<span class="p-tag p-tag-instock">In Stock · ${totalStock}</span>`;
-
-    const stockTagMobile =
-      totalStock == null
-        ? ""
-        : totalStock === 0
-          ? `<span class="p-tag p-tag-out" style="font-size:8px;padding:2px 6px;">Out</span>`
-          : totalStock <= 5
-            ? `<span class="p-tag p-tag-low" style="font-size:8px;padding:2px 6px;">Low·${totalStock}</span>`
-            : `<span class="p-tag p-tag-instock" style="font-size:8px;padding:2px 6px;">✓ ${totalStock}</span>`;
-
-    const imgHtml = p.mainImage
-      ? `<img src="${p.mainImage}" alt="${p.name}" onerror="this.parentElement.innerHTML='<div class=\\'p-card-no-img\\'><i class=\\'fas fa-spa\\'></i></div>'">`
-      : `<div class="p-card-no-img"><i class="fas fa-spa"></i></div>`;
-
-    const mobImgHtml = p.mainImage
-      ? `<img src="${p.mainImage}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">`
-      : `<div class="p-card-mob-img-ph"><i class="fas fa-spa"></i></div>`;
-
-    const gallery = (p.images || []).slice(0, 3);
-    const thumbs = gallery.length
-      ? gallery.map((u) => `<img class="p-thumb" src="${u}" alt="">`).join("")
-      : `<div class="p-thumb-ph"><i class="fas fa-image"></i></div>`;
-
-    // Desktop specs
+    
+    const burnTime = p.burnTime || "";
     const totalSold = packs.length
-      ? packs.reduce((s, pk) => s + (pk.totalSold || 0), 0)
+      ? packs.reduce((sum, pk) => sum + (pk.totalSold || 0), 0)
       : (p.totalSold || 0);
 
-    const specs = [
-      p.burnTime && `<div class="p-spec"><i class="fas fa-fire"></i>${p.burnTime}</div>`,
-      totalSold > 0 && `<div class="p-spec"><i class="fas fa-chart-bar"></i>${totalSold} sold</div>`,
-      packLabel,
-    ]
-      .filter(Boolean)
-      .join("");
+    const imgHtml = p.mainImage
+      ? `<img src="${p.mainImage}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='&#10022;';">`
+      : "&#10022;";
 
-    const mobSpecs = [
-      p.burnTime && `<div class="p-card-mob-spec"><i class="fas fa-fire"></i>${p.burnTime}</div>`,
-      totalSold > 0 && `<div class="p-card-mob-spec"><i class="fas fa-chart-bar"></i>${totalSold} sold</div>`,
-      packs.length > 0 && `<div class="p-card-mob-spec"><i class="fas fa-layer-group"></i>${packs.length} pack${packs.length > 1 ? "s" : ""}</div>`,
-    ]
-      .filter(Boolean)
+    const stockClass = (n) => {
+      if (n === 0) return ["out", "red", "Out of stock"];
+      if (n <= 20) return ["low-stock", "amber", n + " left"];
+      return ["in-stock", "green", n + " in stock"];
+    };
+
+    const packsHtml = packs
+      .map((pk, ki) => {
+        const [sc, dc, sl] = stockClass(pk.stock || 0);
+        const sel = ki === 0 ? " selected" : "";
+        return `
+        <div class="lux-pack-row${sel}" onclick="window.selectPack(this)">
+          <div class="lux-pack-left">
+            <div class="lux-radio"><div class="lux-radio-dot"></div></div>
+            <span class="lux-pack-weight">${pk.weight || ""}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="lux-pack-price">&#8377;${(pk.price || 0).toLocaleString("en-IN")}</span>
+            <span class="lux-stock-pill ${sc}">
+              <span class="lux-dot ${dc}"></span>${sl}
+            </span>
+          </div>
+        </div>`;
+      })
       .join("");
 
     return `
-    <div class="p-card" style="animation-delay:${i * 0.04}s">
+    <div class="lux-card" style="animation-delay:${i * 0.04}s">
+      <div class="lux-img-ph">${imgHtml}</div>
+      <div class="lux-category-row">
+        <span class="lux-cat">${category}</span>
+        <span class="lux-type">${type}</span>
+      </div>
+      <div class="lux-name">${p.name}</div>
+      <div class="lux-sku">SKU: ${p.sku || ""}</div>
 
-      <!-- ─ DESKTOP: vertical card ─ -->
-      <div class="p-card-img-wrap">
-        ${imgHtml}
-        <div class="p-card-badges">
-          ${p.isFeatured ? '<span class="p-tag p-tag-featured">Featured</span>' : ""}
-          ${p.isActive === false ? '<span class="p-tag p-tag-inactive">Inactive</span>' : ""}
-          ${stockTagDesktop}
+      <div class="lux-meta">
+        ${burnTime ? `<div class="lux-meta-item">
+          <svg class="lux-meta-icon fire" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2c0 0-5 5.5-5 10a5 5 0 0 0 10 0c0-4.5-5-10-5-10z"/></svg>
+          ${burnTime}
+        </div><div class="lux-meta-sep"></div>` : ""}
+        ${totalSold > 0 ? `<div class="lux-meta-item">
+          <svg class="lux-meta-icon sold" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M16 3H8l-2 4h12z"/></svg>
+          ${totalSold} sold
+        </div><div class="lux-meta-sep"></div>` : ""}
+        <div class="lux-meta-item">
+          <svg class="lux-meta-icon packs" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          ${packs.length} ${packs.length === 1 ? "pack" : "packs"}
         </div>
       </div>
 
-      <div class="p-card-body">
-
-        <div class="p-card-meta-top">
-          <div class="p-card-category">${p.fragranceCategory || "floral"}</div>
-          <div class="p-card-type">${p.productType || "single"}</div>
-        </div>
-        <div class="p-card-name">${p.name}</div>
-        ${p.sku ? `<div class="p-card-sku">SKU: ${p.sku}</div>` : '<div class="p-card-sku">&nbsp;</div>'}
-        <div class="p-card-price-row">
-          <div class="p-card-price">${priceDisplay}</div>
-        </div>
-        
-        ${specs ? `<div class="p-card-specs">${specs}</div>` : ""}
-
-        ${packs.length > 0 ? `<div class="p-card-packs">${packs.map((pk) => {
-      const st = pk.stock === 0 ? 'out' : pk.stock <= 5 ? 'low' : 'in';
-      const stLbl = pk.stock === 0 ? 'Out' : pk.stock + '';
-      return `<div class="p-pack-chip"><span class="p-pack-chip-wt">${pk.weight || '?'}</span><span class="p-pack-chip-price">₹${(pk.price || 0).toLocaleString('en-IN')}</span><span class="p-pack-chip-stock ${st}">${stLbl}</span></div>`;
-    }).join('')}</div>` : ""}
-
-        <!-- ─ MOBILE: horizontal row ─ -->
-        <div class="p-card-main-row">
-          <div class="p-card-mob-img">
-            ${mobImgHtml}
-            <div class="p-card-mob-badges">
-              ${p.isFeatured ? '<span class="p-tag p-tag-featured" style="font-size:8px;padding:2px 6px;">⭐</span>' : ""}
-              ${p.isActive === false ? '<span class="p-tag p-tag-inactive" style="font-size:8px;padding:2px 6px;">Off</span>' : ""}
-            </div>
-          </div>
-
-          <div class="p-card-mob-info">
-            <div class="p-card-mob-stock">${stockTagMobile}</div>
-            <div class="p-card-mob-name">${p.name}</div>
-            <div class="p-card-mob-price-row">
-              <div class="p-card-mob-price">${priceDisplay}</div>
-            </div>
-            <div class="p-card-mob-labels">
-              <div class="p-card-mob-cat">${p.fragranceCategory || "floral"}</div>
-              <div class="p-card-mob-type">${p.productType || "single"}</div>
-            </div>
-            ${mobSpecs ? `<div class="p-card-mob-specs">${mobSpecs}</div>` : ""}
-          </div>
-        </div>
-
-      </div><!-- /p-card-body -->
-
-      ${gallery.length ? `<div class="p-card-gallery">${thumbs}</div>` : ""}
-
-      <div class="p-card-footer">
-        <button class="p-card-btn p-card-btn-edit" data-edit="${id}"><i class="fas fa-pen"></i> Edit</button>
-        <button class="p-card-btn p-card-btn-del" data-del="${id}" data-name="${p.name}"><i class="fas fa-trash-alt"></i> Delete</button>
+      ${packs.length > 0 ? `<div class="lux-divider"></div><div class="lux-packs">${packsHtml}</div>` : `<div style="flex:1"></div>`}
+      
+      <div class="lux-actions">
+        ${showingDeleted
+          ? `<button class="lux-btn-restore" data-restore="${id}"><i class="fas fa-undo"></i> Restore</button>`
+          : `<button class="lux-btn-edit" data-edit="${id}">&#9998; Edit</button>
+             <button class="lux-btn-del" data-del="${id}" data-name="${p.name}">&#128465; Delete</button>`
+        }
       </div>
     </div>`;
   }
+
+  window.selectPack = function (el) {
+    const card = el.closest(".lux-card");
+    if (card) {
+      card.querySelectorAll(".lux-pack-row").forEach((r) => r.classList.remove("selected"));
+      el.classList.add("selected");
+    }
+  };
 
   // ── Edit ───────────────────────────────────────────
   async function startEdit(id) {
@@ -968,6 +944,27 @@
     } finally {
       setLoading(btn, false);
       closeModal();
+    }
+  }
+
+  // ── Restore Deleted Product ───────────────────────
+  async function restoreProduct(id) {
+    if (!id) return;
+    try {
+      const r = await fetch(`${API}/${id}/restore`, {
+        method: "PATCH",
+        credentials: "include",
+      });
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        throw new Error(err.message || "Restore failed");
+      }
+      products = products.filter((p) => (p._id || p.id) !== id);
+      showNotif("Product restored successfully.", "success");
+      renderGrid();
+      updateCount();
+    } catch (err) {
+      showNotif(err.message || "Could not restore product.", "error");
     }
   }
 

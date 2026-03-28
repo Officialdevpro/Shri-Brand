@@ -11,7 +11,7 @@ const BRAND = {
   gold: "#C9A84C",
   goldLight: "#e8c96a",
   // Logo served from your public directory
-  logoUrl: "https://shrifragrance.in/assets/images/logo/Logo.png",
+  logoUrl: process.env.BRAND_LOGO_URL || "https://shrifragrance.in/assets/images/logo/Logo.png",
 };
 
 // Shared base template wrapper
@@ -384,8 +384,8 @@ const baseTemplate = (headerContent, bodyContent, footerNote = "") => `
 // ── Transporter ───────────────────────────────────────────────────────────────
 const createTransporter = () => {
   return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
+    host: process.env.SMTP_HOST || "smtp.gmail.com",
+    port: parseInt(process.env.SMTP_PORT, 10) || 465,
     secure: true,
     auth: {
       user: process.env.EMAIL_USER,

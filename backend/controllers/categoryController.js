@@ -10,7 +10,7 @@ const getAllCategories = catchAsync(async (req, res, next) => {
     const filter = {};
     if (req.query.active === "true") filter.isActive = true;
 
-    const categories = await Category.find(filter).sort("order name");
+    const categories = await Category.find(filter).sort("order name").lean();
 
     res.status(200).json({
         success: true,
@@ -69,15 +69,17 @@ const deleteCategory = catchAsync(async (req, res, next) => {
         return next(new AppError("Category not found", 404));
     }
 
-    // Check if any products use this category
+    // Check if any ACTIVE products use this category (case-insensitive match)
+    // Soft-deleted products (isActive: false) are excluded
     const productCount = await Product.countDocuments({
-        productType: category.name,
+        productType: { $regex: new RegExp(`^${category.name}$`, "i") },
+        isActive: { $ne: false },
     });
 
     if (productCount > 0) {
         return next(
             new AppError(
-                `Cannot delete: ${productCount} product(s) are using the "${category.name}" category. Reassign them first.`,
+                `Cannot delete: ${productCount} product(s) are using the "${category.label || category.name}" category. Please delete or reassign those products first.`,
                 400
             )
         );
@@ -87,7 +89,7 @@ const deleteCategory = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        message: "Category deleted successfully",
+        message: "Category deleted successfully.",
         data: null,
     });
 });

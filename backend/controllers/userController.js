@@ -18,7 +18,7 @@ const filterObj = (obj, ...allowedFields) => {
 // ==================== GET CURRENT USER ====================
 
 exports.getMe = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+  const user = await User.findById(req.user.id).lean();
 
   res.status(200).json({
     status: "success",
@@ -207,7 +207,7 @@ exports.deleteAddress = catchAsync(async (req, res, next) => {
 // ==================== ADMIN: GET ALL USERS ====================
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
+  const users = await User.find().lean();
 
   res.status(200).json({
     status: "success",
@@ -221,7 +221,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 // ==================== ADMIN: GET USER BY ID ====================
 
 exports.getUserById = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.params.id).lean();
 
   if (!user) {
     return next(new AppError("User not found", 404));

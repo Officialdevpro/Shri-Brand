@@ -12,6 +12,7 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
+  restoreProduct,
   getFeaturedProducts,
   getProductsByCategory,
   updateStock,
@@ -45,5 +46,8 @@ router.delete("/:id", validateObjectId(), deleteProduct);
 
 // Update product stock
 router.patch("/:id/stock", validateObjectId(), updateStock);
+
+// Restore a soft-deleted product
+router.patch("/:id/restore", validateObjectId(), restoreProduct);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const AppError = require("../utils/AppError");
+const logger = require("../utils/logger");
 
 /**
  * Handle Mongoose CastError (Invalid ObjectId)
@@ -70,7 +71,7 @@ const sendErrorProd = (err, res) => {
   // Programming or unknown error: don't leak error details
   else {
     // Log error for debugging
-    console.error("ERROR 💥", err);
+    logger.error("Unhandled error", { name: err.name, message: err.message, stack: err.stack });
 
     // Send generic message
     res.status(500).json({

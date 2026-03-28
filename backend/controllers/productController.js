@@ -3,6 +3,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
+const logger = require("../utils/logger");
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -37,7 +38,7 @@ const deleteFromCloudinary = async (publicId) => {
     } catch (err) {
         // Log but don't throw — we don't want a Cloudinary hiccup to break the
         // main operation.  The image will be orphaned but the DB stays consistent.
-        console.error(`Cloudinary deletion failed for "${publicId}":`, err.message);
+        logger.warn(`Cloudinary deletion failed for "${publicId}"`, { error: err.message });
     }
 };
 
@@ -53,7 +54,7 @@ const deleteManyFromCloudinary = async (publicIds = []) => {
     );
     const failures = results.filter((r) => r.status === "rejected");
     if (failures.length) {
-        console.error(`${failures.length}/${publicIds.length} Cloudinary deletions failed.`);
+        logger.warn(`${failures.length}/${publicIds.length} Cloudinary deletions failed.`);
     }
 };
 
@@ -101,7 +102,13 @@ const getAllProducts = catchAsync(async (req, res, next) => {
     } = req.query;
 
     // Build filter query
-    const query = { isActive: true };
+    // When showDeleted=true, return soft-deleted products for admin view
+    const query = {};
+    if (req.query.showDeleted === "true") {
+        query.isActive = false;
+    } else {
+        query.isActive = true;
+    }
 
     if (fragranceCategory) query.fragranceCategory = fragranceCategory;
     if (productType) query.productType = productType;
@@ -534,12 +541,37 @@ const updateStock = catchAsync(async (req, res, next) => {
     });
 });
 
+// @desc    Restore a soft-deleted product
+// @route   PATCH /api/v1/products/:id/restore
+// @access  Private/Admin
+const restoreProduct = catchAsync(async (req, res, next) => {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+        return next(new AppError("Product not found", 404));
+    }
+
+    if (product.isActive) {
+        return next(new AppError("Product is already active", 400));
+    }
+
+    product.isActive = true;
+    await product.save();
+
+    res.status(200).json({
+        success: true,
+        message: "Product restored successfully",
+        data: product,
+    });
+});
+
 module.exports = {
     getAllProducts,
     getProduct,
     createProduct,
     updateProduct,
     deleteProduct,
+    restoreProduct,
     getFeaturedProducts,
     getProductsByCategory,
     updateStock,

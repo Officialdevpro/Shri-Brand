@@ -10,7 +10,7 @@ const logger = require("./utils/logger");
 process.on("uncaughtException", (err) => {
   logger.error("UNCAUGHT EXCEPTION! Shutting down...");
   logger.error(`${err.name}: ${err.message}`);
-  console.error("Stack:", err.stack);
+  logger.error(`Stack: ${err.stack}`);
   process.exit(1);
 });
 
@@ -71,6 +71,6 @@ mongoose
   .catch((err) => {
     logger.error("MongoDB connection error:");
     logger.error(err.message);
-    console.error("Stack:", err.stack);
+    logger.error(`Stack: ${err.stack}`);
     process.exit(1);
   });

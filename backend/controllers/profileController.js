@@ -15,7 +15,8 @@ exports.renderProfilePage = catchAsync(async (req, res, next) => {
   // Fetch all orders for this user, newest first
   const orders = await Order.find({ userId: user._id })
     .sort({ createdAt: -1 })
-    .select("-payment.razorpaySignature"); // don't expose signature
+    .select("-payment.razorpaySignature") // don't expose signature
+    .lean();
 
   // Compute stats
   const stats = {

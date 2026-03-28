@@ -1,5 +1,6 @@
 const cloudinary = require("cloudinary").v2;
 const dotenv = require("dotenv");
+const logger = require("../utils/logger");
 
 // Load environment variables
 dotenv.config({ path: "./config.env" });
@@ -17,8 +18,8 @@ if (
     !process.env.CLOUDINARY_API_KEY ||
     !process.env.CLOUDINARY_API_SECRET
 ) {
-    console.warn(
-        "⚠️  WARNING: Cloudinary credentials not found in config.env. Image upload will not work."
+    logger.warn(
+        "Cloudinary credentials not found in config.env. Image upload will not work."
     );
 }
 

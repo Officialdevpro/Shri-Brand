@@ -38,7 +38,12 @@ app.set("views", path.join(__dirname, "views"));
 // ── Global Middlewares ─────────────────────────────────────────
 app.set("trust proxy", 1);
 
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({
+  origin: process.env.NODE_ENV === "production"
+    ? process.env.CORS_ORIGIN || "https://www.shrifragrance.in"
+    : true,
+  credentials: true
+}));
 
 app.use(helmet({ contentSecurityPolicy: false }));
 

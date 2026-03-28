@@ -19,6 +19,7 @@ const crypto   = require('crypto');
 const Post     = require('../models/blogModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError   = require('../utils/AppError');
+const logger     = require('../utils/logger');
 
 // ─────────────────────────────────────────────
 //  HELPERS
@@ -173,7 +174,7 @@ exports.getPostBySlug = catchAsync(async (req, res, next) => {
 
   // ── View count (fire-and-forget — don't block the response) ──
   _recordView(post, req).catch(err =>
-    console.error('[view-count] Failed to record view:', err.message)
+    logger.warn('Failed to record view', { error: err.message })
   );
 
   const visibleComments = admin
@@ -209,7 +210,7 @@ exports.getPost = catchAsync(async (req, res, next) => {
 
   // ── View count (fire-and-forget) ──
   _recordView(post, req).catch(err =>
-    console.error('[view-count] Failed to record view:', err.message)
+    logger.warn('Failed to record view', { error: err.message })
   );
 
   const visibleComments = admin

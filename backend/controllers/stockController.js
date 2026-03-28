@@ -32,6 +32,7 @@ const {
 } = require("../models/stockModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError   = require("../utils/AppError");
+const logger     = require("../utils/logger");
 
 // ══════════════════════════════════════════════════════════════════════════════
 //  PRIVATE HELPERS
@@ -258,7 +259,6 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
   // ══════════════════════════════════════════════════════════════════════
   //  STEP 1 — Validate request structure
   // ══════════════════════════════════════════════════════════════════════
-  console.log("[COMMIT] STEP 1 — Validating request structure...");
 
   if (!Array.isArray(clientEntries) || clientEntries.length === 0)
     return next(new AppError("packingEntries must be a non-empty array", 400));
@@ -278,14 +278,12 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
   if (structErrors.length)
     return next(new AppError(`Payload validation: ${structErrors.join(" | ")}`, 400));
 
-  console.log(`[COMMIT] STEP 1 — OK. ${clientEntries.length} entr(ies) received.`);
 
   // ══════════════════════════════════════════════════════════════════════
   //  STEP 2 — Fetch live inventory
   //  CRITICAL FIX: products must include "packs" in the select so that
   //  pack-match validation and stock updates work correctly.
   // ══════════════════════════════════════════════════════════════════════
-  console.log("[COMMIT] STEP 2 — Fetching live inventory from DB...");
 
   const uniqueBoxIds     = [...new Set(clientEntries.map((e) => e.boxTypeId))];
   const uniqueProductIds = [...new Set(clientEntries.map((e) => e.productId))];
@@ -305,14 +303,12 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
   const boxMap     = Object.fromEntries(boxes.map((b)    => [b._id.toString(), b]));
   const productMap = Object.fromEntries(products.map((p) => [p._id.toString(), p]));
 
-  console.log(`[COMMIT] STEP 2 — OK. rawMaterial=${rawMaterial.quantityKg}kg, boxes=${boxes.length}, products=${products.length}`);
 
   // ══════════════════════════════════════════════════════════════════════
   //  STEP 3 — PACK-MATCH VALIDATION
   //  box.weightGm must match at least one pack.weightValue on the product.
   //  Collects ALL mismatches — returns one error so admin can fix all at once.
   // ══════════════════════════════════════════════════════════════════════
-  console.log("[COMMIT] STEP 3 — Running pack-match validation...");
 
   const packMatchErrors = [];
   const refErrors       = [];
@@ -335,8 +331,6 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
         `${prefix}: Box size ${box.weightGm}g ("${box.label}") does NOT match any pack on this product. ` +
         `Available: [${available || "none"}]`
       );
-    } else {
-      console.log(`[COMMIT]   ✓ ${prefix} → matched pack "${matchingPack.weight}" (weightValue=${matchingPack.weightValue})`);
     }
   });
 
@@ -344,7 +338,6 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
     return next(new AppError(`Reference errors:\n${refErrors.join("\n")}`, 422));
 
   if (packMatchErrors.length) {
-    console.warn("[COMMIT] STEP 3 — FAILED. Pack mismatches:\n", packMatchErrors.join("\n"));
     return next(new AppError(
       `Pack size mismatch — correct the following before committing:\n\n` +
       packMatchErrors.map((m, i) => `  ${i + 1}. ${m}`).join("\n"),
@@ -352,12 +345,10 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
     ));
   }
 
-  console.log("[COMMIT] STEP 3 — OK. All pack sizes match.");
 
   // ══════════════════════════════════════════════════════════════════════
   //  STEP 4 — STOCK SUFFICIENCY CHECK
   // ══════════════════════════════════════════════════════════════════════
-  console.log("[COMMIT] STEP 4 — Checking stock sufficiency...");
 
   let totalStickNeeded = 0;
   const boxUsage = {};
@@ -385,7 +376,6 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
   }
 
   if (stockErrors.length) {
-    console.warn("[COMMIT] STEP 4 — FAILED. Stock errors:\n", stockErrors.join("\n"));
     return next(new AppError(
       `Insufficient stock — resolve before committing:\n\n` +
       stockErrors.map((e, i) => `  ${i + 1}. ${e}`).join("\n"),
@@ -393,12 +383,10 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
     ));
   }
 
-  console.log(`[COMMIT] STEP 4 — OK. Stick needed=${totalStickNeeded.toFixed(3)}kg, available=${rawMaterial.quantityKg.toFixed(3)}kg`);
 
   // ══════════════════════════════════════════════════════════════════════
   //  STEP 5 — Snapshot inventory before any mutation
   // ══════════════════════════════════════════════════════════════════════
-  console.log("[COMMIT] STEP 5 — Snapshotting inventory...");
 
   const inventorySnapshot = {
     stickKg:          rawMaterial.quantityKg,
@@ -413,12 +401,10 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
     })),
   };
 
-  console.log("[COMMIT] STEP 5 — OK.");
 
   // ══════════════════════════════════════════════════════════════════════
   //  STEP 6 — Build packing entries (server recalculates all costs/MRP)
   // ══════════════════════════════════════════════════════════════════════
-  console.log("[COMMIT] STEP 6 — Building packing entries...");
 
   // ── Wholesaler tier names MUST match the enum in wholesalerTierSchema exactly.
   //    We merge client-supplied minBoxes/markupPercent with server-enforced tierNames.
@@ -458,15 +444,10 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
     })
   );
 
-  builtEntries.forEach((e) =>
-    console.log(`[COMMIT]   ${e.productName} — ${e.boxesPacked} boxes, MRP ₹${e.mrpPerBox}, cost ₹${e.totalCostPerBox}`)
-  );
-  console.log("[COMMIT] STEP 6 — OK.");
 
   // ══════════════════════════════════════════════════════════════════════
   //  STEP 7 — Persist ProductionRun document
   // ══════════════════════════════════════════════════════════════════════
-  console.log("[COMMIT] STEP 7 — Persisting ProductionRun...");
 
   let run;
   try {
@@ -480,7 +461,7 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
   } catch (createErr) {
     // Surface the real Mongoose validation error instead of letting it
     // bubble up as "next is not a function" from inside the pre-save hook.
-    console.error("[COMMIT] STEP 7 — FAILED. ProductionRun.create() threw:", createErr.message);
+    logger.error("ProductionRun.create() failed", { error: createErr.message });
     if (createErr.name === "ValidationError") {
       const fields = Object.values(createErr.errors).map((e) => e.message).join("; ");
       return next(new AppError(`Production run validation failed: ${fields}`, 422));
@@ -488,12 +469,10 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
     return next(new AppError(`Failed to save production run: ${createErr.message}`, 500));
   }
 
-  console.log(`[COMMIT] STEP 7 — OK. Run created: ${run.runCode} | boxes=${run.totalBoxesPacked} | value=₹${run.totalProductionValue}`);
 
   // ══════════════════════════════════════════════════════════════════════
   //  STEP 8 — Atomic deduction: rawMaterial.quantityKg + BoxType.stock
   // ══════════════════════════════════════════════════════════════════════
-  console.log("[COMMIT] STEP 8 — Deducting raw material and box stock...");
 
   const deductOps = [
     RawMaterialInventory.updateOne(
@@ -509,12 +488,10 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
   const deductFailed  = deductResults.filter((r) => r.status === "rejected");
 
   if (deductFailed.length) {
-    console.error(
-      `[COMMIT] STEP 8 — ⚠️  ${deductFailed.length} deduction(s) failed (manual reconciliation required):`,
-      deductFailed.map((f) => f.reason?.message).join("\n")
+    logger.error(
+      `${deductFailed.length} deduction(s) failed (manual reconciliation required)`,
+      { errors: deductFailed.map((f) => f.reason?.message) }
     );
-  } else {
-    console.log(`[COMMIT] STEP 8 — OK. Deducted ${run.totalStickUsedKg}kg stick. Box deductions: ${JSON.stringify(boxUsage)}`);
   }
 
   // ══════════════════════════════════════════════════════════════════════
@@ -535,7 +512,6 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
   //    • atomic at the MongoDB document level
   //    • no pre/post save hooks on unrelated fields
   // ══════════════════════════════════════════════════════════════════════
-  console.log("[COMMIT] STEP 9 — Updating product stock and prices...");
 
   // Aggregate by productId::weightGm to collapse duplicate entries
   const updatePlan = new Map();
@@ -566,14 +542,13 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
 
   for (const [, plan] of updatePlan) {
     const { productId, productName, boxWeightGm, totalBoxesToAdd, totalCostPerBox } = plan;
-    console.log(`[COMMIT]   Updating "${productName}" — pack ${boxWeightGm}g, +${totalBoxesToAdd} boxes, cost ₹${totalCostPerBox}`);
 
     try {
       // ── a) Fresh read to get current stock and price ──────────────────
       const freshProduct = await Product.findById(productId).select("name sku packs");
 
       if (!freshProduct) {
-        console.warn(`[COMMIT]   ⚠️  Product ${productId} not found during update — skipping`);
+        logger.warn(`Product ${productId} not found during update — skipping`);
         productUpdateResults.push({ productId, productName, packWeight: `${boxWeightGm}g`, error: "Product not found during update" });
         continue;
       }
@@ -581,7 +556,7 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
       const pack = freshProduct.packs.find((pk) => Number(pk.weightValue) === Number(boxWeightGm));
 
       if (!pack) {
-        console.warn(`[COMMIT]   ⚠️  Pack ${boxWeightGm}g not found on "${productName}" — skipping`);
+        logger.warn(`Pack ${boxWeightGm}g not found on "${productName}" — skipping`);
         productUpdateResults.push({ productId, productName, packWeight: `${boxWeightGm}g`, error: `Pack ${boxWeightGm}g not found on product` });
         continue;
       }
@@ -630,12 +605,6 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
         }
       );
 
-      console.log(
-        `[COMMIT]   ✓ "${productName}" pack ${boxWeightGm}g: ` +
-        `stock ${previousStock} → ${newStock} (+${totalBoxesToAdd}), ` +
-        `MRP ₹${previousPrice} → ₹${newMRP}${priceChanged ? " (CHANGED)" : " (unchanged)"}` +
-        (wholesalerPricing.length ? `, ${wholesalerPricing.length} wholesaler tier(s) saved` : "")
-      );
 
       productUpdateResults.push({
         productId,
@@ -654,7 +623,7 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
 
     } catch (updateErr) {
       // Non-fatal — run is committed and raw materials already deducted.
-      console.error(`[COMMIT]   ✗ Failed to update "${productName}" (${boxWeightGm}g):`, updateErr.message);
+      logger.error(`Failed to update "${productName}" (${boxWeightGm}g)`, { error: updateErr.message });
       productUpdateResults.push({
         productId,
         productName,
@@ -668,15 +637,10 @@ exports.commitProductionRun = catchAsync(async (req, res, next) => {
   const priceChanges = productUpdateResults.filter((r) => r.priceChanged);
   const updateFailed = productUpdateResults.filter((r) => r.error);
 
-  console.log(
-    `[COMMIT] STEP 9 — Done. ${productUpdateResults.length} product(s) processed, ` +
-    `${priceChanges.length} price change(s), ${updateFailed.length} failure(s).`
-  );
 
   // ══════════════════════════════════════════════════════════════════════
   //  STEP 10 — Final response
   // ══════════════════════════════════════════════════════════════════════
-  console.log(`[COMMIT] STEP 10 — Sending success response for run ${run.runCode}.`);
 
   res.status(201).json({
     success: true,

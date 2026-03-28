@@ -62,7 +62,6 @@ exports.createOrder = catchAsync(async (req, res, next) => {
       return next(new AppError("Your cart is empty. Please add items before checkout.", 400));
     }
 
-    console.log(`✅ Step 1: Order request received — User: ${userId}, Items: ${cart.items.length}`);
 
     // ── 2. Validate shipping address ──────────────────────────────
     const { fullName, email, phone, address, city, state, pincode } = req.body;
@@ -92,11 +91,9 @@ exports.createOrder = catchAsync(async (req, res, next) => {
     // ── 4. Generate dummy Razorpay IDs ────────────────────────────
     // TODO: Replace this block with real Razorpay order creation:
     //   const razorpayOrder = await razorpay.orders.create({ amount, currency, receipt, notes });
-    console.log("✅ Step 2: Payment processing started — Simulating payment...");
 
     const dummyIds = generateDummyIds();
 
-    console.log("✅ Step 3: Payment completed successfully");
 
     // ── 5. Build cart snapshot (lock in current prices) ───────────
     const itemsSnapshot = cart.items.map((item) => ({
@@ -126,7 +123,6 @@ exports.createOrder = catchAsync(async (req, res, next) => {
       orderStatus: "placed",
     });
 
-    console.log(`✅ Step 4: Order saved to database — Order ID: ${order._id}`);
 
     logger.info("Simulated order created", {
       orderId:         order._id,
@@ -151,7 +147,6 @@ exports.createOrder = catchAsync(async (req, res, next) => {
       },
     });
   } catch (err) {
-    console.error(`❌ Order creation failed: ${err.message}`);
     return next(err);
   }
 });
@@ -202,7 +197,6 @@ exports.simulatePayment = catchAsync(async (req, res, next) => {
     // ── 3. Clear the cart ─────────────────────────────────────────
     await Cart.deleteOne({ userId: req.user.id });
 
-    console.log(`✅ Step 5: Cart cleared for user — User ID: ${req.user.id}`);
 
     // ── 4. Reduce stock for each ordered item ─────────────────────
     const Product = require("../models/productModel");
@@ -215,7 +209,6 @@ exports.simulatePayment = catchAsync(async (req, res, next) => {
         }
       } catch (stockErr) {
         // Log but don't block order — stock may have changed since cart was validated
-        console.error(`❌ Stock reduction failed for product ${item.productId}: ${stockErr.message}`);
         logger.warn("Stock reduction failed", {
           productId: item.productId,
           packWeight: item.packWeight,
@@ -224,7 +217,6 @@ exports.simulatePayment = catchAsync(async (req, res, next) => {
       }
     }
 
-    console.log("✅ Step 6: Product stock updated for all ordered items");
 
     logger.info("Simulated payment completed — order fulfilled", {
       orderId:     order._id,
@@ -234,7 +226,6 @@ exports.simulatePayment = catchAsync(async (req, res, next) => {
       userId:      req.user.id,
     });
 
-    console.log("✅ Step 7: Order placement complete");
 
     res.status(200).json({
       status: "success",
@@ -247,7 +238,6 @@ exports.simulatePayment = catchAsync(async (req, res, next) => {
       },
     });
   } catch (err) {
-    console.error(`❌ Simulate payment failed: ${err.message}`);
     return next(err);
   }
 });
@@ -478,7 +468,6 @@ exports.createCodOrder = catchAsync(async (req, res, next) => {
     orderStatus: "placed",
   });
 
-  console.log(`✅ COD Order created — Order ID: ${order._id}`);
 
   // ── 7. Reduce stock for each ordered item ────────────────────
   const Product = require("../models/productModel");
@@ -490,7 +479,6 @@ exports.createCodOrder = catchAsync(async (req, res, next) => {
         await product.reserveStock(item.packWeight, item.quantity);
       }
     } catch (stockErr) {
-      console.error(`❌ Stock reduction failed for product ${item.productId}: ${stockErr.message}`);
       logger.warn("Stock reduction failed (COD)", {
         productId: item.productId,
         packWeight: item.packWeight,
@@ -599,17 +587,45 @@ exports.updateOrderStatus = catchAsync(async (req, res, next) => {
     return next(new AppError(`Invalid order status. Must be one of: ${validStatuses.join(", ")}`, 400));
   }
 
-  const order = await Order.findByIdAndUpdate(
-    req.params.orderId,
-    { orderStatus },
-    { new: true, runValidators: true }
-  ).populate("userId", "name email");
+  const order = await Order.findById(req.params.orderId).populate("userId", "name email");
 
   if (!order) return next(new AppError("Order not found.", 404));
+
+  const previousStatus = order.orderStatus;
+
+  // ── Restore stock when cancelling a non-cancelled order ────────
+  if (orderStatus === "cancelled" && previousStatus !== "cancelled") {
+    const Product = require("../models/productModel");
+
+    for (const item of order.items) {
+      try {
+        const product = await Product.findById(item.productId);
+        if (product && item.packWeight) {
+          await product.restoreStock(item.packWeight, item.quantity);
+        }
+      } catch (stockErr) {
+        logger.warn("Stock restore failed on cancel", {
+          productId: item.productId,
+          packWeight: item.packWeight,
+          error: stockErr.message,
+        });
+      }
+    }
+
+    logger.info("Stock restored for cancelled order", {
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      itemCount: order.items.length,
+    });
+  }
+
+  order.orderStatus = orderStatus;
+  await order.save();
 
   logger.info("Admin updated order status", {
     orderId: order._id,
     orderNumber: order.orderNumber,
+    previousStatus,
     newStatus: orderStatus,
   });
 
@@ -664,9 +680,37 @@ exports.updatePaymentStatus = catchAsync(async (req, res, next) => {
 //  Real orders should be cancelled instead, not deleted.
 // ─────────────────────────────────────────────────────────────────
 exports.deleteOrder = catchAsync(async (req, res, next) => {
-  const order = await Order.findByIdAndDelete(req.params.orderId);
+  const order = await Order.findById(req.params.orderId);
 
   if (!order) return next(new AppError("Order not found.", 404));
+
+  // ── Restore stock if order was NOT already cancelled ──────────
+  if (order.orderStatus !== "cancelled") {
+    const Product = require("../models/productModel");
+
+    for (const item of order.items) {
+      try {
+        const product = await Product.findById(item.productId);
+        if (product && item.packWeight) {
+          await product.restoreStock(item.packWeight, item.quantity);
+        }
+      } catch (stockErr) {
+        logger.warn("Stock restore failed on delete", {
+          productId: item.productId,
+          packWeight: item.packWeight,
+          error: stockErr.message,
+        });
+      }
+    }
+
+    logger.info("Stock restored for deleted order", {
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      itemCount: order.items.length,
+    });
+  }
+
+  await Order.findByIdAndDelete(req.params.orderId);
 
   logger.warn("Admin deleted order", {
     orderId: order._id,

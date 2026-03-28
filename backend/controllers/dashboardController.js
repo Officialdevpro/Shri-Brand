@@ -4,6 +4,7 @@
 const Order   = require("../models/orderModel");
 const Product = require("../models/productModel");
 const User    = require("../models/userModel");
+const logger  = require("../utils/logger");
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 const startOf = (unit) => {
@@ -15,8 +16,11 @@ const startOf = (unit) => {
 };
 
 const ok  = (res, data)         => res.status(200).json({ status: "success", data });
-const err = (res, e, msg = "Server error") =>
-  res.status(500).json({ status: "error", message: msg, detail: e.message });
+const err = (res, e, msg = "Server error") => {
+  logger.error(msg, { error: e.message, stack: e.stack });
+  const detail = process.env.NODE_ENV === "production" ? undefined : e.message;
+  res.status(500).json({ status: "error", message: msg, ...(detail && { detail }) });
+};
 
 // ════════════════════════════════════════════════════════════════════════════
 //  TAB 1 — REVENUE & ORDERS

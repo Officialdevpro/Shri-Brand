@@ -1562,6 +1562,13 @@ textarea {
   .page-shell {
     padding: 24px 16px 60px;
   }
+  #page-order-history,#page-recent-orders{
+  width: 100vw;
+}
+#page-users{
+  width: 90vw;
+}
+
   .page-top {
     flex-direction: column;
     align-items: flex-start;
@@ -1604,6 +1611,10 @@ textarea {
   .toolbar {
     flex-wrap: wrap;
   }
+  #page-order-history,#page-recent-orders{
+  width: 100vw;
+}
+
   .filter-sel {
     flex: 1;
     min-width: 130px;
@@ -1837,4 +1848,105 @@ textarea {
   .p-card-specs {
     display: none !important;
   }
+}
+
+/* ═══════════════════════════════════════════════
+   LUX CARD DESIGN
+   ═══════════════════════════════════════════════ */
+.lux-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 24px 0; }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.lux-card { background: #fff; border: 1px solid rgba(184,134,11,0.2); position: relative; overflow: hidden; font-family: 'Jost', sans-serif; display: flex; flex-direction: column; }
+.lux-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #b8860b, #d4a520, #b8860b); }
+.lux-img-ph { width: 100%; height: 200px; background: #f0ebe3; display: flex; align-items: center; justify-content: center; color: rgba(184,134,11,0.4); font-size: 40px; overflow: hidden; }
+.lux-category-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px 4px; }
+.lux-cat { font-size: 9px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: #b8860b; }
+.lux-type { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; padding: 3px 10px; border: 1px solid rgba(184,134,11,0.35); color: #7a6a58; background: rgba(184,134,11,0.06); }
+.lux-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: #7f0403; padding: 2px 16px 2px; letter-spacing: 0.02em; line-height: 1.2; }
+.lux-sku { font-size: 11px; color: #aa9988; letter-spacing: 0.08em; padding: 2px 16px 10px; }
+.lux-meta { display: flex; align-items: center; gap: 14px; padding: 0 16px 12px; flex-wrap: wrap; }
+.lux-meta-item { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: #7a6a58; }
+.lux-meta-icon { font-size: 12px; }
+.lux-meta-icon.fire { color: #b8860b; }
+.lux-meta-icon.sold { color: #b8860b; }
+.lux-meta-icon.packs { color: #b8860b; }
+.lux-meta-sep { width: 1px; height: 12px; background: rgba(184,134,11,0.25); }
+.lux-divider { height: 1px; background: linear-gradient(90deg, rgba(184,134,11,0.4), rgba(184,134,11,0.05)); margin: 0 16px 12px; }
+.lux-packs { padding: 0 16px 12px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
+.lux-pack-row { display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(184,134,11,0.22); padding: 10px 13px; background: rgba(247,244,240,0.7); cursor: pointer; transition: all 0.2s; }
+.lux-pack-row:hover { border-color: #b8860b; background: rgba(184,134,11,0.07); }
+.lux-pack-row.selected { border-color: #b8860b; background: rgba(184,134,11,0.1); box-shadow: inset 2px 0 0 #b8860b; }
+.lux-pack-left { display: flex; align-items: center; gap: 10px; }
+.lux-radio { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid rgba(184,134,11,0.5); background: #fff; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.lux-pack-row.selected .lux-radio { border-color: #b8860b; background: #b8860b; }
+.lux-radio-dot { width: 5px; height: 5px; border-radius: 50%; background: #fff; display: none; }
+.lux-pack-row.selected .lux-radio-dot { display: block; }
+.lux-pack-weight { font-size: 13px; font-weight: 600; color: #1c1410; letter-spacing: 0.04em; }
+.lux-pack-price { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 700; color: #7f0403; }
+.lux-stock-pill { font-size: 10px; font-weight: 600; padding: 3px 9px; letter-spacing: 0.08em; display: flex; align-items: center; gap: 5px; }
+.lux-stock-pill.in-stock { background: rgba(58,122,86,0.1); color: #2a6040; border: 1px solid rgba(58,122,86,0.25); }
+.lux-stock-pill.low-stock { background: rgba(184,134,11,0.12); color: #7a5800; border: 1px solid rgba(184,134,11,0.3); }
+.lux-stock-pill.out { background: rgba(127,4,3,0.08); color: #7f0403; border: 1px solid rgba(127,4,3,0.2); }
+.lux-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.lux-dot.green { background: #3a7a56; }
+.lux-dot.amber { background: #b8860b; }
+.lux-dot.red { background: #7f0403; }
+.lux-actions { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(184,134,11,0.15); margin-top: auto; }
+.lux-btn-edit { padding: 13px; background: transparent; border: none; border-right: 1px solid rgba(184,134,11,0.15); color: #3a7a56; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; transition: background 0.2s; }
+.lux-btn-del { padding: 13px; background: transparent; border: none; color: #a32d2d; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; transition: background 0.2s; }
+.lux-btn-edit:hover { background: rgba(58,122,86,0.06); }
+.lux-btn-del:hover { background: rgba(127,4,3,0.06); }
+
+/* Deleted Products Toggle Button */
+.btn-deleted-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 18px;
+  height: 42px;
+  border: 1px solid rgba(127,4,3,0.25);
+  background: transparent;
+  color: #a32d2d;
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-deleted-toggle:hover {
+  background: rgba(127,4,3,0.06);
+  border-color: rgba(127,4,3,0.45);
+}
+.btn-deleted-toggle.active {
+  background: #7f0403;
+  border-color: #7f0403;
+  color: #fff;
+}
+.btn-deleted-toggle.active:hover {
+  background: #a01e1d;
+  border-color: #a01e1d;
+}
+
+/* Restore Button on Deleted Cards */
+.lux-btn-restore {
+  padding: 13px;
+  background: transparent;
+  border: none;
+  color: #3a7a56;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: background 0.2s;
+  grid-column: 1 / -1;
+}
+.lux-btn-restore:hover {
+  background: rgba(58,122,86,0.08);
 }

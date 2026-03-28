@@ -619,7 +619,7 @@ async function loadOrderHistory() {
     erpEmptyState.style.display = "none";
 
     const response = await fetch(
-      "https://shri-brand.onrender.com/api/v1/orders?limit=1000",
+      "/api/v1/orders?limit=1000",
     );
     const result = await response.json();
 

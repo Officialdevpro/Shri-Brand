@@ -320,10 +320,7 @@ function validatePostFields(body, isCreate = false) {
  * Validates all required + optional fields for creating a new post.
  */
 exports.validateCreatePost = (req, res, next) => {
-  console.log('[validateCreatePost] ▸ incoming body keys:', Object.keys(req.body));
   const errors = validatePostFields(req.body, true); // isCreate = true
-  if (errors.length) console.log('[validateCreatePost] ✗ validation errors:', errors);
-  else console.log('[validateCreatePost] ✓ validation passed');
   const err = buildError(errors);
   if (err) return next(err);
   next();
@@ -335,7 +332,6 @@ exports.validateCreatePost = (req, res, next) => {
  * Rejects completely empty bodies.
  */
 exports.validateUpdatePost = (req, res, next) => {
-  console.log('[validateUpdatePost] ▸ incoming body keys:', Object.keys(req.body));
   const UPDATABLE = [
     'title', 'subtitle', 'slug', 'blocks', 'coverImage',
     'category', 'tags', 'author', 'publishDate', 'readTime',
@@ -343,10 +339,8 @@ exports.validateUpdatePost = (req, res, next) => {
   ];
 
   const provided = Object.keys(req.body).filter(k => UPDATABLE.includes(k));
-  console.log('[validateUpdatePost] ▸ updatable fields found:', provided);
 
   if (provided.length === 0) {
-    console.log('[validateUpdatePost] ✗ no updatable fields');
     return next(
       new AppError(
         'Update body must contain at least one updatable field: ' + UPDATABLE.join(', '),
@@ -356,8 +350,6 @@ exports.validateUpdatePost = (req, res, next) => {
   }
 
   const errors = validatePostFields(req.body, false); // isCreate = false
-  if (errors.length) console.log('[validateUpdatePost] ✗ validation errors:', errors);
-  else console.log('[validateUpdatePost] ✓ validation passed');
   const err = buildError(errors);
   if (err) return next(err);
   next();

@@ -723,8 +723,8 @@ function blogOpenEditor(postId) {
   // Reset src first to force a fresh load even if the same postId is opened again
   iframe.src = "about:blank";
   const targetUrl = postId
-    ? `./blogpost.ejs?edit=${postId}`
-    : "./blogpost.ejs";
+    ? `/admin/blogpost?edit=${postId}`
+    : `/admin/blogpost`;
   // Small delay to ensure src reset is processed before setting the new URL
   setTimeout(() => {
     iframe.src = targetUrl;

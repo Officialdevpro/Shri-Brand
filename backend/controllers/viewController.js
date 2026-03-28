@@ -46,7 +46,8 @@ exports.renderHomePage = catchAsync(async (req, res, next) => {
     // 1. Fetch ALL active products
     const products = await Product.find({ isActive: true })
         .sort("createdAt")
-        .select("name slug mainImage shortDescription packs productType _id");
+        .select("name slug mainImage shortDescription packs productType _id")
+        .lean();
 
     // 2. Group products by productType
     const grouped = {};
@@ -57,7 +58,7 @@ exports.renderHomePage = catchAsync(async (req, res, next) => {
     });
 
     // 3. Fetch categories for display labels & ordering (optional)
-    const categories = await Category.find({ isActive: true }).sort("order name");
+    const categories = await Category.find({ isActive: true }).sort("order name").lean();
     const catMap = {};
     categories.forEach((c) => {
         catMap[c.name.toLowerCase()] = { label: c.label, order: c.order };
@@ -149,3 +150,8 @@ exports.renderCheckoutPage = catchAsync(async (req, res, next) => {
 exports.renderBlogPage = (req, res) => {
     res.status(200).render("blogView", { blogId: req.params.id });
 };
+
+// Render Admin Blog Editor
+exports.renderAdminBlogEditor = catchAsync(async (req, res, next) => {
+    res.status(200).render("admin/blogpost");
+});
