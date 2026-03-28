@@ -10,7 +10,7 @@
   //  CONFIG
   // ════════════════════════════════════════════
   const MSG_CONFIG = {
-    BASE_URL: "http://localhost:5000",
+    BASE_URL: "https://shri-brand.onrender.com",
     API_BASE: "/api/v1",
     PER_PAGE: 20,
   };

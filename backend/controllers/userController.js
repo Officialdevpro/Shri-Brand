@@ -259,6 +259,48 @@ exports.updateUser = catchAsync(async (req, res, next) => {
   });
 });
 
+// ==================== ADMIN: CREATE USER (bypass OTP) ====================
+
+exports.createUser = catchAsync(async (req, res, next) => {
+  const { name, email, password, phone, role } = req.body;
+
+  // 1) Validate required fields
+  if (!name || !email || !password) {
+    return next(new AppError("Name, email, and password are required", 400));
+  }
+
+  if (password.length < 8) {
+    return next(new AppError("Password must be at least 8 characters", 400));
+  }
+
+  // 2) Check if user already exists
+  const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
+  if (existingUser) {
+    return next(new AppError("A user with this email already exists", 400));
+  }
+
+  // 3) Create user directly (admin-created users are auto-verified)
+  const newUser = await User.create({
+    name,
+    email: email.toLowerCase().trim(),
+    password,
+    phone: phone || undefined,
+    role: role || "user",
+    isVerified: true
+  });
+
+  // Remove password from output
+  newUser.password = undefined;
+
+  res.status(201).json({
+    status: "success",
+    message: "User created successfully",
+    data: {
+      user: newUser
+    }
+  });
+});
+
 // ==================== ADMIN: DELETE USER ====================
 
 exports.deleteUser = catchAsync(async (req, res, next) => {

@@ -213,15 +213,15 @@ async function saveUser() {
             if (!res.ok) throw new Error(data.message || "Failed to update user");
             uToast("User updated successfully", "success");
         } else {
-            // ── CREATE new user via signup API ──
+            // ── CREATE new user via admin API ──
             const body = {
                 name: fullName,
                 email,
                 password: document.getElementById("f_pass").value,
-                confirmPassword: document.getElementById("f_pass").value,
-                phone: phone || undefined
+                phone: phone || undefined,
+                role: document.getElementById("f_role").value
             };
-            const res = await fetch("/api/v1/auth/signup", {
+            const res = await fetch("/api/v1/users", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",

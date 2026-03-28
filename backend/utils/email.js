@@ -383,16 +383,17 @@ const baseTemplate = (headerContent, bodyContent, footerNote = "") => `
 
 // ── Transporter ───────────────────────────────────────────────────────────────
 const createTransporter = () => {
+  const port = parseInt(process.env.SMTP_PORT, 10) || 465;
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || "smtp.gmail.com",
-    port: parseInt(process.env.SMTP_PORT, 10) || 465,
-    secure: true,
+    port: port,
+    secure: port === 465, // true for 465, false for other ports like 587
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
     tls: {
-      rejectUnauthorized: false, // 👈 Add this
+      rejectUnauthorized: false,
     },
   });
 };
